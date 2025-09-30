@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  </head>
+  <body>
+    <div class="dashboard">
+      <div class="sidebar">
+        <h2>Student Panel</h2>
+        <ul>
+          <li><a href="#" onclick="loadPapers()">Available Papers</a></li>
+          <li><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+      </div>
+      <div class="main-content">
+        <h1>Available Question Papers</h1>
+        <div id="message"></div>
+        <div class="card">
+          <div id="papersList">
+            <div class="loading">Loading papers...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script>
+      if (!Auth.requireAuth("student")) return;
+
+      async function loadPapers() {
+        const papersList = document.getElementById("papersList");
+
+        try {
+          papersList.innerHTML = '<div class="loading">Loading papers...</div>';
+          const response = await StudentAPI.getPapers();
+          displayPapers(response.data);
+        } catch (error) {
+          papersList.innerHTML = `<div class="error">Failed to load papers: ${error.message}</div>`;
+        }
+      }
+
+      function displayPapers(papers) {
+        if (!papers || papers.length === 0) {
+          document.getElementById("papersList").innerHTML =
+            '<div class="loading">No papers available</div>';
+          return;
+        }
+
+        const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Upload Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${papers
+                          .map(
+                            (paper) => `
+                            <tr>
+                                <td>${paper.title}</td>
+                                <td>${paper.subject}</td>
+                                <td>${new Date(
+                                  paper.uploadDate
+                                ).toLocaleDateString()}</td>
+                                <td>${paper.status}</td>
+                                <td>
+                                    <button onclick="downloadPaper(${
+                                      paper.id
+                                    })">Download</button>
+                                </td>
+                            </tr>
+                        `
+                          )
+                          .join("")}
+                    </tbody>
+                </table>
+            `;
+        document.getElementById("papersList").innerHTML = html;
+      }
+
+      async function downloadPaper(paperId) {
+        try {
+          const response = await StudentAPI.downloadPaper(paperId);
+          // Handle file download
+          window.open(response.data.downloadUrl, "_blank");
+        } catch (error) {
+          showMessage(`Failed to download paper: ${error.message}`, "error");
+        }
+      }
+
+      function showMessage(text, type) {
+        const messageDiv = document.getElementById("message");
+        messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+      }
+
+      function logout() {
+        Auth.logout();
+      }
+
+      loadPapers();
+    </script>
+  </body>
+</html>

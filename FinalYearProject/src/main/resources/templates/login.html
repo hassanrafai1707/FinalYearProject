@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Question Paper System</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  </head>
+  <body>
+    <div class="login-container">
+      <h1 class="login-title">Question Paper System</h1>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role:</label>
+          <select id="role" name="role" required>
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+            <option value="supervisor">Supervisor</option>
+          </select>
+        </div>
+
+        <button type="submit" id="loginBtn">Login</button>
+      </form>
+      <div id="message"></div>
+    </div>
+
+    <script th:src="@{/js/auth.js}"></script>
+    <script th:src="@{/js/api.js}"></script>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const loginBtn = document.getElementById("loginBtn");
+          const messageDiv = document.getElementById("message");
+
+          loginBtn.disabled = true;
+          loginBtn.textContent = "Logging in...";
+          messageDiv.innerHTML = "";
+
+          const formData = new FormData(e.target);
+          const loginData = {
+            email: formData.get("email"),
+            password: formData.get("password"),
+            role: formData.get("role"),
+          };
+
+          try {
+            const response = await AuthAPI.login(
+              loginData.email,
+              loginData.password,
+              loginData.role
+            );
+
+            Auth.setUser(response.data);
+
+            // Redirect based on role
+            switch (loginData.role) {
+              case "admin":
+                window.location.href = "/admin-dashboard";
+                break;
+              case "teacher":
+                window.location.href = "/teacher-dashboard";
+                break;
+              case "student":
+                window.location.href = "/student-dashboard";
+                break;
+              case "supervisor":
+                window.location.href = "/supervisor-dashboard";
+                break;
+            }
+          } catch (error) {
+            messageDiv.innerHTML = `<div class="error">${error.message}</div>`;
+          } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = "Login";
+          }
+        });
+
+      // Redirect if already logged in
+      if (Auth.isAuthenticated()) {
+        const role = Auth.getRole();
+        switch (role) {
+          case "admin":
+            window.location.href = "/admin-dashboard";
+            break;
+          case "teacher":
+            window.location.href = "/teacher-dashboard";
+            break;
+          case "student":
+            window.location.href = "/student-dashboard";
+            break;
+          case "supervisor":
+            window.location.href = "/supervisor-dashboard";
+            break;
+        }
+      }
+    </script>
+  </body>
+</html>
