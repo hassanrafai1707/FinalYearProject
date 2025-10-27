@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @Entity
-@Table(name = "User")
+@Table(name = "Users")
 public class User {
     @Id
     @SequenceGenerator(
@@ -28,6 +28,24 @@ public class User {
     public String role;
     public boolean is_enable;
     public String password;
+    public boolean locked;
+    public boolean expired;
+
+    public boolean isExpired() {
+        return expired;
+    }
+
+    public void setExpired(boolean expired) {
+        this.expired = expired;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 
     public String getPassword() {
         return password;

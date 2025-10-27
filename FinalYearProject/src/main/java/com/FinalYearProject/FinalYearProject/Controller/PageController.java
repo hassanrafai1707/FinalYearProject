@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @NoArgsConstructor
 public class PageController {
     @Autowired
-    public User user;
+    public UserRepository userRepository;
 
     @GetMapping("/")
     public String home(){

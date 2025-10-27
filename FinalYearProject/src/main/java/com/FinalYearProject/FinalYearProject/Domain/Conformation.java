@@ -41,6 +41,10 @@ public class Conformation {
         this.token= UUID.randomUUID().toString();
     }
 
+    public Long getId() {
+        return Id;
+    }
+
     public User getUser() {
         return user;
     }
