@@ -1,6 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.Domain.User;
+
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -35,7 +35,7 @@ public class PageController {
     public String supervisor(){
     return "supervisor-dashboard";
     }
-    @GetMapping("teacher-dashboard")
+    @GetMapping("/teacher-dashboard")
     public String teacher(){
         return "teacher-dashboard";
     }

@@ -33,12 +33,19 @@ public class SecurityConfig {
                 .csrf(customizer -> customizer.disable())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
                 .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/login")
-                                .permitAll()
+                        auth ->
+                                auth
+                                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                                        .requestMatchers("/", "/login", "/register").permitAll()
                                 .anyRequest()
                                 .authenticated()
+                )
+                .formLogin(form ->
+                        form
+                                .loginPage("/login")
+                                .permitAll()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
