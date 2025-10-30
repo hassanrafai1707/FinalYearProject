@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+    @Value("${jwt.secret}")
     private String secretKey;
     public JwtService(){
     try {
@@ -41,7 +43,7 @@ public class JwtService {
                 .add(claims)
                 .subject(name)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() +60*60*30))
+                .expiration(new Date(System.currentTimeMillis() +1000*60*60*5))
                 .and()
                     .signWith(getKey())
                 .compact();

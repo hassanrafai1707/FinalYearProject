@@ -1,7 +1,8 @@
 // Since you're using Spring Boot with Thymeleaf templates, use relative paths
-const API_BASE = "/api";
+const API_BASE = "/api/v1";
 
 class API {
+  // Generic request handler
   static async request(endpoint, options = {}) {
     const url = `${API_BASE}${endpoint}`;
 
@@ -31,22 +32,17 @@ class API {
     }
   }
 
+  // ✅ REST helper methods
   static async get(endpoint) {
     return this.request(endpoint, { method: "GET" });
   }
 
   static async post(endpoint, data) {
-    return this.request(endpoint, {
-      method: "POST",
-      body: data,
-    });
+    return this.request(endpoint, { method: "POST", body: data });
   }
 
   static async put(endpoint, data) {
-    return this.request(endpoint, {
-      method: "PUT",
-      body: data,
-    });
+    return this.request(endpoint, { method: "PUT", body: data });
   }
 
   static async delete(endpoint) {
@@ -54,18 +50,22 @@ class API {
   }
 }
 
-// Auth endpoints
+// ✅ Auth endpoints
 class AuthAPI {
-  static login(email, password, role) {
+  static async login(email, password, role) {
     return API.post("/auth/login", { email, password, role });
   }
 
-  static logout() {
+  static async logout() {
     return API.post("/auth/logout");
+  }
+
+  static async register(name, email, password, role) {
+    return API.post("/register", { name, email, password, role });
   }
 }
 
-// Admin endpoints
+// ✅ Admin endpoints
 class AdminAPI {
   static getUsers() {
     return API.get("/admin/users");
@@ -84,7 +84,7 @@ class AdminAPI {
   }
 }
 
-// Teacher endpoints
+// ✅ Teacher endpoints
 class TeacherAPI {
   static getQuestions() {
     return API.get("/teacher/questions");
@@ -111,7 +111,7 @@ class TeacherAPI {
   }
 }
 
-// Student endpoints
+// ✅ Student endpoints
 class StudentAPI {
   static getPapers() {
     return API.get("/student/papers");
@@ -122,7 +122,7 @@ class StudentAPI {
   }
 }
 
-// Supervisor endpoints
+// ✅ Supervisor endpoints
 class SupervisorAPI {
   static getPendingPapers() {
     return API.get("/supervisor/papers/pending");
