@@ -31,7 +31,7 @@ public class UserService {
             throw new RuntimeException("Email already taken");
         }
 
-        user.setIs_enable(false);
+        user.setIs_enable(true);
         user.setPassword(encoder.encode(user.getPassword()));
         user.setExpired(false);
         user.setLocked(false);
@@ -123,7 +123,7 @@ public class UserService {
     // ✅ VERIFY LOGIN
     public String verify(User user) {
         Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getName(), user.getPassword())
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
         );
         if (authentication.isAuthenticated()){
             return jwtService.jwtToken(user.getEmail());

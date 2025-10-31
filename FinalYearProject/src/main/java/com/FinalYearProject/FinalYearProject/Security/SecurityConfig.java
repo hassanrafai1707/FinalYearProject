@@ -31,26 +31,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .httpBasic(Customizer.withDefaults())
                 .csrf( csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth ->
                                 auth
-                                        .requestMatchers( "/css/**",
+                                        .requestMatchers(
+                                                "/api/v1/login",
+                                                "/api/v1/register",
+                                                "/login",
+                                                "/register",
+                                                "/css/**",
                                                 "/js/**",
                                                 "/images/**",
                                                 "/webjars/**",
-                                                "/",
-                                                "/login",
-                                                "/register",
-                                                "/api/v1/**"
+                                                "/"
                                         )
                                         .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

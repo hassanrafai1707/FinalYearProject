@@ -25,6 +25,7 @@ public class User {
     public Long Id;
     public String name;
     public String email;
+    @Column(nullable = false)
     public String role;
     public boolean is_enable;
     public String password;

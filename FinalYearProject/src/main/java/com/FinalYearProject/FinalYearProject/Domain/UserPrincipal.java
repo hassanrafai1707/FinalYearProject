@@ -9,10 +9,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@AllArgsConstructor
 public class UserPrincipal implements UserDetails {
-    @Autowired
-    private User user;
+
+
+    private final User user;
+
+    public UserPrincipal(User user){
+        this.user=user;
+    }
     @Override
     public boolean isEnabled() {
         return user.isIs_enable();
@@ -20,22 +24,31 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return !user.isExpired();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.isLocked();
+        return !user.isLocked();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole()));
+        String role = user.getRole();
+        System.out.println("DEBUG: User role from DB -> " + role);
+        if (role == null || role.isBlank()) {
+            throw new IllegalArgumentException("User role cannot be null or empty");
+        }
+        if (!role.startsWith("ROLE_")) {
+            role = "ROLE_" + role.toUpperCase();
+        }
+        System.out.println("DEBUG: Final GrantedAuthority -> " + role);
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return user.isExpired();
+        return !user.isExpired();
     }
 
     @Override
@@ -45,6 +58,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getName();
+        return user.getEmail();
     }
 }
