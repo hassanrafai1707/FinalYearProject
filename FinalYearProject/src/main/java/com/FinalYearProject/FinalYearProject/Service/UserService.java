@@ -25,13 +25,13 @@ public class UserService {
     private final JwtService jwtService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    // ✅ CREATE
+    //  CREATE user
     public User saveUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already taken");
         }
 
-        user.setIs_enable(true);
+        user.setIs_enable(false);
         user.setPassword(encoder.encode(user.getPassword()));
         user.setExpired(false);
         user.setLocked(false);
@@ -45,29 +45,29 @@ public class UserService {
         return user;
     }
 
-    // ✅ READ (all users)
+    //  READ (all users)
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    // ✅ READ (by ID)
+    //  READ (by ID)
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
-    // ✅ READ (by email)
+    //  READ (by email)
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    // ✅ READ (by username)
+    //  READ (by username)
     public User findByUsername(String name) {
         return userRepository.findByName(name)
                 .orElseThrow(() -> new RuntimeException("User not found: " + name));
     }
 
-    // ✅ UPDATE
+    //  UPDATE
     public User updateUser(Long id, User updatedUser) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -86,7 +86,7 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-    // ✅ DELETE (by user)
+    //  DELETE (by user)
     public void deleteUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             userRepository.deleteById(user.getId());
@@ -96,7 +96,7 @@ public class UserService {
         }
     }
 
-    // ✅ DELETE (by ID)
+    //  DELETE (by ID)
     public void deleteUserById(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
@@ -105,13 +105,13 @@ public class UserService {
         }
     }
 
-    // ✅ DELETE ALL
+    //  DELETE ALL
     public void deleteAllUsers() {
         userRepository.deleteAll();
         conformationRepository.deleteAll();
     }
 
-    // ✅ Suspend User
+    //  Suspend User
     public void suspendUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -120,8 +120,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // ✅ VERIFY LOGIN
-    public String verify(User user) {
+    //  VERIFY LOGIN
+    public String verifyLogin(User user) {
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
         );

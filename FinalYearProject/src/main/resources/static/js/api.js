@@ -1,19 +1,25 @@
-// Since you're using Spring Boot with Thymeleaf templates, use relative paths
-const API_BASE = "/api/v1";
+// 🌐 Base API URLs
+const AUTH_API = "/api/v1/auth";   // For login/register
+const API_BASE = "/api/v1";        // For all other endpoints
 
+// 🧠 Generic API handler
 class API {
-  // Generic request handler
-  static async request(endpoint, options = {}) {
-    const url = `${API_BASE}${endpoint}`;
+  static async request(base, endpoint, options = {}) {
+    const url = `${base}${endpoint}`;
+
+    // ✅ Attach token automatically if present
+    const token = localStorage.getItem("token");
 
     const config = {
       headers: {
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
       },
       ...options,
     };
 
+    // ✅ Convert body to JSON if present
     if (options.body) {
       config.body = JSON.stringify(options.body);
     }
@@ -21,51 +27,81 @@ class API {
     try {
       const response = await fetch(url, config);
 
+      // ❌ Throw if request failed
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
-      return await response.json();
+      // ✅ Try to parse JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        return await response.json();
+      } else {
+        return await response.text();
+      }
     } catch (error) {
       console.error("API Error:", error);
       throw error;
     }
   }
 
-  // ✅ REST helper methods
-  static async get(endpoint) {
-    return this.request(endpoint, { method: "GET" });
+  // ✅ HTTP method helpers for main API
+  static get(endpoint) {
+    return this.request(API_BASE, endpoint, { method: "GET" });
   }
 
-  static async post(endpoint, data) {
-    return this.request(endpoint, { method: "POST", body: data });
+  static post(endpoint, data) {
+    return this.request(API_BASE, endpoint, { method: "POST", body: data });
   }
 
-  static async put(endpoint, data) {
-    return this.request(endpoint, { method: "PUT", body: data });
+  static put(endpoint, data) {
+    return this.request(API_BASE, endpoint, { method: "PUT", body: data });
   }
 
-  static async delete(endpoint) {
-    return this.request(endpoint, { method: "DELETE" });
+  static delete(endpoint) {
+    return this.request(API_BASE, endpoint, { method: "DELETE" });
   }
 }
 
-// ✅ Auth endpoints
+// 🔐 Authentication API (separate base)
 class AuthAPI {
+  // ✅ /api/v1/auth/login
   static async login(email, password, role) {
-    return API.post("/auth/login", { email, password, role });
+    const result = await API.request(AUTH_API, "/login", {
+      method: "POST",
+      body: { email, password, role },
+    });
+    if (result?.token) {
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("role", result.role);
+    }
+    return result;
   }
 
-  static async logout() {
-    return API.post("/auth/logout");
-  }
-
+  // ✅ /api/v1/auth/register
   static async register(name, email, password, role) {
-    return API.post("/register", { name, email, password, role });
+    return API.request(AUTH_API, "/register", {
+      method: "POST",
+      body: { name, email, password, role },
+    });
+  }
+
+  static logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+  }
+
+  static getToken() {
+    return localStorage.getItem("token");
+  }
+
+  static getRole() {
+    return localStorage.getItem("role");
   }
 }
 
-// ✅ Admin endpoints
+// 🧑‍💼 Admin endpoints (→ /api/v1/admin/**)
 class AdminAPI {
   static getUsers() {
     return API.get("/admin/users");
@@ -84,7 +120,7 @@ class AdminAPI {
   }
 }
 
-// ✅ Teacher endpoints
+// 👩‍🏫 Teacher endpoints (→ /api/v1/teacher/**)
 class TeacherAPI {
   static getQuestions() {
     return API.get("/teacher/questions");
@@ -111,7 +147,7 @@ class TeacherAPI {
   }
 }
 
-// ✅ Student endpoints
+// 🎓 Student endpoints (→ /api/v1/student/**)
 class StudentAPI {
   static getPapers() {
     return API.get("/student/papers");
@@ -122,7 +158,7 @@ class StudentAPI {
   }
 }
 
-// ✅ Supervisor endpoints
+// 🧑‍💼 Supervisor endpoints (→ /api/v1/supervisor/**)
 class SupervisorAPI {
   static getPendingPapers() {
     return API.get("/supervisor/papers/pending");

@@ -1,4 +1,4 @@
-package com.FinalYearProject.FinalYearProject.Security.Filter;
+package com.FinalYearProject.FinalYearProject.Config.Security.Filter;
 
 import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.MyUserDetailsServices;
@@ -17,42 +17,59 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
 
+
+//this class is used to configure the Jwt json web token used for authorization
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
     @Autowired
     private ApplicationContext applicationContext;
-    private static final Set<String> excludedPaths= Set.of(
-            "/api/v1/register",
-            "/api/v1/login",
-            "/login",
-            "/register",
-            "/",
-            "/css/",
-            "/js/",
-            "/images/",
-            "/webjars/"
-    );
+//    private static final Set<String> excludedPaths= Set.of(
+//            "/api/v1/register",
+//            "/api/v1/login",
+//            "/auth/login",
+//            "/auth/register",
+//            "/login",
+//            "/register",
+//            "/",
+//            "/css/",
+//            "/js/",
+//            "/images/",
+//            "/webjars/"
+//    );
     String token = null;
     String username=null;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader =request.getHeader("Authorization");
+        String authHeader =request.getHeader("Authorization");//contain auth heder
         String path = request.getServletPath();
-        for(String excludedPath : excludedPaths){
-            if (path.startsWith(excludedPath) || path.startsWith(excludedPath+"/"))  {
-                filterChain.doFilter(request, response);
-                System.out.println("path "+path);
-                System.out.println("🔍 JwtFilter triggered for path: " + request.getServletPath());
-                return;
-            }
+        System.out.println("\n\nincoming path= "+path);//incoming path for debuging
+        if (//All allowed paths without auth
+                path.startsWith("/api/v1/login") ||
+                        path.startsWith("/api/v1/register") ||
+                        path.startsWith("/auth/login") ||
+                        path.startsWith("/api/v1/auth/login")||
+                        path.startsWith("/api/v1/auth/register")||
+                        path.startsWith("/auth/register") ||
+                        path.startsWith("/login") ||
+                        path.startsWith("/register") ||
+                        path.startsWith("/css") ||
+                        path.startsWith("/js") ||
+                        path.startsWith("/images") ||
+                        path.startsWith("/webjars") ||
+                        path.equals("/") ||
+                        path.equals("/favicon.ico")
+        ) {
+
+            System.out.println("path "+path);//for debuging check path
+            System.out.println("🔓 Skipped JwtFilter for path: " + path);//for debuging
+            filterChain.doFilter(request, response);
+            return;
         }
         if(authHeader!=null && authHeader.startsWith("Bearer ")){
-            token=authHeader.substring(7);
+            token=authHeader.substring(7); //separate the heder type form heder
             username= jwtService.extractUserEmail(token);
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
@@ -68,7 +85,7 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request,response);
     }
     @PostConstruct
-    public void init(){
+    public void init(){ // no use just for debuging
         System.out.println("✅ JwtFilter initialized and added to SecurityFilterChain");
     }
 }

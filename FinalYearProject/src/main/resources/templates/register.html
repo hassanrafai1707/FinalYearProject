@@ -41,10 +41,10 @@
             <label for="role">Role:</label>
             <select id="role" name="role" required>
                 <option value="">Select Role</option>
-                <option value="admin">Admin</option>
-                <option value="teacher">Teacher</option>
-                <option value="student">Student</option>
-                <option value="supervisor">Supervisor</option>
+                <option value="ROLE_ADMIN">Admin</option>
+                <option value="ROLE_TEACHER'">Teacher</option>
+                <option value="ROLE_STUDENT">Student</option>
+                <option value="ROLE_SUPERVISOR">Supervisor</option>
             </select>
         </div>
 
@@ -58,8 +58,8 @@
     <div id="message"></div>
 </div>
 
-<script th:src="@{/js/auth.js}"></script>
 <script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/auth.js}"></script>
 <script>
     document
       .getElementById("registerForm")
@@ -106,7 +106,7 @@
 
           // Optional: redirect to login after 3s
           setTimeout(() => {
-            window.location.href = "/login";
+            window.location.href = "api/v1/login";
           }, 3000);
         } catch (error) {
           messageDiv.innerHTML = `<div class="error">${error.message}</div>`;

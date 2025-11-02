@@ -1,0 +1,21 @@
+| Category       | Method   | Endpoint                                      | Description                      |
+| -------------- | -------- | --------------------------------------------- | -------------------------------- |
+| **Auth**       | `POST`   | `/api/v1/auth/login`                          | Login with email, password, role |
+|                | `POST`   | `/api/v1/auth/logout`                         | Logout and clear token           |
+|                | `POST`   | `/api/v1/register`                            | Register new user                |
+| **Admin**      | `GET`    | `/api/v1/admin/users`                         | Get all users                    |
+|                | `POST`   | `/api/v1/admin/users`                         | Create new user                  |
+|                | `PUT`    | `/api/v1/admin/users/{userId}`                | Update existing user             |
+|                | `DELETE` | `/api/v1/admin/users/{userId}`                | Delete user                      |
+| **Teacher**    | `GET`    | `/api/v1/teacher/questions`                   | Get all questions                |
+|                | `POST`   | `/api/v1/teacher/questions`                   | Create question                  |
+|                | `PUT`    | `/api/v1/teacher/questions/{questionId}`      | Update question                  |
+|                | `DELETE` | `/api/v1/teacher/questions/{questionId}`      | Delete question                  |
+|                | `GET`    | `/api/v1/teacher/papers`                      | Get all papers                   |
+|                | `POST`   | `/api/v1/teacher/papers`                      | Upload paper                     |
+| **Student**    | `GET`    | `/api/v1/student/papers`                      | Get available papers             |
+|                | `GET`    | `/api/v1/student/papers/{paperId}/download`   | Download paper                   |
+| **Supervisor** | `GET`    | `/api/v1/supervisor/papers/pending`           | Get pending papers               |
+|                | `GET`    | `/api/v1/supervisor/papers/approved`          | Get approved papers              |
+|                | `PUT`    | `/api/v1/supervisor/papers/{paperId}/approve` | Approve paper                    |
+|                | `PUT`    | `/api/v1/supervisor/papers/{paperId}/reject`  | Reject paper with feedback       |

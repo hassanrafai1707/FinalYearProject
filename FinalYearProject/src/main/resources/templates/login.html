@@ -39,9 +39,7 @@
     <script th:src="@{/js/auth.js}"></script>
     <script th:src="@{/js/api.js}"></script>
     <script>
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", async (e) => {
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
           e.preventDefault();
 
           const loginBtn = document.getElementById("loginBtn");
@@ -59,16 +57,18 @@
           };
 
           try {
+            // 🔹 Call Java backend
             const response = await AuthAPI.login(
               loginData.email,
               loginData.password,
               loginData.role
             );
 
-            Auth.setUser(response.data);
+            // 🔹 Save token and role
+            Auth.setToken(response.token, response.role);
 
-            // Redirect based on role
-            switch (loginData.role) {
+            // 🔹 Redirect handled based on role
+            switch (response.role.toLowerCase()) {
               case "admin":
                 window.location.href = "/admin-dashboard";
                 break;
@@ -81,33 +81,36 @@
               case "supervisor":
                 window.location.href = "/supervisor-dashboard";
                 break;
+              default:
+                window.location.href = "/";
             }
           } catch (error) {
-            messageDiv.innerHTML = `<div class="error">${error.message}</div>`;
+            messageDiv.innerHTML = `<div class="error">Invalid email or password</div>`;
           } finally {
             loginBtn.disabled = false;
             loginBtn.textContent = "Login";
           }
         });
 
-      // Redirect if already logged in
-      if (Auth.isAuthenticated()) {
-        const role = Auth.getRole();
-        switch (role) {
-          case "admin":
-            window.location.href = "/admin-dashboard";
-            break;
-          case "teacher":
-            window.location.href = "/teacher-dashboard";
-            break;
-          case "student":
-            window.location.href = "/student-dashboard";
-            break;
-          case "supervisor":
-            window.location.href = "/supervisor-dashboard";
-            break;
+        // Auto redirect if logged in
+        if (Auth.isAuthenticated()) {
+          const role = Auth.getRole();
+          switch (role?.toLowerCase()) {
+            case "admin":
+              window.location.href = "/admin-dashboard";
+              break;
+            case "teacher":
+              window.location.href = "/teacher-dashboard";
+              break;
+            case "student":
+              window.location.href = "/student-dashboard";
+              break;
+            case "supervisor":
+              window.location.href = "/supervisor-dashboard";
+              break;
+          }
         }
-      }
     </script>
+
   </body>
 </html>

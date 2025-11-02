@@ -7,6 +7,12 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
   </head>
   <body>
+  <script th:src="@{/js/auth.js}"></script>
+  <script>
+      if (!Auth.isAuthenticated()) {
+        window.location.href = "/login";
+      }
+  </script>
     <div class="dashboard">
       <div class="sidebar">
         <h2>Teacher Panel</h2>

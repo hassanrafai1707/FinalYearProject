@@ -16,8 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+//this class is implementation the jwt filter meaning
 @Service
-public class JwtService {
+public class JwtService  {
     private String secretKey;
     public JwtService(){
     try {
