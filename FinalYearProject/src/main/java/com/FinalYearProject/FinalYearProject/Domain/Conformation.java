@@ -6,9 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -28,17 +27,15 @@ public class Conformation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator="ConformationSequence")
     public Long Id;
     public String token;
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreatedDate
-    public LocalDateTime createDate;
+    public int Otp;
     @OneToOne(targetEntity = User.class,fetch = FetchType.EAGER)
     @JoinColumn(nullable = false,name = "User_Id")
     private User user;
 
     public Conformation(User user) {
         this.user = user;
-        this.createDate=LocalDateTime.now();
         this.token= UUID.randomUUID().toString();
+        generateOtp();
     }
 
     public Long getId() {
@@ -51,5 +48,15 @@ public class Conformation {
 
     public String getToken() {
         return token;
+    }
+
+    public void generateOtp(){
+        Random random=new Random();
+        int Otp=random.nextInt(1000,9999);
+        this.Otp=Otp;
+    }
+
+    public int getOtp(){
+        return Otp;
     }
 }

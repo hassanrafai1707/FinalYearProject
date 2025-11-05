@@ -46,7 +46,12 @@ public class UserService {
 
         Conformation conformation = new Conformation(user);
         conformationRepository.save(conformation);
-        conformationService.sendEmail(user.getEmail(), user.getName(), conformation.getToken());
+        conformationService.sendEmail(
+                user.getEmail(),
+                user.getName(),
+                conformation.getToken(),
+                conformation.getOtp()
+        );
         System.out.println("user saved success");
         return user;
     }
@@ -142,10 +147,10 @@ public class UserService {
         }
     }
     // VERIFY Token
-    public Boolean verifyToken(String token){
+    public Boolean verifyTokenAndOTP(String token,int Otp){
         try{
             Optional<Conformation> conformation = conformationRepository.findByToken(token);
-            if (conformation.isPresent()){
+            if (conformation.isPresent() && Otp==conformation.get().getOtp()){
                 User user= conformation.get().getUser();
                 user.setIs_enable(true);
                 userRepository.save(user);

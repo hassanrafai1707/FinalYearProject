@@ -6,10 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -68,6 +65,31 @@ public class AuthController {
                                     e.getMessage()
                             )
                     );
+        }
+    }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<?> conformation(@RequestParam("token") String token,
+                                          @RequestParam("OTP") int Otp){
+        try{
+            System.out.println("your account not verified yet before calling userService.verifyTokenAndOTP");
+            Boolean ConformToken= userService.verifyTokenAndOTP(token,Otp);
+            return ResponseEntity.ok(
+                    Map.of(
+                            "message",
+                            "User confirm",
+                            "User Confirm token",
+                            ConformToken
+                    )
+            );
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(
+                    Map.of(
+                            "message",  "Invalid token",
+                            "error" ,e.getMessage()
+                    )
+            );
         }
     }
 }

@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import javax.crypto.KeyGenerator;
@@ -27,7 +26,7 @@ public class JwtService  {
         secretKey= Base64.getEncoder().encodeToString(sk.getEncoded());
         System.out.println("========================================");
         System.out.println("🧩 New Secret Key Generated at Startup:");
-        System.out.println(secretKey);
+        System.out.println(secretKey);// every user must reLogin after restart
         System.out.println("========================================");
     }
     catch (NoSuchAlgorithmException e){
