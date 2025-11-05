@@ -45,13 +45,14 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader =request.getHeader("Authorization");//contain auth heder
         String path = request.getServletPath();
-        System.out.println("\n\nincoming path= "+path);//incoming path for debuging
+        System.out.println("\n\nincoming path= "+path);//incoming path for debugging
         if (//All allowed paths without auth
                 path.startsWith("/api/v1/login") ||
                         path.startsWith("/api/v1/register") ||
                         path.startsWith("/auth/login") ||
                         path.startsWith("/api/v1/auth/login")||
                         path.startsWith("/api/v1/auth/register")||
+                        path.startsWith("/api/v1/confirm")||
                         path.startsWith("/auth/register") ||
                         path.startsWith("/login") ||
                         path.startsWith("/register") ||
@@ -64,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
         ) {
 
             System.out.println("path "+path);//for debuging check path
-            System.out.println("🔓 Skipped JwtFilter for path: " + path);//for debuging
+            System.out.println("🔓 Skipped JwtFilter for path: " + path);//for debugging
             filterChain.doFilter(request, response);
             return;
         }
@@ -85,7 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request,response);
     }
     @PostConstruct
-    public void init(){ // no use just for debuging
+    public void init(){ // no use just for debugging
         System.out.println("✅ JwtFilter initialized and added to SecurityFilterChain");
     }
 }

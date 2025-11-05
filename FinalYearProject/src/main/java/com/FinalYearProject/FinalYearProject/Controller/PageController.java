@@ -1,32 +1,41 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 
+import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@RequestMapping("/api/v1")
+import java.util.Map;
+
 @Controller
 // this class is only used to load front end ie get request
 public class PageController {
     @Autowired
     public UserService userService;
 
-
-    @GetMapping("/login")
-    public String login(){
-        return "login";
+    @GetMapping("/api/v1/confirm")
+    public ResponseEntity<?> conformation(@RequestParam("token") String token){
+    try{
+        System.out.println("your account not verified yet before calling userService.verifyToken");
+        Boolean ConformToken= userService.verifyToken(token);
+        return ResponseEntity.ok(
+                Map.of(
+                      "message",
+                      "User confirm",
+                      "User Confirm token",
+                      ConformToken
+                )
+        );
     }
-
-    @GetMapping("/register")
-    public String register(){
-        return "register";
+    catch (Exception e){
+        return ResponseEntity.badRequest().body("invalid token"+e);
     }
-
-
+    }
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     @GetMapping("/student-dashboard")
     public String student(){

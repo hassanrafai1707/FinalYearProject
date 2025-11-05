@@ -106,7 +106,7 @@
 
           // Optional: redirect to login after 3s
           setTimeout(() => {
-            window.location.href = "api/v1/login";
+            window.location.href = "/login";
           }, 3000);
         } catch (error) {
           messageDiv.innerHTML = `<div class="error">${error.message}</div>`;

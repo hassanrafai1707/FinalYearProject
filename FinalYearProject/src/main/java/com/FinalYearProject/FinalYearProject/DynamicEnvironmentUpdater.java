@@ -1,4 +1,4 @@
-package com.FinalYearProject.FinalYearProject.Config.Security;
+package com.FinalYearProject.FinalYearProject;
 
 
 
@@ -42,6 +42,8 @@ public class DynamicEnvironmentUpdater implements SpringApplicationRunListener {
             System.err.println("\nFailed to get public IP:"  + e.getMessage());
         }
         Map<String,Object> props= new HashMap<>();
+        props.put("dynamic.public.ip",PublicIP);
+        props.put("dynamic.local.ip",LocalIP);
         props.put("server.address",LocalIP);
         environment.getPropertySources().addFirst(new MapPropertySource("DynamicIP",props));
     }

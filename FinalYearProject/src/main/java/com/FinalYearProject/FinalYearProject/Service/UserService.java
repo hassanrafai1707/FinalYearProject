@@ -5,6 +5,7 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Repository.ConformationRepository;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,13 +18,18 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class UserService {
-
+    @Autowired
     private final UserRepository userRepository;
+    @Autowired
     private final ConformationRepository conformationRepository;
+    @Autowired
     private final ConformationService conformationService;
+    @Autowired
     private final AuthenticationManager authManager;
+    @Autowired
     private final JwtService jwtService;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    @Autowired
+    private final BCryptPasswordEncoder encoder ;
 
     //  CREATE user
     public User saveUser(User user) {
@@ -41,7 +47,7 @@ public class UserService {
         Conformation conformation = new Conformation(user);
         conformationRepository.save(conformation);
         conformationService.sendEmail(user.getEmail(), user.getName(), conformation.getToken());
-
+        System.out.println("user saved success");
         return user;
     }
 
@@ -122,14 +128,36 @@ public class UserService {
 
     //  VERIFY LOGIN
     public String verifyLogin(User user) {
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
-        );
-        if (authentication.isAuthenticated()){
-            return jwtService.jwtToken(user.getEmail());
+        try {
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+            );
+            authentication.isAuthenticated();
+                System.out.println("User login successful");
+                return jwtService.jwtToken(user.getEmail());
         }
-        else {
-            throw new RuntimeException("Invalid credentials");
+        catch (Exception e){
+            System.err.println("Error in verify Login in UserService "+e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+    // VERIFY Token
+    public Boolean verifyToken(String token){
+        try{
+            Optional<Conformation> conformation = conformationRepository.findByToken(token);
+            if (conformation.isPresent()){
+                User user= conformation.get().getUser();
+                user.setIs_enable(true);
+                userRepository.save(user);
+                return Boolean.TRUE;
+            }
+            else {
+                return Boolean.FALSE;
+            }
+        }
+        catch (Exception e){
+            System.err.println("Error in verify Token in UserServices "+e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }
