@@ -18,7 +18,7 @@ public class PageController {
     @Autowired
     public UserService userService;
 
-    @GetMapping("/api/v1/confirm")
+    @GetMapping("/api/v1/confirm?token=")
     public ResponseEntity<?> conformation(@RequestParam("token") String token){
     try{
         System.out.println("your account not verified yet before calling userService.verifyToken");

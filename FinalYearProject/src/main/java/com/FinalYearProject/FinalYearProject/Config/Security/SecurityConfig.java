@@ -45,7 +45,7 @@ public class SecurityConfig {
                                                 "/auth/login",
                                                 "/auth/register",
                                                 "/api/v1/register",
-                                                "/api/v1/confirm",
+                                                "/api/v1/confirm?token=",
                                                 "/login",
                                                 "/register",
                                                 "/css/**",

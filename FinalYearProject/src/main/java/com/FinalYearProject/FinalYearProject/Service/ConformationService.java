@@ -34,7 +34,7 @@ public class ConformationService {
             System.out.println("✅ Email sent successfully to: " + toEmail);
         }
         catch (Exception e){
-            System.out.println(e);
+            System.err.println(e);
         }
     }
 }
