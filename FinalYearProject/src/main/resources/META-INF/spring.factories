@@ -1,2 +1,2 @@
-org.springframework.boot.SpringApplicationRunListener=\
-com.FinalYearProject.FinalYearProject.DynamicEnvironmentUpdater
+#org.springframework.boot.SpringApplicationRunListener=\
+#com.FinalYearProject.FinalYearProject.DynamicEnvironmentUpdater
