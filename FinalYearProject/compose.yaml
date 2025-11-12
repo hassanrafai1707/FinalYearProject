@@ -36,6 +36,8 @@ services:
     ports:
       - "5432:5432"
     environment:
+      environment:
+      SPRING_PROFILES_ACTIVE: docker
       POSTGRES_DB: finalyearproject
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: yourNewPassword
