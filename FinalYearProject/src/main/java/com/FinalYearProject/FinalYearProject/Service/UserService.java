@@ -29,7 +29,7 @@ public class UserService {
     @Autowired
     private final JwtService jwtService;
     @Autowired
-    private final BCryptPasswordEncoder encoder ;
+    private final BCryptPasswordEncoder encoder;
 
     //  CREATE user
     public User saveUser(User user) {
@@ -108,27 +108,23 @@ public class UserService {
     }
 
     //  DELETE (by ID)
-    public void deleteUserById(Long id) {
+    public String deleteUserById(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
+            return "deleted successfully";
         } else {
             throw new RuntimeException("User not found with id: " + id);
         }
     }
 
-    //  DELETE ALL
-    public void deleteAllUsers() {
-        userRepository.deleteAll();
-        conformationRepository.deleteAll();
-    }
-
     //  Suspend User
-    public void suspendUser(Long id) {
+    public String suspendUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
         user.setLocked(true);
         user.setExpired(true);
         userRepository.save(user);
+        return "User Suspend successfully";
     }
 
     //  VERIFY LOGIN
@@ -138,20 +134,20 @@ public class UserService {
                     new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
             );
             authentication.isAuthenticated();
-                System.out.println("User login successful");
-                return jwtService.jwtToken(user.getEmail(),user.getRole());
-        }
-        catch (Exception e){
-            System.err.println("Error in verify Login in UserService "+e.getMessage());
+            System.out.println("User login successful");
+            return jwtService.jwtToken(user.getEmail(), user.getRole());
+        } catch (Exception e) {
+            System.err.println("Error in verify Login in UserService " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
+
     // VERIFY Token
-    public Boolean verifyTokenAndOTP(String token,int Otp){
-        try{
+    public Boolean verifyTokenAndOTP(String token, int otp) {
+        try {
             Optional<Conformation> conformation = conformationRepository.findByToken(token);
-            if (conformation.isPresent() && Otp==conformation.get().getOtp()){
-                User user= conformation.get().getUser();
+            if (conformation.isPresent() && otp == conformation.get().getOtp()) {
+                User user = conformation.get().getUser();
                 user.setIs_enable(true);
                 userRepository.save(user);
                 return Boolean.TRUE;
@@ -164,5 +160,8 @@ public class UserService {
             System.err.println("Error in verify Token in UserServices "+e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+    public List<User> listOfUserByRole(String role){
+        return userRepository.findByRole(role);
     }
 }

@@ -3,6 +3,7 @@ package com.FinalYearProject.FinalYearProject.Config.Security;
 import com.FinalYearProject.FinalYearProject.Config.Security.Filter.JwtFilter;
 import com.FinalYearProject.FinalYearProject.Service.MyUserDetailsServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Value("${app.version}")
+    private String appVersion;
     @Autowired
     private JwtFilter jwtFilter;
     @Autowired
@@ -38,14 +41,18 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
+                                        .requestMatchers("appVersion/admin/**").hasAnyAuthority("ROLE_ADMIN")
+                                        .requestMatchers("appVersion/student/**").hasAnyAuthority("ROLE_STUDENT")
+                                        .requestMatchers("appVersion/teacher**").hasAnyAuthority("ROLE_TEACHER")
+                                        .requestMatchers("appVersion/supervisor").hasAnyAuthority("ROLE_SUPERVISOR")
                                         .requestMatchers(
                                                 // All of the below paths are permitted with put being authorised
-                                                "/api/v1/login",
-                                                "/api/v1/auth/**",
+                                                appVersion+"/login",
+                                                appVersion+"/auth/**",
                                                 "/auth/login",
                                                 "/auth/register",
-                                                "/api/v1/register",
-                                                "/api/v1/auth/confirm",
+                                                appVersion+"/register",
+                                                appVersion+"/auth/confirm",
                                                 "/login",
                                                 "/register",
                                                 "/css/**",
