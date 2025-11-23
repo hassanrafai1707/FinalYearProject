@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import javax.crypto.KeyGenerator;
@@ -37,8 +38,9 @@ public class JwtService  {
         byte [] KeyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(KeyBytes);
     }
-    public String jwtToken(String email){
+    public String jwtToken(String email ,String role){
         Map<String ,Object> claims = new HashMap<>();
+        claims.put("role",role);
         return Jwts.builder()
                 .claims()
                 .add(claims)
@@ -68,14 +70,27 @@ public class JwtService  {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUserEmail(token);
-        return (username.equals(userDetails.getUsername())&& !isTokenExpired(token));
+        return (
+                username.equals(
+                        userDetails.getUsername()
+                )
+                        && !isTokenExpired(token)
+                        && userDetails.getAuthorities()
+                        .contains(
+                                new SimpleGrantedAuthority(extractUserRole(token)
+                                )
+                        )
+        );
     }
     private boolean isTokenExpired(String token){
         return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
-        return extractClaim(token,Claims::getExpiration);
+        return extractClaim(token, Claims::getExpiration);
+    }
+    private String extractUserRole(String token){
+        return extractClaim(token,claims -> claims.get("role", String.class));
     }
 
 }

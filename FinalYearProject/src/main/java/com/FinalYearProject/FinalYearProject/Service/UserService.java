@@ -139,7 +139,7 @@ public class UserService {
             );
             authentication.isAuthenticated();
                 System.out.println("User login successful");
-                return jwtService.jwtToken(user.getEmail());
+                return jwtService.jwtToken(user.getEmail(),user.getRole());
         }
         catch (Exception e){
             System.err.println("Error in verify Login in UserService "+e.getMessage());
