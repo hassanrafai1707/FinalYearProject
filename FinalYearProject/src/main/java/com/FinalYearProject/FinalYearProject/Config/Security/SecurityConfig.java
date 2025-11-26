@@ -41,10 +41,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
-                                        .requestMatchers("appVersion/admin/**").hasAnyAuthority("ROLE_ADMIN")
-                                        .requestMatchers("appVersion/student/**").hasAnyAuthority("ROLE_STUDENT")
-                                        .requestMatchers("appVersion/teacher**").hasAnyAuthority("ROLE_TEACHER")
-                                        .requestMatchers("appVersion/supervisor").hasAnyAuthority("ROLE_SUPERVISOR")
+                                        .requestMatchers(appVersion+"/admin/**").hasAnyAuthority("ROLE_ADMIN")
+                                        .requestMatchers(appVersion+"/student/**").hasAnyAuthority("ROLE_STUDENT")
+                                        .requestMatchers(appVersion+"/teacher**").hasAnyAuthority("ROLE_TEACHER")
+                                        .requestMatchers(appVersion+"/supervisor").hasAnyAuthority("ROLE_SUPERVISOR")
                                         .requestMatchers(
                                                 // All of the below paths are permitted with put being authorised
                                                 appVersion+"/login",
