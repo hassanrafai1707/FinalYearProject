@@ -33,7 +33,7 @@ public class UserService {
 
     //  CREATE user
     public User saveUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if (existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email already taken");
         }
 
@@ -161,7 +161,35 @@ public class UserService {
             throw new RuntimeException(e);
         }
     }
+
     public List<User> listOfUserByRole(String role){
         return userRepository.findByRole(role);
+    }
+
+    public Boolean existsByEmail(String email){
+        if (userRepository.existsByEmail(email)){
+            return Boolean.TRUE;
+        }
+        else {
+            return Boolean.FALSE;
+        }
+    }
+
+    public User getSmallestId(){
+        try {
+            return userRepository.findFirstByOrderByIdAsc();
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public User getLargestId(){
+        try {
+            return userRepository.findFirstByOrderByIdDesc();
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }
