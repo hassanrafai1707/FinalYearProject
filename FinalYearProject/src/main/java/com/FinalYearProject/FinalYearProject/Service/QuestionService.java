@@ -1,7 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Question;
-import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,37 +16,68 @@ public class QuestionService {
     @Autowired
     private UserService userService;
 
+    public List<Question> getAllQuestion(){
+        return questionRepository.findAll();
+    }
     public Question getQuestionById(Long id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Question not found with ID: " + id));
     }
 
     public List<Question> findByMappedCO(String mappedCO){
-        return questionRepository.findByMappedCO(mappedCO);
+        List<Question> questions=questionRepository.findByMappedCO(mappedCO);
+        if (questions.isEmpty()){
+            throw new RuntimeException("No questions found for Mapped CO: " + mappedCO);
+        }
+        return questions;
     }
 
     public List<Question> findBySubjectName(String subjectName){
-        return questionRepository.findBySubjectName(subjectName);
+        List<Question> questions=questionRepository.findBySubjectName(subjectName);
+        if (questions.isEmpty()){
+            throw new RuntimeException("No questions found for Mapped CO: " + subjectName);
+        }
+        return questions;
     }
 
     public List<Question> findBySubjectCode(String subjectCode){
-        return questionRepository.findBySubjectCode(subjectCode);
+        List<Question> questions=questionRepository.findBySubjectCode(subjectCode);
+        if (questions.isEmpty()){
+            throw new RuntimeException("No questions found for Mapped CO: " + subjectCode);
+        }
+        return questions;
     }
 
     public List<Question> findByCognitiveLevel(String cognitiveLevel){
-        return questionRepository.findByCognitiveLevel(cognitiveLevel);
+        List<Question> questions=questionRepository.findByCognitiveLevel(cognitiveLevel);
+        if (questions.isEmpty()){
+            throw new RuntimeException("No questions found for Mapped CO: " + cognitiveLevel);
+        }
+        return questions;
     }
 
-    public List<Question> findByCreatedBy(User user){
-        if (userService.existsByEmail(user.getEmail())) {
-            return questionRepository.findByCreatedBy(user);
+    public List<Question> findByCreatedByUsingEmail(String email){
+        if (userService.existsByEmail(email)) {
+            return questionRepository.findByCreatedByUsingEmail(email);
         }
-        throw new RuntimeException("User does not exist!");
+        throw new RuntimeException("User does not exist! with email"+email);
+    }
+
+    public List<Question> findByCreatedByUsingId(Long Id){
+        if (userService.existsById(Id)){
+            return questionRepository.findByCreatedByUsingId(Id);
+        }
+        throw new RuntimeException("User does not exist! with Id"+Id);
     }
 
     public Question addQuestion(Question question){
-        question.setInUse(false);
-        return questionRepository.save(question);
+        if (questionRepository.existsByQuestionBody(question.getQuestionBody())){
+            throw new RuntimeException("question already present");
+        }
+        else {
+            question.setInUse(false);
+            return questionRepository.save(question);
+        }
     }
 
     public void deleteQuestionById(Long id){
@@ -57,6 +87,16 @@ public class QuestionService {
         else {
             throw new RuntimeException("Question not found with ID: " + id);
         }
+    }
+
+    public void deleteQuestionByQuestionBody(String questionBody){
+        Question temp=questionRepository.findByQuestionBody(questionBody)
+                .orElseThrow(
+                        ()-> new RuntimeException(
+                            "Question with this "+questionBody+" Question body not present"
+                        )
+                );
+        questionRepository.delete(temp);
     }
 
     public List<Question> generateQuestion(

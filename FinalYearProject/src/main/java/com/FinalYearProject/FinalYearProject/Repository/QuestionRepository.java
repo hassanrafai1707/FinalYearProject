@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question , Long> {
@@ -15,9 +16,11 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     public List<Question> findBySubjectName(String subjectName);
     public List<Question> findBySubjectCode(String subjectCode);
     public List<Question> findByCognitiveLevel(String cognitiveLevel);
-    public List<Question> findByCreatedBy(User user);
-    @Query("SELECT q FROM Question q WHERE q.id=(SELECT MIN(qs.id) FROM Question qs)")
-    public User getSmallestId();
-    @Query("SELECT q FROM Question q WHERE q.id=(SELECT MAX(qs.id) FROM Question qs)")
-    public User getLargestId();
+    public Boolean existsByQuestionBody(String question);
+    @Query("SELECT q FROM Question q WHERE q.questionBody =:questionBody")
+    public Optional<Question> findByQuestionBody(String questionBody);
+    @Query("SELECT q FROM Question q WHERE q.createdBy.email =:email")
+    public List<Question> findByCreatedByUsingEmail(String email);
+    @Query("SELECT q FROM Question q WHERE q.createdBy.id=:Id")
+    public List<Question> findByCreatedByUsingId(Long Id);
 }

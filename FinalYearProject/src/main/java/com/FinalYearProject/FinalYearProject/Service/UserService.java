@@ -192,4 +192,12 @@ public class UserService {
             throw new RuntimeException(e);
         }
     }
+    public Boolean existsById(Long Id){
+        if (userRepository.existsById(Id)){
+            return Boolean.TRUE;
+        }
+        else {
+            return Boolean.FALSE;
+        }
+    }
 }
