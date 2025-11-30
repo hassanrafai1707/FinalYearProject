@@ -72,14 +72,17 @@ public class QuestionService {
 
     public Question addQuestion(Question question){
         if (
-                questionRepository.existsByQuestionBody(question.getQuestionBody()) &&
-                question.getCreatedBy().getRole().equalsIgnoreCase("ROLE_TEACHER")
-        ){
+                questionRepository.existsByQuestionBody(question.getQuestionBody())){
             throw new RuntimeException("question already present");
         }
         else {
-            question.setInUse(false);
-            return questionRepository.save(question);
+            if (question.getCreatedBy().getRole().equalsIgnoreCase("ROLE_TEACHER")){
+                question.setInUse(false);
+                return questionRepository.save(question);
+            }
+            else {
+                throw new RuntimeException("User UnAuthorised to make this request");
+            }
         }
     }
 
