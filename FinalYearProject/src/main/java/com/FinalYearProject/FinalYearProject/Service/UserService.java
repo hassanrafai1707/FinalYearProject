@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +20,17 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserService {
     @Autowired
-    private final UserRepository userRepository;
+    private  UserRepository userRepository;
     @Autowired
-    private final ConformationRepository conformationRepository;
+    private ConformationRepository conformationRepository;
     @Autowired
-    private final ConformationService conformationService;
+    private ConformationService conformationService;
     @Autowired
-    private final AuthenticationManager authManager;
+    private AuthenticationManager authManager;
     @Autowired
-    private final JwtService jwtService;
+    private JwtService jwtService;
     @Autowired
-    private final BCryptPasswordEncoder encoder;
+    private BCryptPasswordEncoder encoder;
 
     //  CREATE user
     public User saveUser(User user) {
@@ -64,46 +65,69 @@ public class UserService {
     //  READ (by ID)
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "User not found with id: " + id
+                        )
+                );
     }
 
     //  READ (by email)
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    //  READ (by username)
-    public User findByUsername(String name) {
-        return userRepository.findByName(name)
-                .orElseThrow(() -> new RuntimeException("User not found: " + name));
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "User not found with email"
+                        +email
+                        )
+                );
     }
 
     //  UPDATE
-    public User updateUser(Long id, User updatedUser) {
+
+    public User updateUserEmailById(Long id, String email) {
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
 
-        existingUser.setName(updatedUser.getName());
-        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setEmail(email);
 
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-            existingUser.setPassword(encoder.encode(updatedUser.getPassword()));
-        }
+        return userRepository.save(existingUser);
+    }
 
-        existingUser.setLocked(updatedUser.isLocked());
-        existingUser.setExpired(updatedUser.isExpired());
-        existingUser.setIs_enable(updatedUser.isIs_enable());
+    public User updateUserEmailByEmail (String oldEmail, String newEmail){
+
+        User existingUser =userRepository.findByEmail(oldEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + oldEmail));
+
+        existingUser.setEmail(newEmail);
+
+        return userRepository.save(existingUser);
+    }
+
+    public User updateUserPasswordById(Long id, String newPassword){
+        User existingUser=userRepository.findById(id)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+id));
+
+        existingUser.setPassword(encoder.encode(newPassword));
+
+        return userRepository.save(existingUser);
+    }
+
+    public User updateUserPasswordByEmail(String email, String newPassword){
+        User existingUser=userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with Email :"+email));
+
+        existingUser.setPassword(encoder.encode(newPassword));
 
         return userRepository.save(existingUser);
     }
 
     //  DELETE (by user)
-    public void deleteUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            userRepository.deleteById(user.getId());
-            conformationRepository.deleteByUser(user);
+    public String deleteUserByEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            userRepository.deleteByEmail(email);
+            return "User deleted successfully";
         } else {
-            throw new RuntimeException("User not found with email: " + user.getEmail());
+            throw new UsernameNotFoundException("User not found with email: " + email);
         }
     }
 
@@ -113,17 +137,20 @@ public class UserService {
             userRepository.deleteById(id);
             return "deleted successfully";
         } else {
-            throw new RuntimeException("User not found with id: " + id);
+            throw new UsernameNotFoundException("User not found with id: " + id);
         }
     }
 
     //  Suspend User
-    public String suspendUser(Long id) {
+    public String suspendUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+
         user.setLocked(true);
         user.setExpired(true);
+
         userRepository.save(user);
+
         return "User Suspend successfully";
     }
 
@@ -150,6 +177,7 @@ public class UserService {
                 User user = conformation.get().getUser();
                 user.setIs_enable(true);
                 userRepository.save(user);
+                conformationRepository.deleteByUser(user); //delete conformation after verifying token and otp
                 return Boolean.TRUE;
             }
             else {
@@ -175,23 +203,6 @@ public class UserService {
         }
     }
 
-    public User getSmallestId(){
-        try {
-            return userRepository.findFirstByOrderByIdAsc();
-        }
-        catch (Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    public User getLargestId(){
-        try {
-            return userRepository.findFirstByOrderByIdDesc();
-        }
-        catch (Exception e){
-            throw new RuntimeException(e);
-        }
-    }
     public Boolean existsById(Long Id){
         if (userRepository.existsById(Id)){
             return Boolean.TRUE;

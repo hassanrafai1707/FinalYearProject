@@ -4,6 +4,7 @@ import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -120,7 +121,7 @@ public class AdminRestController {
     public ResponseEntity<?> suspendUserById(@RequestBody Map<String,Long> request){
         Long Id= request.get("id");
         try {
-            String Message= userService.suspendUser(Id);
+            String Message= userService.suspendUserById(Id);
             return ResponseEntity.ok(
                     Map.of(
                             "states","successful",
@@ -128,11 +129,22 @@ public class AdminRestController {
                     )
             );
         }
-        catch (Exception e){
+        catch (UsernameNotFoundException e) {
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.NOT_FOUND)
                     .body(
                             Map.of(
+                                    "states","unsuccessful",
+                                    "error", e.getMessage()
+                            )
+                    );
+        }
+        catch (Exception e){
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(
+                            Map.of(
+                                    "states","unsuccessful",
                                     "message","something went wrong try again",
                                     "error", e.getMessage()
                             )
