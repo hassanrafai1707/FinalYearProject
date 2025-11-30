@@ -119,7 +119,7 @@ public class UserService {
         existingUser.setPassword(encoder.encode(newPassword));
 
         return userRepository.save(existingUser);
-    }
+    }//
 
     //  DELETE (by user)
     public String deleteUserByEmail(String email) {
@@ -152,7 +152,7 @@ public class UserService {
         userRepository.save(user);
 
         return "User Suspend successfully";
-    }
+    }//todo suspendUserByEmail
 
     //  VERIFY LOGIN
     public String verifyLogin(User user) {
@@ -164,14 +164,14 @@ public class UserService {
             User foundUser = userRepository.findByEmail(user.getEmail())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            foundUser.setExpired(false); // 🔥 Reset expired status after login
+            foundUser.setExpired(false);
             userRepository.save(foundUser);
 
             return jwtService.jwtToken(user.getEmail(), foundUser.getRole());
         }
 
         throw new RuntimeException("Login failed");
-    }
+    }//todo verifyLogin by Id
 
 
     // VERIFY Token
