@@ -2,6 +2,7 @@ package com.FinalYearProject.FinalYearProject.Config.Security.Filter;
 
 import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.MyUserDetailsServices;
+import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,6 +28,8 @@ public class JwtFilter extends OncePerRequestFilter {
     private JwtService jwtService;
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private MyUserDetailsServices myUserDetailsServices;
 //    private static final Set<String> excludedPaths= Set.of(
 //            "/api/v1/register",
 //            "/api/v1/login",
@@ -72,6 +76,14 @@ public class JwtFilter extends OncePerRequestFilter {
         if(authHeader!=null && authHeader.startsWith("Bearer ")){
             token=authHeader.substring(7); //separate the heder type form heder
             username= jwtService.extractUserEmail(token);
+            try {
+                jwtService.isTokenExpiredOrThrow(token);
+            } catch (Exception e) {
+                UserDetails userDetails = myUserDetailsServices.loadUserByUsername(username);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token Expired — Please Login Again");
+                return;
+            }
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails =applicationContext.getBean(MyUserDetailsServices.class).loadUserByUsername(username);

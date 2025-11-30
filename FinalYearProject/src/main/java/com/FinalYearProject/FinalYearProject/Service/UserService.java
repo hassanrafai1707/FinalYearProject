@@ -156,18 +156,23 @@ public class UserService {
 
     //  VERIFY LOGIN
     public String verifyLogin(User user) {
-        try {
-            Authentication authentication = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
-            );
-            authentication.isAuthenticated();
-            System.out.println("User login successful");
-            return jwtService.jwtToken(user.getEmail(), user.getRole());
-        } catch (Exception e) {
-            System.err.println("Error in verify Login in UserService " + e.getMessage());
-            throw new RuntimeException(e);
+        Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+        );
+
+        if (authentication.isAuthenticated()) {
+            User foundUser = userRepository.findByEmail(user.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+            foundUser.setExpired(false); // 🔥 Reset expired status after login
+            userRepository.save(foundUser);
+
+            return jwtService.jwtToken(user.getEmail(), foundUser.getRole());
         }
+
+        throw new RuntimeException("Login failed");
     }
+
 
     // VERIFY Token
     public Boolean verifyTokenAndOTP(String token, int otp) {
@@ -210,5 +215,15 @@ public class UserService {
         else {
             return Boolean.FALSE;
         }
+    }
+
+    public void updateUserExpiredStatus(String username) {
+        userRepository.findByEmail(username)
+                .ifPresent(
+                        user -> {
+                            user.setExpired(true);
+                            userRepository.save(user);
+                        }
+                );
     }
 }

@@ -92,5 +92,9 @@ public class JwtService  {
     private String extractUserRole(String token){
         return extractClaim(token,claims -> claims.get("role", String.class));
     }
-
+    public void isTokenExpiredOrThrow(String token){
+        if (isTokenExpired(token)){
+            throw new RuntimeException("JWT token expired");
+        }
+    }
 }
