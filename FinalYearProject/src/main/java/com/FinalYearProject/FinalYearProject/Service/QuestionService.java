@@ -27,7 +27,7 @@ public class QuestionService {
     public List<Question> findByMappedCO(String mappedCO){
         List<Question> questions=questionRepository.findByMappedCO(mappedCO);
         if (questions.isEmpty()){
-            throw new RuntimeException("No questions found for Mapped CO: " + mappedCO);
+            throw new RuntimeException("No questions found with Mapped CO: " + mappedCO);
         }
         return questions;
     }
@@ -35,7 +35,7 @@ public class QuestionService {
     public List<Question> findBySubjectName(String subjectName){
         List<Question> questions=questionRepository.findBySubjectName(subjectName);
         if (questions.isEmpty()){
-            throw new RuntimeException("No questions found for Mapped CO: " + subjectName);
+            throw new RuntimeException("No questions found with Subject name: " + subjectName);
         }
         return questions;
     }
@@ -43,7 +43,7 @@ public class QuestionService {
     public List<Question> findBySubjectCode(String subjectCode){
         List<Question> questions=questionRepository.findBySubjectCode(subjectCode);
         if (questions.isEmpty()){
-            throw new RuntimeException("No questions found for Mapped CO: " + subjectCode);
+            throw new RuntimeException("No questions found with Subject code: " + subjectCode);
         }
         return questions;
     }
@@ -51,7 +51,7 @@ public class QuestionService {
     public List<Question> findByCognitiveLevel(String cognitiveLevel){
         List<Question> questions=questionRepository.findByCognitiveLevel(cognitiveLevel);
         if (questions.isEmpty()){
-            throw new RuntimeException("No questions found for Mapped CO: " + cognitiveLevel);
+            throw new RuntimeException("No questions found with Cognitive Level: " + cognitiveLevel);
         }
         return questions;
     }
