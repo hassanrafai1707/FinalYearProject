@@ -71,7 +71,10 @@ public class QuestionService {
     }
 
     public Question addQuestion(Question question){
-        if (questionRepository.existsByQuestionBody(question.getQuestionBody())){
+        if (
+                questionRepository.existsByQuestionBody(question.getQuestionBody()) &&
+                question.getCreatedBy().getRole().equalsIgnoreCase("ROLE_TEACHER")
+        ){
             throw new RuntimeException("question already present");
         }
         else {
