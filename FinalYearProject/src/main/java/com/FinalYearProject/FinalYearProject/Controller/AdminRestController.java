@@ -14,13 +14,34 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-//todo combine commonly used lines in one function
 @RequestMapping("${app.version}/admin")
 @RestController
 public class AdminRestController {
     @Autowired
     private UserService userService;
 
+    private ResponseEntity<?> handleUnknownException(Exception e){
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                        Map.of(
+                                "states","unsuccessful",
+                                "message","something went wrong try again",
+                                "error", e.getMessage()
+                        )
+                );
+    }
+
+    private ResponseEntity<?> handleUserNotFoudException(UsernameNotFoundException e){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                        Map.of(
+                                "states","unsuccessful",
+                                "error", e.getMessage()
+                        )
+                );
+    }
 
     @PostMapping("/findUserById")
     public ResponseEntity<?> findUserById(@RequestBody Map<String ,Long> request){
@@ -35,25 +56,10 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "status","unsuccessful",
-                                    "message",e.getMessage()
-                            )
-                    );
+            return handleUserNotFoudException(e);
         }
         catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            Map.of(
-                                    "status","unsuccessful",
-                                    "message","invade Id try again ",
-                                    "error",e.getMessage()
-                            )
-                    );
+            return handleUnknownException(e);
         }
     }
 
@@ -70,25 +76,10 @@ public class AdminRestController {
            );
        }
        catch (UsernameNotFoundException e){
-           return ResponseEntity
-                   .status(HttpStatus.NOT_FOUND)
-                   .body(
-                           Map.of(
-                                   "status","unsuccessful",
-                                   "message",e.getMessage()
-                           )
-                   );
+           return handleUserNotFoudException(e);
        }
        catch (Exception e){
-           return ResponseEntity
-                   .status(HttpStatus.BAD_REQUEST)
-                   .body(
-                           Map.of(
-                                "status","unsuccessful",
-                               "message", "User email not found",
-                               "error", e.getMessage()
-                           )
-                   );
+           return handleUnknownException(e);
        }
     }
 
@@ -153,26 +144,11 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "states", "unsuccessful",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUserNotFoudException(e);
 
         }
         catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "message","Something went wrong",
-                                    "error",e.getMessage()
-                            )
-                    );
+            return handleUnknownException(e);
         }
     }
 
@@ -189,25 +165,10 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e) {
-           return ResponseEntity
-                   .status(HttpStatus.NOT_FOUND)
-                   .body(
-                           Map.of(
-                                   "states","unsuccessful",
-                                   "error",e.getMessage()
-                           )
-                   );
+           return handleUserNotFoudException(e);
         }
         catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "message","Something went wrong",
-                                    "error",e.getMessage()
-                            )
-                    );
+            return handleUnknownException(e);
         }
     }
 
@@ -224,25 +185,10 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUserNotFoudException(e);
         }
         catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "message","something went wrong try again",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUnknownException(e);
         }
     }
 
@@ -261,24 +207,9 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUserNotFoudException(e);
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "message","something went wrong try again",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUnknownException(e);
         }
     }
 
@@ -297,25 +228,10 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUserNotFoudException(e);
         }
         catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "message","something went wrong try again",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUnknownException(e);
         }
     }
 
@@ -334,24 +250,10 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "error", e.getMessage()
-                            )
-                    );
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "message","something went wrong try again",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUserNotFoudException(e);
+        }
+        catch (Exception e) {
+            return handleUnknownException(e);
         }
     }
 
@@ -370,28 +272,12 @@ public class AdminRestController {
             );
         }
         catch (UsernameNotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUserNotFoudException(e);
         }
         catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                            Map.of(
-                                    "states","unsuccessful",
-                                    "message","something went wrong try again",
-                                    "error", e.getMessage()
-                            )
-                    );
+            return handleUnknownException(e);
         }
     }
-
 
     @GetMapping("/test")
     public String test(){
