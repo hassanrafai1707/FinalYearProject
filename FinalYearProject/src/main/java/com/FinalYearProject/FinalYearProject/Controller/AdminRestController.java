@@ -5,7 +5,9 @@ import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUserIdAndPa
 import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUsesEmaiAndIdInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUserOldEmailAndNewEmailInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import java.util.Map;
 public class AdminRestController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private JwtService jwtService;
 
     private ResponseEntity<?> handleUnknownException(Exception e){
         return ResponseEntity
@@ -276,6 +280,21 @@ public class AdminRestController {
         }
         catch (Exception e){
             return handleUnknownException(e);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutProcesser (HttpServletRequest token){
+        try {
+            return ResponseEntity.ok(
+                    Map.of(
+                            "states","successful",
+                            "message","user logout successfully"
+                    )
+            );
+        }
+        catch (Exception e) {
+           return handleUnknownException(e);
         }
     }
 

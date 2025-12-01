@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class JwtService  {
                 .add(claims)
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() +1000*60*60*5))
+                .expiration(new Date(System.currentTimeMillis() +1000*60*30))
                 .and()
                 .signWith(getKey())
                 .compact();
@@ -96,5 +97,19 @@ public class JwtService  {
         if (isTokenExpired(token)){
             throw new RuntimeException("JWT token expired");
         }
+    }
+
+    public String extractEmailFromJwtToken(HttpServletRequest request){// may need in further
+        String token;
+        String authHeader =request.getHeader("Authorization");//contain auth heder
+
+        if(authHeader==null || !authHeader.startsWith("Bearer ")){
+            throw new RuntimeException("Invalid Authorization Header");
+        }
+
+        token=authHeader.substring(7);//separate the heder type form heder
+        isTokenExpiredOrThrow(token);
+
+        return extractUserEmail(token);
     }
 }

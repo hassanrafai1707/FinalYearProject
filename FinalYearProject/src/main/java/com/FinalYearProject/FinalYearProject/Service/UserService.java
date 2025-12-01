@@ -158,28 +158,33 @@ public class UserService {
     //  VERIFY LOGIN
     public Map<String,Object> verifyLoginByEmail(String email, String password) {
         Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)//what if send userId
+                new UsernamePasswordAuthenticationToken(email, password)
         );
 
         if (authentication.isAuthenticated()) {
             User foundUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            if (foundUser.isIs_enable() && foundUser.isLocked()){
+                throw new RuntimeException("Login failed due to user is locked");
+            }
+            else {
+                foundUser.setExpired(false);
+                foundUser.setIs_enable(true);
+                foundUser.setLocked(false);
+                userRepository.save(foundUser);
 
-            foundUser.setExpired(false);
-            foundUser.setIs_enable(true);
-            foundUser.setLocked(false);
-            userRepository.save(foundUser);
-
-            String token= jwtService.jwtToken(email, foundUser.getRole());
-            return Map.of(
-                    "token", token,
-                    "user", foundUser
-            );
+                String token= jwtService.jwtToken(email, foundUser.getRole());
+                return Map.of(
+                        "token", token,
+                        "user", foundUser
+                );
+            }
         }
 
         throw new RuntimeException("Login failed");
     }//todo verifyLoginByEmail by Id
 
+    //todo use frontend to logout user
 
     // VERIFY Token
     public Boolean verifyTokenAndOTP(String token, int otp) {
