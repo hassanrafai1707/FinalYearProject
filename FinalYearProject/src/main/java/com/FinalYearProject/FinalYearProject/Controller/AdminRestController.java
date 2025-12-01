@@ -196,6 +196,26 @@ public class AdminRestController {
         }
     }
 
+    @PostMapping("/suspendUserByEmail")
+    public ResponseEntity<?> suspendUserByEmail(@RequestBody Map<String,String> request){
+        String email=request.get("email");
+        try {
+            String message = userService.suspendUserByEmail(email);
+            return ResponseEntity.ok(
+                    Map.of(
+                            "states","successful",
+                            "message", message
+                    )
+            );
+        }
+        catch (UsernameNotFoundException e){
+            return handleUserNotFoudException(e);
+        }
+        catch (Exception e){
+            return handleUnknownException(e);
+        }
+    }
+
     @PostMapping("/updateUserEmailById")
     public ResponseEntity<?>updateUserEmailById(@RequestBody DtoForAnyRequestThatUsesEmaiAndIdInRequest
                                                             dto){

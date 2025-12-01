@@ -153,7 +153,18 @@ public class UserService {
         userRepository.save(user);
 
         return "User Suspend successfully";
-    }//todo suspendUserByEmail
+    }
+
+    public String suspendUserByEmail(String email){
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException( "User not found with email"+email));
+
+        user.setExpired(true);
+        user.setLocked(true);
+
+        userRepository.save(user);
+        return "User Suspend successfully";
+    }
 
     //  VERIFY LOGIN
     public Map<String,Object> verifyLoginByEmail(String email, String password) {
