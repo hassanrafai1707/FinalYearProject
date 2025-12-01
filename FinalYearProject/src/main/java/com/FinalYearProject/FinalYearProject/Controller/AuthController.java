@@ -1,11 +1,13 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
+import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUserEmailAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,15 +21,26 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> processLogin(@RequestBody User user){
+    public ResponseEntity<?> processLoginByEmail(@RequestBody DtoForAnyRequestThatUserEmailAndPasswordInRequest dto){
         try {
-            String token = userService.verifyLogin(user);
+            Map<String,Object> temp=userService.verifyLoginByEmail(dto.getEmail(), dto.getPassword());
+            User user=(User) temp.get("user");
             return ResponseEntity
                     .ok(
                             Map.of(
-                                    "token",token,
+                                    "status","successful",
+                                    "token",temp.get("token"),
                                     "role",user.getRole()
-
+                            )
+                    );
+        }
+        catch (UsernameNotFoundException e){
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(
+                            Map.of(
+                                    "status","unsuccessful",
+                                    "error",e.getMessage()
                             )
                     );
         }
@@ -36,7 +49,9 @@ public class AuthController {
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(
                             Map.of(
-                                    "message","Invalid credentials"
+                                    "status","unsuccessful",
+                                    "message","Invalid credentials",
+                                    "error",e.getMessage()
                             )
                     );
         }
@@ -47,10 +62,8 @@ public class AuthController {
             User saveUser =userService.saveUser(user);
             return ResponseEntity.ok(
                     Map.of(
-                            "message",
-                            "User registered successfully. Please verifyLogin your email.",
-                            "user",
-                            saveUser
+                            "message", "User registered successfully. Please verifyLoginByEmail your email.",
+                            "user", saveUser
                     )
             );
         }
@@ -59,10 +72,8 @@ public class AuthController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(
                             Map.of(
-                                    "message",
-                                    "Registration failed",
-                                    "error",
-                                    e.getMessage()
+                                    "message", "Registration failed",
+                                    "error", e.getMessage()
                             )
                     );
         }
@@ -76,10 +87,8 @@ public class AuthController {
             Boolean ConformToken= userService.verifyTokenAndOTP(token,Otp);
             return ResponseEntity.ok(
                     Map.of(
-                            "message",
-                            "User confirm",
-                            "User Confirm token",
-                            ConformToken
+                            "message", "User confirm",
+                            "User Confirm token", ConformToken
                     )
             );
         }

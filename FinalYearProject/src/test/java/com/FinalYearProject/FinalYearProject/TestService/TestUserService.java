@@ -71,7 +71,7 @@
 //            fakeUser.setEmail("hassanrafai1707@gmail.com");
 //            fakeUser.setPassword("123456789");
 //
-//            String token=userService.verifyLogin(fakeUser);
+//            String token=userService.verifyLoginByEmail(fakeUser);
 //
 //            assertEquals("fake-jwt-token", token);
 //            verify(authManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
@@ -90,7 +90,7 @@
 //
 //            // Act & Assert
 //            try {
-//                userService.verifyLogin(fakeUser);
+//                userService.verifyLoginByEmail(fakeUser);
 //                fail("Expected an exception for wrong credentials");
 //            } catch (Exception e) {
 //                assertEquals("Bad credentials", e.getMessage());

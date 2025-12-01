@@ -22,12 +22,15 @@ public class User {
             allocationSize = 1
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSequence")
+    @Column(nullable = false)
     public Long Id;
     public String name;
+    @Column(nullable = false)
     public String email;
     @Column(nullable = false)
     public String role;
     public boolean is_enable;
+    @Column(nullable = false)
     public String password;
     public boolean locked;
     public boolean expired;

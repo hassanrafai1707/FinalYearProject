@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -40,8 +41,8 @@ public class UserService {
 
         user.setIs_enable(false);
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setExpired(false);
-        user.setLocked(false);
+        user.setExpired(true);
+        user.setLocked(true);
 
         userRepository.save(user);
 
@@ -155,23 +156,29 @@ public class UserService {
     }//todo suspendUserByEmail
 
     //  VERIFY LOGIN
-    public String verifyLogin(User user) {
+    public Map<String,Object> verifyLoginByEmail(String email, String password) {
         Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
+                new UsernamePasswordAuthenticationToken(email, password)//what if send userId
         );
 
         if (authentication.isAuthenticated()) {
-            User foundUser = userRepository.findByEmail(user.getEmail())
+            User foundUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
             foundUser.setExpired(false);
+            foundUser.setIs_enable(true);
+            foundUser.setLocked(false);
             userRepository.save(foundUser);
 
-            return jwtService.jwtToken(user.getEmail(), foundUser.getRole());
+            String token= jwtService.jwtToken(email, foundUser.getRole());
+            return Map.of(
+                    "token", token,
+                    "user", foundUser
+            );
         }
 
         throw new RuntimeException("Login failed");
-    }//todo verifyLogin by Id
+    }//todo verifyLoginByEmail by Id
 
 
     // VERIFY Token
