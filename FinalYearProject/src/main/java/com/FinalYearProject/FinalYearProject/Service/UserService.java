@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -198,6 +200,7 @@ public class UserService {
     //todo use frontend to logout user
 
     // VERIFY Token
+    @Transactional(propagation = Propagation.REQUIRED)
     public Boolean verifyTokenAndOTP(String token, int otp) {
         try {
             Optional<Conformation> conformation = conformationRepository.findByToken(token);
