@@ -64,6 +64,11 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
 		<!-- Spring Boot Thymeleaf (Optional if using templates) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

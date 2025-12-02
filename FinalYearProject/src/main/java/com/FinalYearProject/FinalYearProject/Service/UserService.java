@@ -31,6 +31,8 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
     @Autowired
+    private RedisService redisService;
+    @Autowired
     private BCryptPasswordEncoder encoder;
 
     //  CREATE user
@@ -47,7 +49,11 @@ public class UserService {
         userRepository.save(user);
 
         Conformation conformation = new Conformation(user);
-        conformationRepository.save(conformation);
+        redisService.set(
+                conformation.getToken(),
+                conformation,
+                10L
+        );
         conformationService.sendEmail(
                 user.getEmail(),
                 user.getName(),
@@ -200,9 +206,12 @@ public class UserService {
     // VERIFY Token
     public Boolean verifyTokenAndOTP(String token, int otp) {
         try {
-            Optional<Conformation> conformation = conformationRepository.findByToken(token);
-            if (conformation.isPresent() && otp == conformation.get().getOtp()) {
-                User user = conformation.get().getUser();
+            Conformation conformation=conformationRepository.findByToken(token)
+                    .orElseThrow(()-> new UsernameNotFoundException("User not found "));
+            if ( conformation!=null && otp == conformation.getOtp()) {
+                User user = conformation.getUser();
+                user.setExpired(false);
+                user.setLocked(false);
                 user.setIs_enable(true);
                 userRepository.save(user);
                 conformationRepository.deleteByUser(user); //delete conformation after verifying token and otp

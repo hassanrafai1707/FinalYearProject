@@ -1,0 +1,8 @@
+ #1. Start
+wsl sudo systemctl start redis-server
+
+# 2. Check
+wsl sudo systemctl status redis-server
+
+# 3. Stop (run both)
+wsl sudo systemctl stop redis-server
