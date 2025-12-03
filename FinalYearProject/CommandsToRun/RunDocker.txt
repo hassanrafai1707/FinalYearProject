@@ -1,0 +1,8 @@
+#shout down server
+ docker-compose down
+
+ #start server
+docker-compose up -d
+
+# check logs
+docker-compose logs -f app

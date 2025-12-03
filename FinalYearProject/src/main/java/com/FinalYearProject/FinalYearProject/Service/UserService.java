@@ -2,7 +2,6 @@ package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
-import com.FinalYearProject.FinalYearProject.Repository.ConformationRepository;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -25,13 +23,13 @@ public class UserService {
     @Autowired
     private  UserRepository userRepository;
     @Autowired
-    private ConformationRepository conformationRepository;
-    @Autowired
     private ConformationService conformationService;
     @Autowired
     private AuthenticationManager authManager;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private RedisService redisService;
     @Autowired
     private BCryptPasswordEncoder encoder;
 
@@ -46,17 +44,22 @@ public class UserService {
         user.setExpired(true);
         user.setLocked(true);
 
-        userRepository.save(user);
-
         Conformation conformation = new Conformation(user);
-        conformationRepository.save(conformation);
+        redisService.set(
+                conformation.getToken(),
+                conformation,
+                10L
+        );
         conformationService.sendEmail(
                 user.getEmail(),
                 user.getName(),
                 conformation.getToken(),
                 conformation.getOtp()
         );
+        System.out.println(redisService.get(conformation.getToken(),Conformation.class));
         System.out.println("user saved success");
+
+        userRepository.save(user);
         return user;
     }
 
@@ -202,14 +205,16 @@ public class UserService {
     @Transactional(propagation = Propagation.REQUIRED)
     public Boolean verifyTokenAndOTP(String token, int otp) {
         try {
-            Optional<Conformation> conformation = conformationRepository.findByToken(token);
-            if (conformation.isPresent() && otp == conformation.get().getOtp()) {
-                User user = conformation.get().getUser();
+            Conformation conformation=redisService.get(token,Conformation.class);
+            if ( conformation !=null && otp == conformation.getOtp()) {
+                User user = conformation.getUser();
+                user.setExpired(false);
+                user.setLocked(false);
                 user.setIs_enable(true);
                 user.setLocked(false);
                 user.setExpired(false);
                 userRepository.save(user);
-                conformationRepository.deleteByUser(user); //delete conformation after verifying token and otp
+                redisService.delete(token);  //delete conformation after verifying token and otp
                 return Boolean.TRUE;
             }
             else {
