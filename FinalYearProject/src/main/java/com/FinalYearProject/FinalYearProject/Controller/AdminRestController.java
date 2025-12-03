@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 @RequestMapping("${app.version}/admin")
 @RestController
+//TODO fix 2/5 let spring handle exception
 public class AdminRestController {
     @Autowired
     private UserService userService;

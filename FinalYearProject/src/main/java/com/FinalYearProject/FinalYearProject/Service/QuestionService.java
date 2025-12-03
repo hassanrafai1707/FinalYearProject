@@ -1,12 +1,17 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionExistsException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
+//TODO Use cache to reduce time for retrieving and computing data
 @Service
 @AllArgsConstructor
 public class QuestionService {
@@ -15,6 +20,8 @@ public class QuestionService {
     private QuestionRepository questionRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisService redisService;
 
     public List<Question> getAllQuestion(){
         return questionRepository.findAll();
@@ -25,55 +32,52 @@ public class QuestionService {
     }
 
     public List<Question> findByMappedCO(String mappedCO){
-        List<Question> questions=questionRepository.findByMappedCO(mappedCO);
-        if (questions.isEmpty()){
-            throw new RuntimeException("No questions found with Mapped CO: " + mappedCO);
-        }
+        List<Question> questions=questionRepository.findByMappedCO(mappedCO)
+                .orElseThrow(()-> new QuestionNotFoundException("Question not found with mappingCo"+mappedCO));
         return questions;
     }
 
     public List<Question> findBySubjectName(String subjectName){
-        List<Question> questions=questionRepository.findBySubjectName(subjectName);
-        if (questions.isEmpty()){
-            throw new RuntimeException("No questions found with Subject name: " + subjectName);
-        }
+        List<Question> questions=questionRepository.findBySubjectName(subjectName)
+                .orElseThrow(()->new QuestionNotFoundException("No questions found with Subject name: "+subjectName));
+
         return questions;
     }
 
     public List<Question> findBySubjectCode(String subjectCode){
-        List<Question> questions=questionRepository.findBySubjectCode(subjectCode);
-        if (questions.isEmpty()){
-            throw new RuntimeException("No questions found with Subject code: " + subjectCode);
-        }
+        List<Question> questions=questionRepository.findBySubjectCode(subjectCode)
+                .orElseThrow(()->new QuestionNotFoundException("No questions found with Subject code: "+subjectCode));
+
         return questions;
     }
 
     public List<Question> findByCognitiveLevel(String cognitiveLevel){
-        List<Question> questions=questionRepository.findByCognitiveLevel(cognitiveLevel);
-        if (questions.isEmpty()){
-            throw new RuntimeException("No questions found with Cognitive Level: " + cognitiveLevel);
-        }
+        List<Question> questions=questionRepository.findByCognitiveLevel(cognitiveLevel)
+                .orElseThrow(()-> new QuestionNotFoundException("No questions found with Cognitive Level: " + cognitiveLevel));
+
         return questions;
     }
 
     public List<Question> findByCreatedByUsingEmail(String email){
         if (userService.existsByEmail(email)) {
-            return questionRepository.findByCreatedByUsingEmail(email);
+            return questionRepository.findByCreatedByUsingEmail(email)
+                    .orElseThrow(()-> new QuestionNotFoundException("User with the email has not created any Question"));
         }
-        throw new RuntimeException("User does not exist! with email"+email);
+        throw new UsernameNotFoundException("User does not exist! with email"+email);
     }
 
     public List<Question> findByCreatedByUsingId(Long Id){
         if (userService.existsById(Id)){
-            return questionRepository.findByCreatedByUsingId(Id);
+            return questionRepository.findByCreatedByUsingId(Id)
+                    .orElseThrow(()-> new QuestionNotFoundException("User with the Id has not created any Question"));
         }
-        throw new RuntimeException("User does not exist! with Id"+Id);
+        throw new UsernameNotFoundException("User does not exist! with Id"+Id);
     }
 
-    public Question addQuestion(Question question){
+    public Question addQuestion(Question question) {
         if (
                 questionRepository.existsByQuestionBody(question.getQuestionBody())){
-            throw new RuntimeException("question already present");
+            throw new QuestionExistsException("question already present");
         }
         else {
             if (question.getCreatedBy().getRole().equalsIgnoreCase("ROLE_TEACHER")){
@@ -81,7 +85,7 @@ public class QuestionService {
                 return questionRepository.save(question);
             }
             else {
-                throw new RuntimeException("User UnAuthorised to make this request");
+                throw new UserNotAuthorizesException("User UnAuthorised to make this request");
             }
         }
     }
@@ -91,14 +95,14 @@ public class QuestionService {
             questionRepository.deleteById(id);
         }
         else {
-            throw new RuntimeException("Question not found with ID: " + id);
+            throw new QuestionNotFoundException("Question not found with ID: " + id);
         }
     }
 
     public void deleteQuestionByQuestionBody(String questionBody){
         Question temp=questionRepository.findByQuestionBody(questionBody)
                 .orElseThrow(
-                        ()-> new RuntimeException(
+                        ()-> new QuestionNotFoundException(
                             "Question with this "+questionBody+" Question body not present"
                         )
                 );

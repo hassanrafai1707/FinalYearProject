@@ -6,15 +6,15 @@ FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
 
 # Copy Maven wrapper + pom.xml
-COPY mvnw ./
-COPY .mvn .mvn
-COPY pom.xml ./
+COPY ../mvnw ./
+COPY ../.mvn .mvn
+COPY ../pom.xml ./
 
 # Download dependencies (cache layer)
 RUN ./mvnw dependency:go-offline
 
 # Copy source code
-COPY src ./src
+COPY ../src ./src
 
 # Build the jar
 RUN ./mvnw -q -e -DskipTests package

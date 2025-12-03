@@ -2,6 +2,8 @@ package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.EmailAllReadyExistsException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ public class UserService {
     //  CREATE user
     public User saveUser(User user) {
         if (existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already taken");
+            throw new EmailAllReadyExistsException( "Email already taken");
         }
 
         user.setIs_enable(false);
@@ -181,7 +183,7 @@ public class UserService {
             User foundUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             if (!foundUser.isIs_enable() || foundUser.isLocked() || foundUser.isExpired() ){
-                throw new RuntimeException("Login failed due to user is locked");
+                throw new UserLockedException("Login failed due to user is locked");
             }
             else {
                 foundUser.setExpired(false);
@@ -197,7 +199,7 @@ public class UserService {
         }
 
         throw new RuntimeException("Login failed");
-    }//todo verifyLoginByEmail by Id
+    }//todo verify Login by Id
 
     //todo use frontend to logout user
 
@@ -248,13 +250,4 @@ public class UserService {
         }
     }
 
-    public void updateUserExpiredStatus(String username) {
-        userRepository.findByEmail(username)
-                .ifPresent(
-                        user -> {
-                            user.setExpired(true);
-                            userRepository.save(user);
-                        }
-                );
-    }
 }
