@@ -25,8 +25,8 @@ public class ConformationService {
 
     public void sendEmail(String toEmail, String name , String token,int Otp){
         try{
-            //example http://localhost:8080/api/v1/confirm?token=673651f2-b068-4334-a03b-a2891c12689d
-        String verificationLink ="http://localhost:8080/api/v1/auth/confirm?token="+token;//need to spiffy port I am also passing the otp for essay login
+            //example http://localhost:8080/api/v1/auth/confirm?token=00847b74-7713-4a41-8fea-7d22e1734a7a&email=hassanrafai@gmail.com
+        String verificationLink ="http://localhost:8080/api/v1/auth/confirm?token="+token+"?email"+toEmail;//need to spiffy port I am also passing the otp for essay login
             SimpleMailMessage message=new SimpleMailMessage();
              message.setTo(toEmail);
             message.setSubject("Verify Account\n");

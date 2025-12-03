@@ -81,11 +81,12 @@ public class AuthRestController {
 
     @PostMapping("/confirm")
     public ResponseEntity<?> conformation(@RequestParam("token") String token,
+                                          @RequestParam("email") String email,
                                           @RequestBody Map<String,Integer> request){
         int otp=request.get("otp");
         try{
             System.out.println("your account not verified yet before calling userService.verifyTokenAndOTP");
-            Boolean ConformToken= userService.verifyTokenAndOTP(token,otp);
+            Boolean ConformToken= userService.verifyTokenAndOTP(email,token,otp);
             return ResponseEntity.ok(
                     Map.of(
                             "message", "User confirm",

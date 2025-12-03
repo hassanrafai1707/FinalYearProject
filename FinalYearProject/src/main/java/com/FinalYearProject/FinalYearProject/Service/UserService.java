@@ -46,7 +46,7 @@ public class UserService {
 
         Conformation conformation = new Conformation(user);
         redisService.set(
-                conformation.getToken(),
+                conformation.getUser().getEmail(),
                 conformation,
                 10L
         );
@@ -203,9 +203,9 @@ public class UserService {
 
     // VERIFY Token
     @Transactional(propagation = Propagation.REQUIRED)
-    public Boolean verifyTokenAndOTP(String token, int otp) {
+    public Boolean verifyTokenAndOTP(String email ,String token, int otp) {
         try {
-            Conformation conformation=redisService.get(token,Conformation.class);
+            Conformation conformation=redisService.get(email,Conformation.class);
             if ( conformation !=null &&
                     otp == conformation.getOtp() &&
                     userRepository.existsByEmail(conformation.getUser().getEmail())
