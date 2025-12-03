@@ -11,13 +11,16 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String ,String > redisTemplate;
 
     public <T> T get(String key,  Class<T>entityClass){
         try {
-            Object dataFromRedis=redisTemplate.opsForValue().get(key);
+            String dataFromRedis = redisTemplate.opsForValue().get(key);
+            if (dataFromRedis==null){
+                return null;
+            }
             ObjectMapper mapper=new ObjectMapper();
-            return mapper.readValue(dataFromRedis.toString(),entityClass);
+            return mapper.readValue(dataFromRedis,entityClass);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -27,10 +30,13 @@ public class RedisService {
         try {
             ObjectMapper mapper=new ObjectMapper();
             String anyValueToString= mapper.writeValueAsString(object);
-            redisTemplate.opsForValue().set(key,object.toString(),tll, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(key,anyValueToString,tll, TimeUnit.MINUTES);
         }
         catch (Exception e){
             throw  new RuntimeException(e);
         }
+    }
+    public void delete(String key){
+        redisTemplate.delete(key);
     }
 }

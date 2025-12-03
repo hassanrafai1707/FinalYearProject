@@ -2,7 +2,6 @@ package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
-import com.FinalYearProject.FinalYearProject.Repository.ConformationRepository;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,18 +11,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class UserService {
     @Autowired
     private  UserRepository userRepository;
-    @Autowired
-    private ConformationRepository conformationRepository;
     @Autowired
     private ConformationService conformationService;
     @Autowired
@@ -46,8 +44,6 @@ public class UserService {
         user.setExpired(true);
         user.setLocked(true);
 
-        userRepository.save(user);
-
         Conformation conformation = new Conformation(user);
         redisService.set(
                 conformation.getToken(),
@@ -60,7 +56,10 @@ public class UserService {
                 conformation.getToken(),
                 conformation.getOtp()
         );
+        System.out.println(redisService.get(conformation.getToken(),Conformation.class));
         System.out.println("user saved success");
+
+        userRepository.save(user);
         return user;
     }
 
@@ -204,17 +203,17 @@ public class UserService {
     //todo use frontend to logout user
 
     // VERIFY Token
+    @Transactional(propagation = Propagation.REQUIRED)
     public Boolean verifyTokenAndOTP(String token, int otp) {
         try {
-            Conformation conformation=conformationRepository.findByToken(token)
-                    .orElseThrow(()-> new UsernameNotFoundException("User not found "));
-            if ( conformation!=null && otp == conformation.getOtp()) {
+            Conformation conformation=redisService.get(token,Conformation.class);
+            if ( conformation !=null && otp == conformation.getOtp()) {
                 User user = conformation.getUser();
                 user.setExpired(false);
                 user.setLocked(false);
                 user.setIs_enable(true);
                 userRepository.save(user);
-                conformationRepository.deleteByUser(user); //delete conformation after verifying token and otp
+                redisService.delete(token);  //delete conformation after verifying token and otp
                 return Boolean.TRUE;
             }
             else {

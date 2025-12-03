@@ -15,31 +15,15 @@ import java.util.UUID;
 @SuperBuilder
 @Getter
 @Setter
-@Entity
-@Table(name = "Conformation")
 public class Conformation {
-    @Id
-    @SequenceGenerator(
-            name= "ConformationSequence",
-            sequenceName = "ConformationSequence",
-            allocationSize = 1
-    )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator="ConformationSequence")
-    public Long Id;
     public String token;
     public int Otp;
-    @OneToOne(targetEntity = User.class,fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false,name = "User_Id")
     private User user;
 
     public Conformation(User user) {
         this.user = user;
         this.token= UUID.randomUUID().toString();
         generateOtp();
-    }
-
-    public Long getId() {
-        return Id;
     }
 
     public User getUser() {
