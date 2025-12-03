@@ -177,13 +177,12 @@ public class UserService {
         if (authentication.isAuthenticated()) {
             User foundUser = userRepository.findByEmail(email)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            if (foundUser.isIs_enable() && foundUser.isLocked()){
+            if (!foundUser.isIs_enable() || foundUser.isLocked() || foundUser.isExpired() ){
                 throw new RuntimeException("Login failed due to user is locked");
             }
             else {
                 foundUser.setExpired(false);
                 foundUser.setIs_enable(true);
-                foundUser.setLocked(false);
                 userRepository.save(foundUser);
 
                 String token= jwtService.jwtToken(email, foundUser.getRole());
@@ -207,6 +206,8 @@ public class UserService {
             if (conformation.isPresent() && otp == conformation.get().getOtp()) {
                 User user = conformation.get().getUser();
                 user.setIs_enable(true);
+                user.setLocked(false);
+                user.setExpired(false);
                 userRepository.save(user);
                 conformationRepository.deleteByUser(user); //delete conformation after verifying token and otp
                 return Boolean.TRUE;
