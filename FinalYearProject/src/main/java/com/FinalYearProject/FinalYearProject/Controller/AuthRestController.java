@@ -22,63 +22,27 @@ public class AuthRestController {
 
     @PostMapping("/login")
     public ResponseEntity<?> processLoginByEmail(@RequestBody DtoForAnyRequestThatUserEmailAndPasswordInRequest dto){
-        try {
-            Map<String,Object> temp=userService.verifyLoginByEmail(dto.getEmail(), dto.getPassword());
-            User user=(User) temp.get("user");
-            return ResponseEntity
-                    .ok(
-                            Map.of(
-                                    "status","successful",
-                                    "token",temp.get("token"),
-                                    "role",user.getRole()
-                            )
-                    );
-        }
-        catch (UsernameNotFoundException e){
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(
-                            Map.of(
-                                    "status","unsuccessful",
-                                    "error",e.getMessage()
-                            )
-                    );
-        }
-        catch (Exception e){
-            return  ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(
-                            Map.of(
-                                    "status","unsuccessful",
-                                    "message","Invalid credentials",
-                                    "error",e.getMessage()
-                            )
-                    );
-        }
+        Map<String,Object> temp=userService.verifyLoginByEmail(dto.getEmail(), dto.getPassword());
+        User user=(User) temp.get("user");
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","successful",
+                                "token",temp.get("token"),
+                                "role",user.getRole()
+                        )
+                );
     }
     @PostMapping("/register")
     public ResponseEntity<?> processRegister (@RequestBody User user){
-        try {
-            User saveUser =userService.saveUser(user);
-            return ResponseEntity.ok(
-                    Map.of(
-                            "message", "User registered successfully. Please verifyLoginByEmail your email.",
-                            "user", saveUser
-                    )
-            );
-        }
-        catch (Exception e){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(
-                            Map.of(
-                                    "message", "Registration failed",
-                                    "error", e.getMessage()
-                            )
-                    );
-        }
+        User saveUser =userService.saveUser(user);
+        return ResponseEntity.ok(
+                Map.of(
+                        "message", "User registered successfully. Please verifyLoginByEmail your email.",
+                        "user", saveUser
+                )
+        );
     }
-
     @PostMapping("/confirm")
     public ResponseEntity<?> conformation(@RequestParam("token") String token,
                                           @RequestParam("email") String email,

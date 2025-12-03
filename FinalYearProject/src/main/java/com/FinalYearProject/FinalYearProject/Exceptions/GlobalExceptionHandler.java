@@ -68,4 +68,9 @@ public class GlobalExceptionHandler  {
     public ResponseEntity<ErrorResponse> handleQuestionExists(QuestionExistsException e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.CONFLICT,request);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnknownException(Exception e, HttpServletRequest request){
+        return buildResponse(e,HttpStatus.INTERNAL_SERVER_ERROR,request);
+    }
 }
