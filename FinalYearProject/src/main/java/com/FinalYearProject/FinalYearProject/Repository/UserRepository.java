@@ -19,4 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("DELETE FROM User u WHERE u.email =:email")
     public void deleteByEmail(String email);
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u set u.is_enable=true, u.locked=false,u.expired=false where u.email=:email")
+    public  void updateIsEnableLockedExpiredToTrue(String email);
 }

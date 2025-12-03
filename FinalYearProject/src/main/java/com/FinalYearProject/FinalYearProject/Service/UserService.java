@@ -206,15 +206,14 @@ public class UserService {
     public Boolean verifyTokenAndOTP(String token, int otp) {
         try {
             Conformation conformation=redisService.get(token,Conformation.class);
-            if ( conformation !=null && otp == conformation.getOtp()) {
-                User user = conformation.getUser();
-                user.setExpired(false);
-                user.setLocked(false);
-                user.setIs_enable(true);
-                user.setLocked(false);
-                user.setExpired(false);
-                userRepository.save(user);
-                redisService.delete(token);  //delete conformation after verifying token and otp
+            if ( conformation !=null &&
+                    otp == conformation.getOtp() &&
+                    userRepository.existsByEmail(conformation.getUser().getEmail())
+            ) {
+                userRepository.updateIsEnableLockedExpiredToTrue(conformation.getUser().getEmail());
+
+                redisService.delete(token);//delete conformation after verifying token and otp
+
                 return Boolean.TRUE;
             }
             else {
