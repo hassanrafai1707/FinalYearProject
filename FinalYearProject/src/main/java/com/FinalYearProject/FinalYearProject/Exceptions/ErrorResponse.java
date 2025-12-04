@@ -1,7 +1,11 @@
 package com.FinalYearProject.FinalYearProject.Exceptions;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+@Getter
+@Setter
 public class ErrorResponse {
     private String message;
     private int status;
@@ -15,14 +19,29 @@ public class ErrorResponse {
         this.path = path;
     }
 
-    // getters and setters
-    public String getMessage() { return message; }
-    public int getStatus() { return status; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public String getPath() { return path; }
+    public String getMessage() {
+        return message;
+    }
+    public int getStatus() {
+        return status;
+    }
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+    public String getPath() {
+        return path;
+    }
 
-    public void setMessage(String message) { this.message = message; }
-    public void setStatus(int status) { this.status = status; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-    public void setPath(String path) { this.path = path; }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+    public void setPath(String path) {
+        this.path = path;
+    }
 }

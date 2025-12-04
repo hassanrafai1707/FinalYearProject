@@ -9,44 +9,18 @@ import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 @RequestMapping("${app.version}/admin")
 @RestController
-//TODO fix 2/5 let spring handle exception
 public class AdminRestController {
     @Autowired
     private UserService userService;
     @Autowired
     private JwtService jwtService;
-
-    private ResponseEntity<?> handleUnknownException(Exception e){
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(
-                        Map.of(
-                                "states","unsuccessful",
-                                "message","something went wrong try again",
-                                "error", e.getMessage()
-                        )
-                );
-    }
-
-    private ResponseEntity<?> handleUserNotFoudException(UsernameNotFoundException e){
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(
-                        Map.of(
-                                "states","unsuccessful",
-                                "error", e.getMessage()
-                        )
-                );
-    }
 
     @PostMapping("/findUserById")
     public ResponseEntity<?> findUserById(@RequestBody Map<String ,Long> request){

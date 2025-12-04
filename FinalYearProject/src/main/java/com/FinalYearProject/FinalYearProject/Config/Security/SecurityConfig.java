@@ -49,10 +49,6 @@ public class SecurityConfig {
                                                 // All of the below paths are permitted with put being authorised
                                                 appVersion+"/login",
                                                 appVersion+"/auth/**",
-                                                "/auth/login",
-                                                "/auth/register",
-                                                appVersion+"/register",
-                                                appVersion+"/auth/confirm",
                                                 "/login",
                                                 "/register",
                                                 "/css/**",

@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +44,8 @@ public class JwtFilter extends OncePerRequestFilter {
 //            "/images/",
 //            "/webjars/"
 //    );
+    @Value("${app.version}")
+    private String appVersion;
     String token = null;
     String username=null;
     @Override
@@ -51,21 +54,18 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         System.out.println("\n\nincoming path= "+path);//incoming path for debugging
         if (//All allowed paths without auth
-                path.startsWith("/api/v1/login") ||
-                        path.startsWith("/api/v1/register") ||
-                        path.startsWith("/auth/login") ||
-                        path.startsWith("/api/v1/auth/login")||
-                        path.startsWith("/api/v1/auth/register")||
-                        path.startsWith("/api/v1/auth/confirm")||
-                        path.startsWith("/auth/register") ||
-                        path.startsWith("/login") ||
-                        path.startsWith("/register") ||
-                        path.startsWith("/css") ||
-                        path.startsWith("/js") ||
-                        path.startsWith("/images") ||
-                        path.startsWith("/webjars") ||
-                        path.equals("/") ||
-                        path.equals("/favicon.ico")
+                 path.startsWith(appVersion+"/login") ||
+                 path.startsWith(appVersion+"/register") ||
+                 path.startsWith(appVersion+"/auth")||
+                 path.equals("/login") ||
+                 path.equals("/register") ||
+                 path.startsWith("/confirm") ||
+                 path.equals("/favicon.ico") ||
+                 path.startsWith("/css") ||
+                 path.startsWith("/js") ||
+                 path.startsWith("/images") ||
+                 path.startsWith("/webjars") ||
+                 path.equals("/")
         ) {
 
             System.out.println("path "+path);//for debuging check path

@@ -250,4 +250,13 @@ public class UserService {
         }
     }
 
+    public void regenerateOtp(String email){
+        try{
+            Conformation existingConformation=redisService.get(email,Conformation.class);
+            existingConformation.generateOtp();
+            redisService.set(email,existingConformation,10L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

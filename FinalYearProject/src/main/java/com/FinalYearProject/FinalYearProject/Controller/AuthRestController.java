@@ -5,9 +5,7 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -33,6 +31,7 @@ public class AuthRestController {
                         )
                 );
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> processRegister (@RequestBody User user){
         User saveUser =userService.saveUser(user);
@@ -43,6 +42,7 @@ public class AuthRestController {
                 )
         );
     }
+
     @PostMapping("/confirm")
     public ResponseEntity<?> conformation(@RequestParam("token") String token,
                                           @RequestParam("email") String email,
