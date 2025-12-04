@@ -1,12 +1,12 @@
 package com.FinalYearProject.FinalYearProject.DTO;
 
-public class DtoForAnyRequestThatUserEmailAndPasswordInRequest {
+public class DtoForEmailAndPasswordInRequest {
     String email;
     String password;
 
-    public DtoForAnyRequestThatUserEmailAndPasswordInRequest(){}
+    public DtoForEmailAndPasswordInRequest(){}
 
-    public DtoForAnyRequestThatUserEmailAndPasswordInRequest(String email, String password){
+    public DtoForEmailAndPasswordInRequest(String email, String password){
         this.email=email;
         this.password=password;
     }

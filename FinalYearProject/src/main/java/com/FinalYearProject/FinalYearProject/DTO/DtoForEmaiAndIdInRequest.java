@@ -1,12 +1,12 @@
 package com.FinalYearProject.FinalYearProject.DTO;
 
-public class DtoForAnyRequestThatUsesEmaiAndIdInRequest {
+public class DtoForEmaiAndIdInRequest {
     Long Id;
     String email;
 
-    public DtoForAnyRequestThatUsesEmaiAndIdInRequest(){}
+    public DtoForEmaiAndIdInRequest(){}
 
-    public DtoForAnyRequestThatUsesEmaiAndIdInRequest(Long Id, String email){
+    public DtoForEmaiAndIdInRequest(Long Id, String email){
         this.Id=Id;
         this.email=email;
     }

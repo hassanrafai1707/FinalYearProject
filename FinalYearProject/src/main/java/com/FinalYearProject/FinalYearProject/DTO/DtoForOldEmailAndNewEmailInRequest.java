@@ -1,12 +1,12 @@
 package com.FinalYearProject.FinalYearProject.DTO;
 
-public class DtoForAnyRequestThatUserOldEmailAndNewEmailInRequest {
+public class DtoForOldEmailAndNewEmailInRequest {
     String newEmail;
     String oldEmail;
 
-    public DtoForAnyRequestThatUserOldEmailAndNewEmailInRequest(){}
+    public DtoForOldEmailAndNewEmailInRequest(){}
 
-    public DtoForAnyRequestThatUserOldEmailAndNewEmailInRequest(String newEmail, String oldEmail){
+    public DtoForOldEmailAndNewEmailInRequest(String newEmail, String oldEmail){
         this.newEmail=newEmail;
         this.oldEmail=oldEmail;
     }

@@ -1,9 +1,9 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUserEmailAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUserIdAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUsesEmaiAndIdInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.DtoForAnyRequestThatUserOldEmailAndNewEmailInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.DtoForEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.DtoFortUserIdAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.DtoForEmaiAndIdInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.DtoForOldEmailAndNewEmailInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
@@ -118,7 +118,7 @@ public class AdminRestController {
     }
 
     @PostMapping("/updateUserEmailById")
-    public ResponseEntity<?>updateUserEmailById(@RequestBody DtoForAnyRequestThatUsesEmaiAndIdInRequest
+    public ResponseEntity<?>updateUserEmailById(@RequestBody DtoForEmaiAndIdInRequest
                                                             dto){
         Long Id= dto.getId();
         String email= dto.getEmail();
@@ -132,7 +132,7 @@ public class AdminRestController {
     }
 
     @PostMapping("/updateUserEmailByEmail")
-    public ResponseEntity<?> updateUserEmailByEmail(@RequestBody DtoForAnyRequestThatUserOldEmailAndNewEmailInRequest
+    public ResponseEntity<?> updateUserEmailByEmail(@RequestBody DtoForOldEmailAndNewEmailInRequest
                                                             dto){
         String newEmail= dto.getNewEmail();
         String oldEmail= dto.getOldEmail();
@@ -146,7 +146,7 @@ public class AdminRestController {
     }
 
     @PostMapping("/updateUserPasswordByEmail")
-    public ResponseEntity<?> updateUserPasswordByEmail(@RequestBody DtoForAnyRequestThatUserEmailAndPasswordInRequest
+    public ResponseEntity<?> updateUserPasswordByEmail(@RequestBody DtoForEmailAndPasswordInRequest
                                                        dto){
         String email= dto.getEmail();
         String newPassword= dto.getPassword();
@@ -160,7 +160,7 @@ public class AdminRestController {
     }
 
     @PostMapping("/updateUserPasswordById")
-    public ResponseEntity<?> updateUserPasswordById(@RequestBody DtoForAnyRequestThatUserIdAndPasswordInRequest
+    public ResponseEntity<?> updateUserPasswordById(@RequestBody DtoFortUserIdAndPasswordInRequest
                                                     dto){
         Long Id=dto.getId();
         String password= dto.getPassword();
