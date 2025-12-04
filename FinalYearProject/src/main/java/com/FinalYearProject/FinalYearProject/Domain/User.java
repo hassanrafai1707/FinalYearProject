@@ -21,19 +21,33 @@ public class User {
             sequenceName = "userSequence",
             allocationSize = 1
     )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSequence")
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "userSequence"
+
+    )
+    @Column(nullable = false ,unique = true ,updatable = false)
+    private Long Id;
+
     @Column(nullable = false)
-    public Long Id;
-    public String name;
+    private String name;
+
     @Column(nullable = false)
-    public String email;
+    private String email;
+
     @Column(nullable = false)
-    public String role;
-    public boolean is_enable;
+    private String role;
     @Column(nullable = false)
-    public String password;
-    public boolean locked;
-    public boolean expired;
+    private boolean is_enable;
+
+    @Column(nullable = false,unique = true)
+    private String password;
+
+    @Column(nullable = false)
+    private boolean locked;
+
+    @Column(nullable = false)
+    private boolean expired;
 
     public boolean isExpired() {
         return expired;

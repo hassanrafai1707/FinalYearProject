@@ -2,7 +2,7 @@ package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.EmailAllReadyExistsException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class UserService {
     //  CREATE user
     public User saveUser(User user) {
         if (existsByEmail(user.getEmail())) {
-            throw new EmailAllReadyExistsException( "Email already taken");
+            throw new DuplicateEmailException( "Email already taken");
         }
 
         user.setIs_enable(false);
@@ -47,11 +47,13 @@ public class UserService {
         user.setLocked(true);
 
         Conformation conformation = new Conformation(user);
+
         redisService.set(
                 conformation.getUser().getEmail(),
                 conformation,
                 10L
         );
+
         conformationService.sendEmail(
                 user.getEmail(),
                 user.getName(),

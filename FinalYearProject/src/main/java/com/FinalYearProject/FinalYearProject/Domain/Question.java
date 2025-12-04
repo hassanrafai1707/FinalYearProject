@@ -23,14 +23,30 @@ public class Question {
             strategy = GenerationType.SEQUENCE ,
             generator = "QuestionSequence"
     )
+    @Column(nullable = false,unique = true,updatable = false)
     private Long Id;
+
+    @Column(nullable = false)
     private String subjectName;
+
+    @Column(nullable = false)
     private int questionMarks;
+
+    @Column(nullable = false)
     private String mappedCO;
+
+    @Column(nullable = false)
     private String subjectCode;
+
+    @Column(nullable = false)
     private String cognitiveLevel;
+
+    @Column(nullable = false)
     private String questionBody;
+
+    @Column(nullable = false)
     private Boolean isInUse;
+
     @ManyToOne
     @JoinColumn(nullable = false,name = "User_Id")
     private User createdBy;

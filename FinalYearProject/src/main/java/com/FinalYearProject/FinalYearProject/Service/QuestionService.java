@@ -1,6 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
-import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionExistsException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
@@ -77,7 +77,7 @@ public class QuestionService {
     public Question addQuestion(Question question) {
         if (
                 questionRepository.existsByQuestionBody(question.getQuestionBody())){
-            throw new QuestionExistsException("question already present");
+            throw new DuplicateQuestionException("question already present");
         }
         else {
             if (question.getCreatedBy().getRole().equalsIgnoreCase("ROLE_TEACHER")){

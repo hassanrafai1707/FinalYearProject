@@ -1,8 +1,8 @@
 package com.FinalYearProject.FinalYearProject.Exceptions;
 
-import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionExistsException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.EmailAllReadyExistsException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotFoundException;
@@ -53,8 +53,8 @@ public class GlobalExceptionHandler  {
         return buildResponse(e,HttpStatus.LOCKED,request);
     }
 
-    @ExceptionHandler(EmailAllReadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAllReadyExists(EmailAllReadyExistsException e, HttpServletRequest request){
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ErrorResponse> handleUserAllReadyExists(DuplicateEmailException e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.CONFLICT,request);
     }
 
@@ -64,8 +64,8 @@ public class GlobalExceptionHandler  {
         return buildResponse(e,HttpStatus.NOT_FOUND,request);
     }
 
-    @ExceptionHandler(QuestionExistsException.class)
-    public ResponseEntity<ErrorResponse> handleQuestionExists(QuestionExistsException e, HttpServletRequest request){
+    @ExceptionHandler(DuplicateQuestionException.class)
+    public ResponseEntity<ErrorResponse> handleQuestionExists(DuplicateQuestionException e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.CONFLICT,request);
     }
 
