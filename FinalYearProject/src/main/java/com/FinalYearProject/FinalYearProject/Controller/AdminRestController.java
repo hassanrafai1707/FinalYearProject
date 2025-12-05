@@ -96,11 +96,23 @@ public class AdminRestController {
     @PatchMapping("/suspendUserById")
     public ResponseEntity<?> suspendUserById(@RequestBody Map<String,Long> request){
         Long Id= request.get("id");
-        String Message= userService.suspendUserById(Id);
+        String message = userService.suspendUserById(Id);
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",
-                        "message", Message
+                        "message", message
+                )
+        );
+    }
+
+    @PatchMapping("/unsuspendUserById")
+    public ResponseEntity<?> unsuspendUserById(@RequestBody Map<String,Long> request){
+        Long Id= request.get("id");
+        String message=userService.unsuspendUserById(Id);
+        return ResponseEntity.ok(
+                Map.of(
+                        "states","successful",
+                        "message", message
                 )
         );
     }
@@ -109,6 +121,18 @@ public class AdminRestController {
     public ResponseEntity<?> suspendUserByEmail(@RequestBody Map<String,String> request){
         String email=request.get("email");
         String message = userService.suspendUserByEmail(email);
+        return ResponseEntity.ok(
+                Map.of(
+                        "states","successful",
+                        "message", message
+                )
+        );
+    }
+
+    @PatchMapping("/unsuspendUserByEmail")
+    public ResponseEntity<?> unsuspendUserByEmail(@RequestBody Map<String,String> request){
+        String email=request.get("email");
+        String message=userService.unsuspendUserByEmail(email);
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",

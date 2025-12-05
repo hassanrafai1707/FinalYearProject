@@ -164,6 +164,18 @@ public class UserService {
         return "User Suspend successfully";
     }
 
+    public String unsuspendUserById(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with id: " + id));
+
+        user.setExpired(false);
+        user.setLocked(false);
+
+        userRepository.save(user);
+
+        return "User Suspend successfully";
+    }
+
     public String suspendUserByEmail(String email){
         User user=userRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException( "User not found with email"+email));
@@ -175,6 +187,16 @@ public class UserService {
         return "User Suspend successfully";
     }
 
+    public String unsuspendUserByEmail(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with email"+email));
+
+        user.setExpired(false);
+        user.setLocked(false);
+
+        userRepository.save(user);
+        return "User Suspend successfully";
+    }
     //  VERIFY LOGIN
     public Map<String,Object> verifyLoginByEmail(String email, String password) {
         Authentication authentication = authManager.authenticate(
@@ -188,7 +210,6 @@ public class UserService {
                 throw new UserLockedException("Login failed due to user is locked");
             }
             else {
-                foundUser.setExpired(false);
                 foundUser.setIs_enable(true);
                 userRepository.save(foundUser);
 
