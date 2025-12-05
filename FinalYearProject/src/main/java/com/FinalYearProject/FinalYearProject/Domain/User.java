@@ -13,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @Entity
+//TODO Use indexing to reduce time complexity
 @Table(name = "Users")
 public class User {
     @Id
