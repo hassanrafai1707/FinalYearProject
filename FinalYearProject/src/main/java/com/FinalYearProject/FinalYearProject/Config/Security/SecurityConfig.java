@@ -37,14 +37,15 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                          session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth ->
                                 auth
+                                        //TODO remove ROLE_ADMIN from where it does not belong
                                         .requestMatchers(appVersion+"/admin/**").hasAnyAuthority("ROLE_ADMIN")
-                                        .requestMatchers(appVersion+"/student/**").hasAnyAuthority("ROLE_STUDENT")
-                                        .requestMatchers(appVersion+"/teacher**").hasAnyAuthority("ROLE_TEACHER")
-                                        .requestMatchers(appVersion+"/supervisor").hasAnyAuthority("ROLE_SUPERVISOR")
+                                        .requestMatchers(appVersion+"/student/**").hasAnyAuthority("ROLE_STUDENT","ROLE_ADMIN")
+                                        .requestMatchers(appVersion+"/teacher**").hasAnyAuthority("ROLE_TEACHER","ROLE_ADMIN")
+                                        .requestMatchers(appVersion+"/supervisor").hasAnyAuthority("ROLE_SUPERVISOR","ROLE_ADMIN")
                                         .requestMatchers(
                                                 // All of the below paths are permitted with put being authorised
                                                 appVersion+"/login",

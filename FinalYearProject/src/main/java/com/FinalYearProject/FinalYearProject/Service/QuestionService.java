@@ -1,5 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
+import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
@@ -32,30 +33,23 @@ public class QuestionService {
     }
 
     public List<Question> findByMappedCO(String mappedCO){
-        List<Question> questions=questionRepository.findByMappedCO(mappedCO)
+        return questionRepository.findByMappedCO(mappedCO)
                 .orElseThrow(()-> new QuestionNotFoundException("Question not found with mappingCo"+mappedCO));
-        return questions;
     }
 
     public List<Question> findBySubjectName(String subjectName){
-        List<Question> questions=questionRepository.findBySubjectName(subjectName)
+        return questionRepository.findBySubjectName(subjectName)
                 .orElseThrow(()->new QuestionNotFoundException("No questions found with Subject name: "+subjectName));
-
-        return questions;
     }
 
     public List<Question> findBySubjectCode(String subjectCode){
-        List<Question> questions=questionRepository.findBySubjectCode(subjectCode)
+        return questionRepository.findBySubjectCode(subjectCode)
                 .orElseThrow(()->new QuestionNotFoundException("No questions found with Subject code: "+subjectCode));
-
-        return questions;
     }
 
     public List<Question> findByCognitiveLevel(String cognitiveLevel){
-        List<Question> questions=questionRepository.findByCognitiveLevel(cognitiveLevel)
+        return questionRepository.findByCognitiveLevel(cognitiveLevel)
                 .orElseThrow(()-> new QuestionNotFoundException("No questions found with Cognitive Level: " + cognitiveLevel));
-
-        return questions;
     }
 
     public List<Question> findByCreatedByUsingEmail(String email){
@@ -74,13 +68,15 @@ public class QuestionService {
         throw new UsernameNotFoundException("User does not exist! with Id"+Id);
     }
 
-    public Question addQuestion(Question question) {
+    public Question addQuestion(Question question,String email) {
+        User user=userService.findByEmail(email);
         if (
                 questionRepository.existsByQuestionBody(question.getQuestionBody())){
             throw new DuplicateQuestionException("question already present");
         }
         else {
-            if (question.getCreatedBy().getRole().equalsIgnoreCase("ROLE_TEACHER")){
+            if (user.getRole().equalsIgnoreCase("ROLE_TEACHER")){
+                question.setCreatedBy(user);
                 question.setInUse(false);
                 return questionRepository.save(question);
             }
