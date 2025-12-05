@@ -15,9 +15,9 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     public Optional<List<Question>> findBySubjectName(String subjectName);
     public Optional<List<Question>> findBySubjectCode(String subjectCode);
     public Optional<List<Question>> findByCognitiveLevel(String cognitiveLevel);
-    public Boolean existsByQuestionBody(String question);
-    @Query("SELECT q FROM Question q WHERE q.questionBody =:questionBody")
-    public Optional<Question> findByQuestionBody(String questionBody);
+    public Boolean existsByQuestionTitle(String question);
+    @Query("SELECT q FROM Question q WHERE q.questionTitle =:QuestionTitle")
+    public Optional<Question> findByQuestionTitle(String questionTitle);
     @Query("SELECT q FROM Question q WHERE q.createdBy.email =:email")
     public Optional<List<Question>> findByCreatedByUsingEmail(String email);
     @Query("SELECT q FROM Question q WHERE q.createdBy.id=:Id")

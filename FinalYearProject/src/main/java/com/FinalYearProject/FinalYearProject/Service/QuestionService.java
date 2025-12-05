@@ -5,11 +5,16 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.Duplic
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotFoundException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 
 //TODO Use cache to reduce time for retrieving and computing data
@@ -68,10 +73,17 @@ public class QuestionService {
         throw new UsernameNotFoundException("User does not exist! with Id"+Id);
     }
 
-    public Question addQuestion(Question question,String email) {
+    @Transactional
+    public Question addQuestion(Question question) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email=authentication.getName();
+        System.out.println(email+"in security context holder");
         User user=userService.findByEmail(email);
+        if (email==null){
+            throw new UserNotFoundException("User not found");
+        }
         if (
-                questionRepository.existsByQuestionBody(question.getQuestionBody())){
+                questionRepository.existsByQuestionTitle(question.getQuestionBody())){
             throw new DuplicateQuestionException("question already present");
         }
         else {
@@ -95,11 +107,11 @@ public class QuestionService {
         }
     }
 
-    public void deleteQuestionByQuestionBody(String questionBody){
-        Question temp=questionRepository.findByQuestionBody(questionBody)
+    public void deleteQuestionByQuestionBody(String questionTitle){
+        Question temp=questionRepository.findByQuestionTitle(questionTitle)
                 .orElseThrow(
                         ()-> new QuestionNotFoundException(
-                            "Question with this "+questionBody+" Question body not present"
+                            "Question with this "+questionTitle+" Question body not present"
                         )
                 );
         questionRepository.delete(temp);

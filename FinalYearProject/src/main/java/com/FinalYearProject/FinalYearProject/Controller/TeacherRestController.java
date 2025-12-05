@@ -99,11 +99,8 @@ public class TeacherRestController {
     }
 
     @PostMapping("/addQuestion")
-    public ResponseEntity<?> addQuestion(@RequestBody DtoForEmailAndQuestionInRequest dto){
-        Question savedQuestion=questionService.addQuestion(
-                dto.getQuestion(),
-                dto.getEmail()
-        );
+    public ResponseEntity<?> addQuestion(@RequestBody Question question){
+        Question savedQuestion=questionService.addQuestion(question);
         return ResponseEntity
                 .ok(
                         Map.of(

@@ -41,9 +41,12 @@ public class Question {
 
     @Column(nullable = false)
     private String cognitiveLevel;
-
-    @Column(nullable = false)
+    @Lob
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String questionBody;
+
+    @Column(nullable = false,unique = true)
+    private String questionTitle;
 
     @Column(nullable = false)
     private Boolean isInUse;
@@ -118,5 +121,13 @@ public class Question {
 
     public void setInUse(Boolean inUse) {
         isInUse = inUse;
+    }
+
+    public String getQuestionTitle() {
+        return questionTitle;
+    }
+
+    public void setQuestionTitle(String questionTitle) {
+        this.questionTitle = questionTitle;
     }
 }
