@@ -11,8 +11,12 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-//TODO Use indexing to reduce time complexity
-@Table(name="QuestionTable")
+@Table(name="QuestionTable",indexes = {
+        @Index(name = "index_Question_id",columnList = "id"),
+        @Index(name = "index_subject_code",columnList = "subject_code"),
+        @Index(name = "index_question_title", columnList = "question_title"),
+        @Index(name = "index_created_by" , columnList = "user_id")
+})
 public class Question {
     @Id
     @SequenceGenerator(
@@ -41,7 +45,7 @@ public class Question {
 
     @Column(nullable = false)
     private String cognitiveLevel;
-    @Lob
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String questionBody;
 

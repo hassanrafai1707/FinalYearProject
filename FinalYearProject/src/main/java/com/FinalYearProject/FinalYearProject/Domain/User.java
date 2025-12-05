@@ -13,8 +13,10 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @Entity
-//TODO Use indexing to reduce time complexity
-@Table(name = "Users")
+@Table(name = "Users",indexes = {
+        @Index(name = "index_id",columnList = "id",unique = true),
+        @Index(name = "index_email" ,columnList = "email",unique = true)
+})
 public class User {
     @Id
     @SequenceGenerator(
