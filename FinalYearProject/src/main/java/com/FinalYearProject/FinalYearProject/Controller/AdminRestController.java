@@ -22,7 +22,7 @@ public class AdminRestController {
     @Autowired
     private JwtService jwtService;
 
-    @PostMapping("/findUserById")
+    @GetMapping("/findUserById")
     public ResponseEntity<?> findUserById(@RequestBody Map<String ,Long> request){
         Long Id= request.get("id");
         User existingUser = userService.getUserById(Id);
@@ -34,7 +34,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/findByEmail")
+    @GetMapping("/findByEmail")
     public ResponseEntity<?> findByEmail(@RequestBody Map<String , String> requst) {
         String Email = requst.get("email");
         User existingUser = userService.findByEmail(Email);
@@ -46,7 +46,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/listOfUserByRole")
+    @GetMapping("/listOfUserByRole")
     public ResponseEntity<?> listOfUserByRole(@RequestBody Map<String ,String > request){
         String Role=request.get("role");
         List<User> userByRole =userService.listOfUserByRole(Role);
@@ -58,7 +58,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/getAllUsers")
+    @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUsers(){
         List<User> AllUsers=userService.getAllUsers();
         return ResponseEntity.ok(
@@ -93,7 +93,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/suspendUserById")
+    @PatchMapping("/suspendUserById")
     public ResponseEntity<?> suspendUserById(@RequestBody Map<String,Long> request){
         Long Id= request.get("id");
         String Message= userService.suspendUserById(Id);
@@ -105,7 +105,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/suspendUserByEmail")
+    @PatchMapping("/suspendUserByEmail")
     public ResponseEntity<?> suspendUserByEmail(@RequestBody Map<String,String> request){
         String email=request.get("email");
         String message = userService.suspendUserByEmail(email);
@@ -117,7 +117,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/updateUserEmailById")
+    @PatchMapping("/updateUserEmailById")
     public ResponseEntity<?>updateUserEmailById(@RequestBody DtoForEmaiAndIdInRequest
                                                             dto){
         Long Id= dto.getId();
@@ -131,7 +131,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/updateUserEmailByEmail")
+    @PatchMapping("/updateUserEmailByEmail")
     public ResponseEntity<?> updateUserEmailByEmail(@RequestBody DtoForOldEmailAndNewEmailInRequest
                                                             dto){
         String newEmail= dto.getNewEmail();
@@ -145,7 +145,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/updateUserPasswordByEmail")
+    @PatchMapping("/updateUserPasswordByEmail")
     public ResponseEntity<?> updateUserPasswordByEmail(@RequestBody DtoForEmailAndPasswordInRequest
                                                        dto){
         String email= dto.getEmail();
@@ -159,7 +159,7 @@ public class AdminRestController {
         );
     }
 
-    @PostMapping("/updateUserPasswordById")
+    @PatchMapping("/updateUserPasswordById")
     public ResponseEntity<?> updateUserPasswordById(@RequestBody DtoFortUserIdAndPasswordInRequest
                                                     dto){
         Long Id=dto.getId();
