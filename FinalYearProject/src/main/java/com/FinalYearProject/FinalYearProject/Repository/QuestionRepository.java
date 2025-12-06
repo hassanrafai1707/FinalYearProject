@@ -11,15 +11,15 @@ import java.util.Optional;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question , Long> {
 
-    public Optional<List<Question>> findByMappedCO(String mappedCO);
-    public Optional<List<Question>> findBySubjectName(String subjectName);
-    public Optional<List<Question>> findBySubjectCode(String subjectCode);
-    public Optional<List<Question>> findByCognitiveLevel(String cognitiveLevel);
+    public List<Question> findByMappedCO(String mappedCO);
+    public List<Question> findBySubjectName(String subjectName);
+    public List<Question> findBySubjectCode(String subjectCode);
+    public List<Question> findByCognitiveLevel(String cognitiveLevel);
     public Boolean existsByQuestionTitle(String question);
     @Query("SELECT q FROM Question q WHERE q.questionTitle =:QuestionTitle")
     public Optional<Question> findByQuestionTitle(String questionTitle);
     @Query("SELECT q FROM Question q WHERE q.createdBy.email =:email")
-    public Optional<List<Question>> findByCreatedByUsingEmail(String email);
+    public List<Question> findByCreatedByUsingEmail(String email);
     @Query("SELECT q FROM Question q WHERE q.createdBy.id=:Id")
-    public Optional<List<Question>> findByCreatedByUsingId(Long Id);
+    public List<Question> findByCreatedByUsingId(Long Id);
 }

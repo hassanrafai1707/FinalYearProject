@@ -25,7 +25,7 @@ public class AdminRestController {
     @GetMapping("/findUserById")
     public ResponseEntity<?> findUserById(@RequestBody Map<String ,Long> request){
         Long Id= request.get("id");
-        User existingUser = userService.getUserById(Id);
+        User existingUser = userService.findUserById(Id);
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful" ,
@@ -60,7 +60,7 @@ public class AdminRestController {
 
     @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUsers(){
-        List<User> AllUsers=userService.getAllUsers();
+        List<User> AllUsers=userService.findAllUsers();
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",

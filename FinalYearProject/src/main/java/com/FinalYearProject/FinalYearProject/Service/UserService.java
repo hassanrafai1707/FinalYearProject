@@ -68,12 +68,12 @@ public class UserService {
     }
 
     //  READ (all users)
-    public List<User> getAllUsers() {
+    public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
     //  READ (by ID)
-    public User getUserById(Long id) {
+    public User findUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
