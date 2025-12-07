@@ -38,6 +38,17 @@ public class TeacherRestController {
                 );
     }
 
+    @GetMapping("/getQuestionById")
+    public ResponseEntity<?> getQuestionById (@RequestBody Map<String,Long> request){
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "question with giver id",questionService.getQuestionById(request.get("id"))
+                        )
+                );
+    }
+
     @GetMapping("/findBySubjectCode-MappedCO")
     public ResponseEntity<?> findByMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
         List<Question> question=questionService.findByMappedCO(dto.getSubjectCode(), dto.getMappedCO());
@@ -187,6 +198,16 @@ public class TeacherRestController {
         );
     }
 
+    @DeleteMapping("/deleteQuestionById")
+    public ResponseEntity<?> deleteQuestionById(@RequestBody Map<String,Long> request){
+        questionService.deleteQuestionById(request.get("id"));
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "states","successful"
+                        )
+                );
+    }
     @GetMapping("/test")
     public String test(){
         return "hii";

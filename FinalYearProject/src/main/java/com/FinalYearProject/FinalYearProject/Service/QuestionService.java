@@ -155,15 +155,6 @@ public class QuestionService {
         }
     }
 
-    public void deleteQuestionByQuestionTitle(String questionTitle){
-        Question temp=questionRepository.findByQuestionTitle(questionTitle)
-                .orElseThrow(
-                        ()-> new QuestionNotFoundException(
-                            "Question with this "+questionTitle+" Question body not present"
-                        )
-                );
-        questionRepository.delete(temp);
-    }
 
     public List<Question> generateQuestion(
             String[] selectedMappedCO,
@@ -238,7 +229,7 @@ public class QuestionService {
                 counter++;
             }
         }
-        if (counter>=questionBody.length()/2){
+        if (counter>=questionBody.length()/4){
             return Boolean.FALSE;
         }
         else {

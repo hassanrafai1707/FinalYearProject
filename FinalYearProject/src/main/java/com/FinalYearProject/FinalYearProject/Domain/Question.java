@@ -12,13 +12,25 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name="QuestionTable",indexes = {
+        //simple index
         @Index(name = "index_Question_id",columnList = "id"),
         @Index(name = "index_subject_name",columnList = "subject_name"),
         @Index(name = "index_subject_code",columnList = "subject_code"),
         @Index(name = "index_question_title", columnList = "question_title"),
         @Index(name = "index_created_by" , columnList = "user_id"),
-        @Index(name = "index_subject_code_and_mapped_co",columnList = "subject_code, mappedco"),
-        @Index(name = "index_subject_code_and_mapped_co_and_cognitive_level",columnList = "subject_code, mappedco, cognitive_level")
+        // compound index
+        @Index(name = "index_subject_code_and_mapped_co",
+               columnList = "subject_code, mapped_co"
+        ),
+        @Index(name = "index_subject_code_and_mapped_co_and_cognitive_level",
+               columnList = "subject_code, mapped_co, cognitive_level"
+        ),
+        @Index(name = "index_subject_name_and_mapped_co" ,
+               columnList = "subject_name , mapped_co"
+        ),
+        @Index(name = "index_subject_name_and_mapped_co_and_cognitive_level",
+               columnList = "subject_name, mapped_co, cognitive_level"
+        )
 })
 public class Question {
     @Id
