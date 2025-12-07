@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+//TODO fix user will not ask for mapped co only he will ask with subject name or subject code
 @RequestMapping("${app.version}/teacher")
 @RestController
 public class TeacherRestController {
@@ -28,7 +29,7 @@ public class TeacherRestController {
                 .ok(
                         Map.of(
                                 "status","Successful",
-                                "all Users", questionList
+                                "all Question", questionList
                         )
                 );
     }
