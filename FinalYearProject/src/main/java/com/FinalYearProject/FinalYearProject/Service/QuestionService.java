@@ -41,8 +41,8 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
     }
 
-    public List<Question> findByMappedCO(String mappedCO){
-        List<Question> tempQuestion=questionRepository.findByMappedCO(mappedCO);
+    public List<Question> findByMappedCO(String subjectCode ,String mappedCO){
+        List<Question> tempQuestion=questionRepository.findBySubjectCodeAndMappedCO(subjectCode,mappedCO);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -69,8 +69,8 @@ public class QuestionService {
         }
     }
 
-    public List<Question> findByCognitiveLevel(String cognitiveLevel){
-        List<Question> tempQuestions=questionRepository.findByCognitiveLevel(cognitiveLevel);
+    public List<Question> findByCognitiveLevel(String subjectCode,String mappedCo, String cognitiveLevel){
+        List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCo, cognitiveLevel);
         if (!(tempQuestions.isEmpty())){
             return tempQuestions;
         }
@@ -110,7 +110,7 @@ public class QuestionService {
             }
         }
     }
-
+    //TODO use hash code in this method of question body
     public Question addQuestion(Question question) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email=authentication.getName();

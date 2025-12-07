@@ -11,15 +11,19 @@ import java.util.Optional;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question , Long> {
 
-    public List<Question> findByMappedCO(String mappedCO);
-    public List<Question> findBySubjectName(String subjectName);
-    public List<Question> findBySubjectCode(String subjectCode);
-    public List<Question> findByCognitiveLevel(String cognitiveLevel);
-    public Boolean existsByQuestionTitle(String question);
-    @Query("SELECT q FROM Question q WHERE q.questionTitle =:QuestionTitle")
-    public Optional<Question> findByQuestionTitle(String questionTitle);
+    //simple Query handled by spring boot
+    List<Question> findBySubjectCode(String subjectCode);
+    List<Question> findBySubjectName(String subjectName);
+    Boolean existsByQuestionTitle(String question);
+    Optional<Question> findByQuestionTitle(String questionTitle);
+
+    // complex query handled by @Query
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO")
+    List<Question> findBySubjectCodeAndMappedCO(String subjectCode, String mappedCO);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel")
+    List<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel);
     @Query("SELECT q FROM Question q WHERE q.createdBy.email =:email")
-    public List<Question> findByCreatedByUsingEmail(String email);
+    List<Question> findByCreatedByUsingEmail(String email);
     @Query("SELECT q FROM Question q WHERE q.createdBy.id=:Id")
-    public List<Question> findByCreatedByUsingId(Long Id);
+    List<Question> findByCreatedByUsingId(Long Id);
 }

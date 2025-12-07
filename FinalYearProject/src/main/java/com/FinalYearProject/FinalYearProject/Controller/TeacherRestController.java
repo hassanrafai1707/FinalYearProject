@@ -1,5 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCO;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCOAndCognitiveLevel;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmaiAndIdInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForOldEmailAndNewEmailInRequest;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-//TODO fix user will not ask for mapped co only he will ask with subject name or subject code
 @RequestMapping("${app.version}/teacher")
 @RestController
 public class TeacherRestController {
@@ -37,15 +38,30 @@ public class TeacherRestController {
                 );
     }
 
-    @GetMapping("/findByMappedCO")
-    public ResponseEntity<?> findByMappedCO(@RequestBody Map<String,String> request){
-        String MappedCO = request.get("mappedCO");
-        List<Question> question=questionService.findByMappedCO(MappedCO);
+    @GetMapping("/findBySubjectCode-MappedCO")
+    public ResponseEntity<?> findByMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
+        List<Question> question=questionService.findByMappedCO(dto.getSubjectCode(), dto.getMappedCO());
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","Successful",
                                 "list of all questions with CO" ,question
+                        )
+                );
+    }
+
+    @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
+    private ResponseEntity<?> findByCognitiveLevel(@RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto){
+        List<Question> questions=questionService.findByCognitiveLevel(
+                dto.getSubjectCode(),
+                dto.getMappedCO(),
+                dto.getCognitiveLevel()
+        );
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "list of all questions with CO",questions
                         )
                 );
     }

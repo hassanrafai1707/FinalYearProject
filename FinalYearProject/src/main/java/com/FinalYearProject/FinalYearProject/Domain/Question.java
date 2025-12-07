@@ -13,9 +13,12 @@ import lombok.Setter;
 @Entity
 @Table(name="QuestionTable",indexes = {
         @Index(name = "index_Question_id",columnList = "id"),
+        @Index(name = "index_subject_name",columnList = "subject_name"),
         @Index(name = "index_subject_code",columnList = "subject_code"),
         @Index(name = "index_question_title", columnList = "question_title"),
-        @Index(name = "index_created_by" , columnList = "user_id")
+        @Index(name = "index_created_by" , columnList = "user_id"),
+        @Index(name = "index_subject_code_and_mapped_co",columnList = "subject_code, mappedco"),
+        @Index(name = "index_subject_code_and_mapped_co_and_cognitive_level",columnList = "subject_code, mappedco, cognitive_level")
 })
 public class Question {
     @Id
@@ -50,7 +53,7 @@ public class Question {
     private String questionBody;
 
     @Column(nullable = false,unique = true)
-    private String questionTitle;
+    private String questionTitle; // this is a unique fingerprint for each question
 
     @Column(nullable = false)
     private Boolean isInUse;
