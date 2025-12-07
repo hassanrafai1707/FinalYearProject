@@ -1,4 +1,4 @@
-package com.FinalYearProject.FinalYearProject.DTO;
+package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
 public class DtoForEmaiAndIdInRequest {
     Long Id;

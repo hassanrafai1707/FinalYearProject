@@ -1,6 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.DtoForEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import lombok.AllArgsConstructor;

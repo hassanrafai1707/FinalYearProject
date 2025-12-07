@@ -1,9 +1,9 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.DtoForEmaiAndIdInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.DtoForEmailAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.DtoForOldEmailAndNewEmailInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.DtoFortUserIdAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmaiAndIdInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForOldEmailAndNewEmailInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoFortUserIdAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
