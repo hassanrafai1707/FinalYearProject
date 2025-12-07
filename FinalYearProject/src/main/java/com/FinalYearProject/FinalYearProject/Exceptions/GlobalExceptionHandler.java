@@ -2,6 +2,7 @@ package com.FinalYearProject.FinalYearProject.Exceptions;
 
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
@@ -65,10 +66,14 @@ public class GlobalExceptionHandler  {
     }
 
     @ExceptionHandler(DuplicateQuestionException.class)
-    public ResponseEntity<ErrorResponse> handleQuestionExists(DuplicateQuestionException e, HttpServletRequest request){
+    public ResponseEntity<ErrorResponse> handleDuplicateQuestionException(DuplicateQuestionException e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.CONFLICT,request);
     }
 
+    @ExceptionHandler(UnacceptableQuestion.class)
+    public ResponseEntity<ErrorResponse> handleUnacceptableQuestionException(UnacceptableQuestion e ,HttpServletRequest request){
+        return buildResponse(e,HttpStatus.NOT_ACCEPTABLE,request);
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnknownException(Exception e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.INTERNAL_SERVER_ERROR,request);

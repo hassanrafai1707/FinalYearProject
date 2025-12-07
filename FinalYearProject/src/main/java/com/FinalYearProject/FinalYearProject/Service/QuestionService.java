@@ -3,9 +3,9 @@ package com.FinalYearProject.FinalYearProject.Service;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotFoundException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+//TODO Use all unused methods in this class
 //TODO Use cache to reduce time for retrieving and computing data
 @Service
 @AllArgsConstructor
@@ -110,27 +114,34 @@ public class QuestionService {
             }
         }
     }
-    //TODO use hash code in this method of question body
+
     public Question addQuestion(Question question) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email=authentication.getName();
+        String questionTitle=sha256(question.getQuestionBody());
         System.out.println(email+"in security context holder");
         User user=userService.findByEmail(email);
-        if (email==null){
-            throw new UserNotFoundException("User not found");
+        if (
+                question.getQuestionBody().isEmpty()||
+                !checkIfQuestionBodyIsAcceptable(question.getQuestionBody())
+        ){
+            throw new UnacceptableQuestion("Unacceptable Question due to eather no question body or more spaces that words ");
         }
         if (
-                questionRepository.existsByQuestionTitle(question.getQuestionBody())){
+                questionRepository.existsByQuestionTitle(questionTitle)
+        ){
             throw new DuplicateQuestionException("question already present");
         }
         else {
-            if (user.getRole().equalsIgnoreCase("ROLE_TEACHER")){
+            // possible to remove this part in future as we are taking email from security context holder so no way to forge
+            if (!user.getRole().equalsIgnoreCase("ROLE_TEACHER")){
+                throw new UserNotAuthorizesException("User UnAuthorised to make this request");
+            }
+            else {
+                question.setQuestionTitle(questionTitle);
                 question.setCreatedBy(user);
                 question.setInUse(false);
                 return questionRepository.save(question);
-            }
-            else {
-                throw new UserNotAuthorizesException("User UnAuthorised to make this request");
             }
         }
     }
@@ -217,6 +228,36 @@ public class QuestionService {
             }
         }
         return output;
+    }
+
+    private Boolean checkIfQuestionBodyIsAcceptable(String questionBody){
+        int counter =0;
+
+        for (int i = 0; i < questionBody.length(); i++) {
+            if (questionBody.charAt(i)==' '){
+                counter++;
+            }
+        }
+        if (counter>=questionBody.length()/2){
+            return Boolean.FALSE;
+        }
+        else {
+            return Boolean.TRUE;
+        }
+    }
+
+    private String sha256(String input){
+        try {
+            MessageDigest messageDigest =MessageDigest.getInstance("SHA-256");
+            byte[] encoderHash = messageDigest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder temp= new StringBuilder();
+            for (byte b : encoderHash){
+                temp.append(String.format("%02x",b));
+            }
+            return temp.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Boolean checkIfPartOfSelectedMappedCO(
