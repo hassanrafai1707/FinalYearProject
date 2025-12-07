@@ -40,7 +40,7 @@ public class Question {
     @Column(nullable = false)
     private int questionMarks;
 
-    @Column(nullable = false)
+    @Column(name = "mapped_co", nullable = false)
     private String mappedCO;
 
     @Column(nullable = false)
