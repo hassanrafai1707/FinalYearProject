@@ -2,6 +2,8 @@ package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCO;
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCOAndCognitiveLevel;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCO;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCOAndCognitiveLevel;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmaiAndIdInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForOldEmailAndNewEmailInRequest;
@@ -49,21 +51,34 @@ public class TeacherRestController {
                 );
     }
 
-    @GetMapping("/findBySubjectCode-MappedCO")
-    public ResponseEntity<?> findByMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
-        List<Question> question=questionService.findByMappedCO(dto.getSubjectCode(), dto.getMappedCO());
+    @GetMapping("/findBySubjectCode")
+    public ResponseEntity<?> findBySubjectCode(@RequestBody Map<String,String> request){
+        String subjectCode =request.get("subjectCode");
+        List<Question> questions=questionService.findBySubjectCode(subjectCode);
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","Successful",
-                                "list of all questions with CO" ,question
+                                "list of all questions with CO" ,questions
+                        )
+                );
+    }
+
+    @GetMapping("/findBySubjectCode-MappedCO")
+    public ResponseEntity<?> findBySubjectCodeMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
+        List<Question> question=questionService.findBySubjectCodeMappedCO(dto.getSubjectCode(), dto.getMappedCO());
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "list of all questions with subject name and mapped CO" ,question
                         )
                 );
     }
 
     @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
     private ResponseEntity<?> findByCognitiveLevel(@RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto){
-        List<Question> questions=questionService.findByCognitiveLevel(
+        List<Question> questions=questionService.findBySubjectCodeMappedCOCognitiveLevel(
                 dto.getSubjectCode(),
                 dto.getMappedCO(),
                 dto.getCognitiveLevel()
@@ -72,7 +87,7 @@ public class TeacherRestController {
                 .ok(
                         Map.of(
                                 "status","Successful",
-                                "list of all questions with CO",questions
+                                "list of all questions with subject code and mapped CO and cognitive level",questions
                         )
                 );
     }
@@ -85,22 +100,40 @@ public class TeacherRestController {
                 .ok(
                         Map.of(
                                 "status","Successful",
-                                "list of all questions with CO" ,questions
+                                "list of all questions with subject name" ,questions
                         )
                 );
     }
 
-    @GetMapping("/findBySubjectCode")
-    public ResponseEntity<?> findBySubjectCode(@RequestBody Map<String,String> request){
-        String subjectCode =request.get("subjectCode");
-        List<Question> questions=questionService.findBySubjectCode(subjectCode);
+    @GetMapping("/findBySubjectName-MappedCO")
+    public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","Successful",
-                                "list of all questions with CO" ,questions
+                                "list of all questions with subject name and mapped CO",
+                                questionService.findBySubjectNameMappedCO(
+                                                dto.getSubjectName(),
+                                                dto.getMappedCO()
+                                )
                         )
                 );
+    }
+
+    @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
+    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(@RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto){
+    return ResponseEntity
+            .ok(
+                    Map.of(
+                            "status" ,"Successful",
+                            "list of all questions with subject name and mapped CO and cognitive level",
+                            questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                    dto.getSubjectName(),
+                                    dto.getMappedCO(),
+                                    dto.getCognitiveLevel()
+                            )
+                    )
+            );
     }
 
     @GetMapping("/findByCreatedByUsingEmail")

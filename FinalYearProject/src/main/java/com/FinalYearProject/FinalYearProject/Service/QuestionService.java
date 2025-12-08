@@ -45,14 +45,29 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
     }
 
-    public List<Question> findByMappedCO(String subjectCode ,String mappedCO){
+    public List<Question> findBySubjectCode(String subjectCode){
+        List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
+        if (!(tempQuestion.isEmpty())){
+            return tempQuestion;
+        }
+        throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
+    }
+
+    public List<Question> findBySubjectCodeMappedCO(String subjectCode , String mappedCO){
         List<Question> tempQuestion=questionRepository.findBySubjectCodeAndMappedCO(subjectCode,mappedCO);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
-        else {
-         throw new QuestionNotFoundException("Question not found with mappingCo"+mappedCO);
+        throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
+    }
+
+
+    public List<Question> findBySubjectCodeMappedCOCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel){
+        List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
+        if (!(tempQuestions.isEmpty())){
+            return tempQuestions;
         }
+        throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
     }
 
     public List<Question> findBySubjectName(String subjectName){
@@ -63,24 +78,20 @@ public class QuestionService {
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
 
-    public List<Question> findBySubjectCode(String subjectCode){
-        List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
+    public List<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO){
+        List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(subjectName,mappedCO);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
-        else {
-            throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
-        }
+        throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO);
     }
 
-    public List<Question> findByCognitiveLevel(String subjectCode,String mappedCo, String cognitiveLevel){
-        List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCo, cognitiveLevel);
-        if (!(tempQuestions.isEmpty())){
-            return tempQuestions;
+    public List<Question> findBySubjectNameMappedCOCognitiveLevel(String subjectName,String mappedCO,String cognitiveLevel){
+        List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(subjectName, mappedCO, cognitiveLevel);
+        if (!(tempQuestion.isEmpty())){
+            return tempQuestion;
         }
-        else{
-            throw new QuestionNotFoundException("No questions found with Cognitive Level: " + cognitiveLevel);
-        }
+        throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
     }
 
     public List<Question> findByCreatedByUsingEmail(String email){

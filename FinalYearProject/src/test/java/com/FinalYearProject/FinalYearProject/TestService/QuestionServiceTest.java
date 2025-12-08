@@ -49,13 +49,13 @@
 //        assertThrows(RuntimeException.class, () -> questionService.getQuestionById(1L));
 //    }
 //
-//    // ============= TEST : findByMappedCO ==================
+//    // ============= TEST : getFindBySubjectNameMappedCOMappedCO ==================
 //    @Test
 //    void testFindByMappedCOSuccess() {
 //        List<Question> list = List.of(new Question());
-//        when(questionRepository.findByMappedCO("CO1")).thenReturn(list);
+//        when(questionRepository.getFindBySubjectNameMappedCOMappedCO("CO1")).thenReturn(list);
 //
-//        assertEquals(1, questionService.findByMappedCO("CO1").size());
+//        assertEquals(1, questionService.getFindBySubjectNameMappedCOMappedCO("CO1").size());
 //    }
 //
 //    // ============= TEST : findBySubjectName ==================
@@ -76,13 +76,13 @@
 //        assertEquals(1, questionService.findBySubjectCode("3140706").size());
 //    }
 //
-//    // ============= TEST : findByCognitiveLevel ==================
+//    // ============= TEST : findBySubjectCodeMappedCOCognitiveLevel ==================
 //    @Test
 //    void testFindByCognitiveLevelSuccess() {
 //        List<Question> list = List.of(new Question());
-//        when(questionRepository.findByCognitiveLevel("L")).thenReturn(list);
+//        when(questionRepository.findBySubjectCodeMappedCOCognitiveLevel("L")).thenReturn(list);
 //
-//        assertEquals(1, questionService.findByCognitiveLevel("L").size());
+//        assertEquals(1, questionService.findBySubjectCodeMappedCOCognitiveLevel("L").size());
 //    }
 //
 //    // ============= TEST : findByCreatedByUsingEmail ==================
