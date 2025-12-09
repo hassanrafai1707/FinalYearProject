@@ -5,6 +5,7 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Domain.UserPrincipal;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotFoundException;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +134,26 @@ public class UserService {
             return "deleted successfully";
         } else {
             throw new UsernameNotFoundException("User not found with id: " + id);
+        }
+    }
+
+    public String deleteUserInBatchById(Long[] ids) {
+        try {
+            userRepository.deleteUserInBatchById(ids);
+            return "all users with Ids"+ids+"deleted ";
+        }
+        catch (UserNotFoundException e){
+            throw new UserNotFoundException(e.getMessage());
+        }
+    }
+
+    public String deleteUserInBatchEmail(String[] emails){
+        try {
+            userRepository.deleteUserInBatchByEmail(emails);
+            return "all users with emails "+emails+" deleted";
+        }
+        catch (UserNotFoundException e){
+            throw new UserNotFoundException(e.getMessage());
         }
     }
 

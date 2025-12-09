@@ -12,9 +12,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    //simple query handled by spring boot
     public Optional<User> findByEmail(String email);
     public Boolean existsByEmail(String email);
     public List<User> findByRole(String role);
+    //complex query handle by @Query
     @Transactional
     @Modifying
     @Query("DELETE FROM User u WHERE u.email =:email")
@@ -23,4 +25,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u set u.is_enable=true, u.locked=false,u.expired=false where u.email=:email")
     public  void updateIsEnableLockedExpiredToTrue(String email);
+    @Query("DELETE User u WHERE u.Id IN:Ids")
+    public void deleteUserInBatchById(Long[] Ids);
+    @Query("DELETE User u WHERE u.email IN:email")
+    public void deleteUserInBatchByEmail(String[] emails);
 }

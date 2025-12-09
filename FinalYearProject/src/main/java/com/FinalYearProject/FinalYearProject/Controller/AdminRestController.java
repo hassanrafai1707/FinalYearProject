@@ -1,11 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoFortUserIdAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmaiAndIdInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForOldEmailAndNewEmailInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
-import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +14,6 @@ import java.util.Map;
 public class AdminRestController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private JwtService jwtService;
 
     @GetMapping("/findUserById")
     public ResponseEntity<?> findUserById(@RequestBody Map<String ,Long> request){
@@ -89,6 +82,17 @@ public class AdminRestController {
                 Map.of(
                         "states","successful",
                         "message",message
+                )
+        );
+    }
+
+    @DeleteMapping("/deleteUsersInBatchByID")
+    public ResponseEntity<?> deleteUsersInBatchByID(@RequestBody Map<String,Long[]> requst){
+        Long[] ids=requst.get("id");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "message",userService.deleteUserInBatchById(ids)
                 )
         );
     }
@@ -165,7 +169,6 @@ public class AdminRestController {
                 )
         );
     }
-
     @PostMapping("/logout")
     public ResponseEntity<?> logoutProcesser (HttpServletRequest token){
         return ResponseEntity.ok(
