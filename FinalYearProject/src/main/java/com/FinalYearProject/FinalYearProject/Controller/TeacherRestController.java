@@ -1,13 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCO;
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCOAndCognitiveLevel;
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCO;
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCOAndCognitiveLevel;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmaiAndIdInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForOldEmailAndNewEmailInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoFortUserIdAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
@@ -16,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -171,6 +165,26 @@ public class TeacherRestController {
                                 "status","Successful",
                                 "message","Question saved",
                                 "Question saved",savedQuestion
+                        )
+                );
+    }
+
+    @GetMapping("/generateQuestionPaper")
+    public ResponseEntity<?> generateQuestionPaper(@RequestBody DtoForSubjectCodeAndMappedCOs_ARU_And_2_4_Marks dto){
+        ArrayList<Question> generatedQuestionPaper=questionService.generateBySubjectCodeQuestion(
+                dto.getSubjectCode(),
+                dto.getMappedCOs(),
+                dto.getNumberOfCognitiveLevel_A(),
+                dto.getNumberOfCognitiveLevel_R(),
+                dto.getNumberOfCognitiveLevel_U(),
+                dto.getMaxNumberOf2Marks(),
+                dto.getMaxNumberOf4Marks()
+        );
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "generated Question Paper",generatedQuestionPaper
                         )
                 );
     }

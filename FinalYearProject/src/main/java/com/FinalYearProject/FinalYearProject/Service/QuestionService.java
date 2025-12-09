@@ -183,68 +183,84 @@ public class QuestionService {
         }
     }
 
-    public ArrayList<Question> generateQuestion(
+    public ArrayList<Question> generateBySubjectCodeQuestion(
             String subjectCode,
             String[] mappedCOs,
-            int numberOfCognitiveLevel_L,
+            int numberOfCognitiveLevel_A,
             int numberOfCognitiveLevel_R,
             int numberOfCognitiveLevel_U,
             int maxNumberOf2Marks,
             int maxNumberOf4Marks
-    ){
-        Question[] allowed =questionRepository.findValidQuestionsWithSubjectCode(subjectCode,mappedCOs);
-        ArrayList<Question> output=new ArrayList<>();
-        Random random= new Random();
-        if (allowed==null){
-            throw new QuestionNotFoundException("there are no questions with selected subject code "+subjectCode+"and selected mappedCO "+mappedCOs);
+    ) {
+        Question[] allowed = questionRepository.findValidQuestionsWithSubjectCode(subjectCode, mappedCOs);
+        ArrayList<Question> output = new ArrayList<>();
+        Random random = new Random();
+
+        if (allowed == null || allowed.length == 0) {
+            throw new QuestionNotFoundException("No questions found for selected subject + CO");
         }
-        else {
-            while (numberOfCognitiveLevel_L>=0 ||numberOfCognitiveLevel_R>=0 || numberOfCognitiveLevel_U>=0|| maxNumberOf2Marks >=0 || maxNumberOf4Marks >=0){
-                int nextRandomQuestionIndex=random.nextInt(0,allowed.length-1);
-                Question temp=allowed[nextRandomQuestionIndex];
-                switch (temp.getCognitiveLevel()){
-                    case "L" ->{
-                        if(!temp.getIsInUse()){
-                            if (temp.getQuestionMarks()==2){
-                                maxNumberOf2Marks--;
-                            }
-                            else if (temp.getQuestionMarks()==4) {
-                                maxNumberOf4Marks--;
-                            }
-                            numberOfCognitiveLevel_L--;
-                            temp.setIsInUse(true);
-                            output.add(temp);
-                        }
+
+        while (
+                (numberOfCognitiveLevel_A > 0 ||
+                        numberOfCognitiveLevel_R > 0 ||
+                        numberOfCognitiveLevel_U > 0)
+                        &&
+                        (maxNumberOf2Marks > 0 || maxNumberOf4Marks > 0)
+        ) {
+
+            int nextRandomQuestionIndex = random.nextInt(allowed.length);
+            Question temp = allowed[nextRandomQuestionIndex];
+
+            // Skip if already selected
+            if (Boolean.TRUE.equals(temp.getIsInUse())) continue;
+
+            switch (temp.getCognitiveLevel()) {
+                case "A" -> {
+                    if (numberOfCognitiveLevel_A > 0 &&
+                            ((temp.getQuestionMarks() == 2 && maxNumberOf2Marks > 0) ||
+                                    (temp.getQuestionMarks() == 4 && maxNumberOf4Marks > 0))) {
+
+                        temp.setIsInUse(true);
+                        output.add(temp);
+                        numberOfCognitiveLevel_A--;
+
+                        if (temp.getQuestionMarks() == 2) maxNumberOf2Marks--;
+                        else maxNumberOf4Marks--;
                     }
-                    case "R" ->{
-                        if(!temp.getIsInUse()) {
-                            if (temp.getQuestionMarks() == 2) {
-                                maxNumberOf2Marks--;
-                            } else if (temp.getQuestionMarks() == 4) {
-                                maxNumberOf4Marks--;
-                            }
-                            numberOfCognitiveLevel_R--;
-                            temp.setIsInUse(true);
-                            output.add(temp);
-                        }
+                }
+
+                case "R" -> {
+                    if (numberOfCognitiveLevel_R > 0 &&
+                            ((temp.getQuestionMarks() == 2 && maxNumberOf2Marks > 0) ||
+                                    (temp.getQuestionMarks() == 4 && maxNumberOf4Marks > 0))) {
+
+                        temp.setIsInUse(true);
+                        output.add(temp);
+                        numberOfCognitiveLevel_R--;
+
+                        if (temp.getQuestionMarks() == 2) maxNumberOf2Marks--;
+                        else maxNumberOf4Marks--;
                     }
-                    case "U" ->{
-                        if(!temp.getIsInUse()) {
-                            if (temp.getQuestionMarks() == 2) {
-                                maxNumberOf2Marks--;
-                            } else if (temp.getQuestionMarks() == 4) {
-                                maxNumberOf4Marks--;
-                            }
-                            numberOfCognitiveLevel_U--;
-                            temp.setInUse(true);
-                            output.add(temp);
-                        }
+                }
+
+                case "U" -> {
+                    if (numberOfCognitiveLevel_U > 0 &&
+                            ((temp.getQuestionMarks() == 2 && maxNumberOf2Marks > 0) ||
+                                    (temp.getQuestionMarks() == 4 && maxNumberOf4Marks > 0))) {
+
+                        temp.setIsInUse(true);
+                        output.add(temp);
+                        numberOfCognitiveLevel_U--;
+
+                        if (temp.getQuestionMarks() == 2) maxNumberOf2Marks--;
+                        else maxNumberOf4Marks--;
                     }
                 }
             }
         }
         return output;
     }
+
 
     private Boolean checkIfQuestionBodyIsAcceptable(String questionBody){
         int counter =0;
