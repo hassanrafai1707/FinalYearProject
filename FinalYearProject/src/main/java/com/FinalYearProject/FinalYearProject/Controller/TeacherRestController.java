@@ -20,7 +20,6 @@ public class TeacherRestController {
     private UserService userService;
     @Autowired
     private QuestionService questionService;
-    //TODO Use Question paper services here
 
     @GetMapping("/getAllQuestion")
     public ResponseEntity<?> getAllQuestion(){
@@ -209,7 +208,15 @@ public class TeacherRestController {
                 );
     }
 
-    
+    @PostMapping("/approveGeneratedQuestionPaper")
+    public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody Map<String,Question[]> request){
+        Question[] approvedQuestions=request.get("generated Question Paper");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful"
+                )
+        );
+    }
     @PatchMapping("/updateUserEmail")
     public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
     ){
