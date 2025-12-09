@@ -169,8 +169,8 @@ public class TeacherRestController {
                 );
     }
 
-    @GetMapping("/generateQuestionPaper")
-    public ResponseEntity<?> generateQuestionPaper(@RequestBody DtoForSubjectCodeAndMappedCOs_ARU_And_2_4_Marks dto){
+    @GetMapping("/generateBySubjectCodeQuestionPaper")
+    public ResponseEntity<?> generateBySubjectCodeQuestionPaper(@RequestBody DtoForSubjectCodeAndMappedCOs_ARU_And_2_4_Marks dto){
         ArrayList<Question> generatedQuestionPaper=questionService.generateBySubjectCodeQuestion(
                 dto.getSubjectCode(),
                 dto.getMappedCOs(),
@@ -189,6 +189,27 @@ public class TeacherRestController {
                 );
     }
 
+    @GetMapping("/generateBySubjectAndQuestionPaper")
+    public ResponseEntity<?> generateBySubjectAndQuestionPaper(@RequestBody DtoForSubjectNameAndMappedCOs_ARU_And_2_4_Marks dto){
+        ArrayList<Question> generatedQuestionPaper=questionService.generateBySubjectNameQuestion(
+                dto.getSubjectName(),
+                dto.getMappedCOs(),
+                dto.getNumberOfCognitiveLevel_A(),
+                dto.getNumberOfCognitiveLevel_R(),
+                dto.getNumberOfCognitiveLevel_U(),
+                dto.getMaxNumberOf2Marks(),
+                dto.getMaxNumberOf4Marks()
+        );
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "generated Question Paper",generatedQuestionPaper
+                        )
+                );
+    }
+
+    
     @PatchMapping("/updateUserEmail")
     public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
     ){

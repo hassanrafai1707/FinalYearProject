@@ -262,6 +262,84 @@ public class QuestionService {
     }
 
 
+    public ArrayList<Question> generateBySubjectNameQuestion(
+            String subjectName,
+            String[] mappedCOs,
+            int numberOfCognitiveLevel_A,
+            int numberOfCognitiveLevel_R,
+            int numberOfCognitiveLevel_U,
+            int maxNumberOf2Marks,
+            int maxNumberOf4Marks
+    ) {
+        Question[] allowed = questionRepository.findValidQuestionWithSubjectName(subjectName, mappedCOs);
+        ArrayList<Question> output = new ArrayList<>();
+        Random random = new Random();
+
+        if (allowed == null || allowed.length == 0) {
+            throw new QuestionNotFoundException("No questions found for selected subject + CO");
+        }
+
+        while (
+                (numberOfCognitiveLevel_A > 0 ||
+                        numberOfCognitiveLevel_R > 0 ||
+                        numberOfCognitiveLevel_U > 0)
+                        &&
+                        (maxNumberOf2Marks > 0 || maxNumberOf4Marks > 0)
+        ) {
+
+            int nextRandomQuestionIndex = random.nextInt(allowed.length);
+            Question temp = allowed[nextRandomQuestionIndex];
+
+            // Skip if already selected
+            if (Boolean.TRUE.equals(temp.getIsInUse())) continue;
+
+            switch (temp.getCognitiveLevel()) {
+                case "A" -> {
+                    if (numberOfCognitiveLevel_A > 0 &&
+                            ((temp.getQuestionMarks() == 2 && maxNumberOf2Marks > 0) ||
+                                    (temp.getQuestionMarks() == 4 && maxNumberOf4Marks > 0))) {
+
+                        temp.setIsInUse(true);
+                        output.add(temp);
+                        numberOfCognitiveLevel_A--;
+
+                        if (temp.getQuestionMarks() == 2) maxNumberOf2Marks--;
+                        else maxNumberOf4Marks--;
+                    }
+                }
+
+                case "R" -> {
+                    if (numberOfCognitiveLevel_R > 0 &&
+                            ((temp.getQuestionMarks() == 2 && maxNumberOf2Marks > 0) ||
+                                    (temp.getQuestionMarks() == 4 && maxNumberOf4Marks > 0))) {
+
+                        temp.setIsInUse(true);
+                        output.add(temp);
+                        numberOfCognitiveLevel_R--;
+
+                        if (temp.getQuestionMarks() == 2) maxNumberOf2Marks--;
+                        else maxNumberOf4Marks--;
+                    }
+                }
+
+                case "U" -> {
+                    if (numberOfCognitiveLevel_U > 0 &&
+                            ((temp.getQuestionMarks() == 2 && maxNumberOf2Marks > 0) ||
+                                    (temp.getQuestionMarks() == 4 && maxNumberOf4Marks > 0))) {
+
+                        temp.setIsInUse(true);
+                        output.add(temp);
+                        numberOfCognitiveLevel_U--;
+
+                        if (temp.getQuestionMarks() == 2) maxNumberOf2Marks--;
+                        else maxNumberOf4Marks--;
+                    }
+                }
+            }
+        }
+        return output;
+    }
+
     private Boolean checkIfQuestionBodyIsAcceptable(String questionBody){
         int counter =0;
 
