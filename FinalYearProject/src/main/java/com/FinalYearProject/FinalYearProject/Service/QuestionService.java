@@ -110,6 +110,15 @@ public class QuestionService {
         }
     }
 
+    public Question findQuestionByQuestionBody(String questionBody){
+        return questionRepository.
+                findByQuestionTitle(
+                        sha256(questionBody)
+                ).orElseThrow(
+                        ()-> new QuestionNotFoundException("no question with this body")
+                );
+    }
+
     public List<Question> findByCreatedByUsingId(Long Id){
         User tempUser=userService.findUserById(Id);
         if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
