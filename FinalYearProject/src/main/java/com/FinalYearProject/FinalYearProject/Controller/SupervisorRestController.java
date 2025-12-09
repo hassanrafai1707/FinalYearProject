@@ -4,10 +4,6 @@ import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAn
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCOAndCognitiveLevel;
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCO;
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCOAndCognitiveLevel;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmaiAndIdInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForOldEmailAndNewEmailInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoFortUserIdAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
@@ -161,12 +157,11 @@ public class SupervisorRestController {
                 );
     }
 
-    @PatchMapping("/updateUserEmailById")
-    public ResponseEntity<?> updateUserEmailById(@RequestBody DtoForEmaiAndIdInRequest
-                                                         dto){
-        Long Id= dto.getId();
-        String email= dto.getEmail();
-        User upDatedUser= userService.updateUserEmailById(Id,email);
+    @PatchMapping("/updateUserEmail")
+    public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
+    ){
+        String email= request.get("email");
+        User upDatedUser= userService.updateUserEmail(email);
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",
@@ -175,40 +170,10 @@ public class SupervisorRestController {
         );
     }
 
-    @PatchMapping("/updateUserEmailByEmail")
-    public ResponseEntity<?> updateUserEmailByEmail(@RequestBody DtoForOldEmailAndNewEmailInRequest
-                                                            dto){
-        String newEmail= dto.getNewEmail();
-        String oldEmail= dto.getOldEmail();
-        User updatedUser=userService.updateUserEmailByEmail(oldEmail,newEmail);
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "updatedUser",updatedUser
-                )
-        );
-    }
-
-    @PatchMapping("/updateUserPasswordByEmail")
-    public ResponseEntity<?> updateUserPasswordByEmail(@RequestBody DtoForEmailAndPasswordInRequest
-                                                               dto){
-        String email= dto.getEmail();
-        String newPassword= dto.getPassword();
-        User updatedUser =userService.updateUserPasswordByEmail(email,newPassword);
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "updatedUser",updatedUser
-                )
-        );
-    }
-
-    @PatchMapping("/updateUserPasswordById")
-    public ResponseEntity<?> updateUserPasswordById(@RequestBody DtoFortUserIdAndPasswordInRequest
-                                                            dto){
-        Long Id=dto.getId();
-        String password= dto.getPassword();
-        User updatedUser = userService.updateUserPasswordById(Id,password);
+    @PatchMapping("/updateUserPassword")
+    public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
+        String password= request.get("password");
+        User updatedUser = userService.updateUserPassword(password);
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",

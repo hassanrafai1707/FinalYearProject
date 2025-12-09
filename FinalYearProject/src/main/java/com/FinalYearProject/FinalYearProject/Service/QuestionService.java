@@ -166,7 +166,7 @@ public class QuestionService {
         }
     }
 
-
+//TODO fix the logic
     public List<Question> generateQuestion(
             String[] selectedMappedCO,
             int numberOfCognitiveLevel_L,

@@ -2,6 +2,7 @@ package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Domain.UserPrincipal;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -94,42 +96,25 @@ public class UserService {
 
     //  UPDATE
 
-    public User updateUserEmailById(Long id, String email) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+    public User updateUserEmail(String email) {
+        UserPrincipal temp= (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User existingUser = userRepository.findById(test().getId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + temp.getId()));
 
         existingUser.setEmail(email);
 
         return userRepository.save(existingUser);
     }
 
-    public User updateUserEmailByEmail (String oldEmail, String newEmail){
-
-        User existingUser =userRepository.findByEmail(oldEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + oldEmail));
-
-        existingUser.setEmail(newEmail);
-
-        return userRepository.save(existingUser);
-    }
-
-    public User updateUserPasswordById(Long id, String newPassword){
-        User existingUser=userRepository.findById(id)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+id));
+    public User updateUserPassword(String newPassword){
+        UserPrincipal temp=(UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User existingUser=userRepository.findById(temp.getId())
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+temp.getId()));
 
         existingUser.setPassword(encoder.encode(newPassword));
 
         return userRepository.save(existingUser);
     }
-
-    public User updateUserPasswordByEmail(String email, String newPassword){
-        User existingUser=userRepository.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with Email :"+email));
-
-        existingUser.setPassword(encoder.encode(newPassword));
-
-        return userRepository.save(existingUser);
-    }//
 
     //  DELETE (by user)
     public String deleteUserByEmail(String email) {
@@ -264,6 +249,9 @@ public class UserService {
         }
     }
 
+    public UserPrincipal test(){
+        return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
     public Boolean existsById(Long Id){
         if (userRepository.existsById(Id)){
             return Boolean.TRUE;
