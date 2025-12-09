@@ -119,6 +119,14 @@ public class QuestionService {
                 );
     }
 
+    public void deleteQuestionByQuestionBody(String questionBody){
+        Question temp=questionRepository.findByQuestionTitle(
+                sha256(questionBody)
+        ).orElseThrow(
+                ()-> new QuestionNotFoundException("no question with this body")
+        );
+        questionRepository.delete(temp);
+    }
     public List<Question> findByCreatedByUsingId(Long Id){
         User tempUser=userService.findUserById(Id);
         if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
