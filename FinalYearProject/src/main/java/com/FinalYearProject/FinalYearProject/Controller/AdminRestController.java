@@ -88,11 +88,22 @@ public class AdminRestController {
 
     @DeleteMapping("/deleteUsersInBatchByID")
     public ResponseEntity<?> deleteUsersInBatchByID(@RequestBody Map<String,Long[]> requst){
-        Long[] ids=requst.get("id");
+        Long[] ids=requst.get("ids");
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
                         "message",userService.deleteUserInBatchById(ids)
+                )
+        );
+    }
+
+    @DeleteMapping("/deleteUsersInBatchByEmail")
+    public ResponseEntity<?> deleteUsersInBatchByEmail(@RequestBody Map<String,String[]> request){
+        String[] emails=request.get("emails");
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "message",userService.deleteUserInBatchEmail(emails)
                 )
         );
     }
