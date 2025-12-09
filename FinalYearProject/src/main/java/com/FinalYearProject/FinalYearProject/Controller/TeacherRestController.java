@@ -245,6 +245,17 @@ public class TeacherRestController {
                         )
                 );
     }
+
+    @DeleteMapping("/deleteQestionByQuestionBody")
+    public ResponseEntity<?> deleteQuestionByQuestionBody(@RequestBody Map<String,String> request){
+        questionService.deleteQuestionByQuestionBody(request.get("questionBody"));
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful"
+                )
+        );
+    }
+
     @GetMapping("/test")
     public String test(){
         return "hii";
