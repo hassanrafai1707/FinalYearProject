@@ -28,6 +28,11 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel")
     List<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(String subjectName ,String mappedCO ,String cognitiveLevel);
 
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO IN :mappedCOs")
+    List<Question> findValidQuestionsWithSubjectCode(String subjectCode,String[] mappedCOs);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO IN : mappedCOs")
+    List<Question> findValidQuestionWithSubjectName(String subjectName,String[] mappedCOs);
+
     @Query("SELECT q FROM Question q WHERE q.createdBy.email =:email")
     List<Question> findByCreatedByUsingEmail(String email);
     @Query("SELECT q FROM Question q WHERE q.createdBy.id=:Id")
