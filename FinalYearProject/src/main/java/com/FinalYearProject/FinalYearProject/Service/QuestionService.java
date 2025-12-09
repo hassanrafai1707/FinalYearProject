@@ -183,67 +183,64 @@ public class QuestionService {
         }
     }
 
-//TODO fix the logic
-    public List<Question> generateQuestion(
-            String[] selectedMappedCO,
+    public ArrayList<Question> generateQuestion(
+            String subjectCode,
+            String[] mappedCOs,
             int numberOfCognitiveLevel_L,
             int numberOfCognitiveLevel_R,
             int numberOfCognitiveLevel_U,
-            int max2Marks,
-            int max4Marks,
-            int maxMarks
-    ) {
-
-        List<Question> allowed = questionRepository.findAll()
-                .stream()
-                .filter(q -> !q.getInUse() &&
-                        checkIfPartOfSelectedMappedCO(q, selectedMappedCO))
-                .toList();
-
-        Collections.shuffle(allowed);
-
-        List<Question> output = new ArrayList<>();
-        int totalMarks = 0;
-        int selected2M = 0;
-        int selected4M = 0;
-
-        for (Question q : allowed) {
-
-            if (totalMarks >= maxMarks) break;
-
-            int marks = q.getQuestionMarks();
-            String level = q.getCognitiveLevel().trim().toUpperCase();
-            boolean canPick = false;
-
-            switch (level) {
-                case "L" -> canPick = numberOfCognitiveLevel_L > 0;
-                case "R" -> canPick = numberOfCognitiveLevel_R > 0;
-                case "U" -> canPick = numberOfCognitiveLevel_U > 0;
-            }
-
-            if (marks == 2 && selected2M < max2Marks) canPick = canPick && true;
-            else if (marks == 4 && selected4M < max4Marks) canPick = canPick && true;
-            else canPick = false;
-
-            if (canPick) {
-                output.add(q);
-                totalMarks += marks;
-
-                switch (level) {
-                    case "L" -> numberOfCognitiveLevel_L--;
-                    case "R" -> numberOfCognitiveLevel_R--;
-                    case "U" -> numberOfCognitiveLevel_U--;
+            int maxNumberOf2Marks,
+            int maxNumberOf4Marks
+    ){
+        Question[] allowed =questionRepository.findValidQuestionsWithSubjectCode(subjectCode,mappedCOs);
+        ArrayList<Question> output=new ArrayList<>();
+        Random random= new Random();
+        if (allowed==null){
+            throw new QuestionNotFoundException("there are no questions with selected subject code "+subjectCode+"and selected mappedCO "+mappedCOs);
+        }
+        else {
+            while (numberOfCognitiveLevel_L>=0 ||numberOfCognitiveLevel_R>=0 || numberOfCognitiveLevel_U>=0|| maxNumberOf2Marks >=0 || maxNumberOf4Marks >=0){
+                int nextRandomQuestionIndex=random.nextInt(0,allowed.length-1);
+                Question temp=allowed[nextRandomQuestionIndex];
+                switch (temp.getCognitiveLevel()){
+                    case "L" ->{
+                        if(!temp.getIsInUse()){
+                            if (temp.getQuestionMarks()==2){
+                                maxNumberOf2Marks--;
+                            }
+                            else if (temp.getQuestionMarks()==4) {
+                                maxNumberOf4Marks--;
+                            }
+                            numberOfCognitiveLevel_L--;
+                            temp.setIsInUse(true);
+                            output.add(temp);
+                        }
+                    }
+                    case "R" ->{
+                        if(!temp.getIsInUse()) {
+                            if (temp.getQuestionMarks() == 2) {
+                                maxNumberOf2Marks--;
+                            } else if (temp.getQuestionMarks() == 4) {
+                                maxNumberOf4Marks--;
+                            }
+                            numberOfCognitiveLevel_R--;
+                            temp.setIsInUse(true);
+                            output.add(temp);
+                        }
+                    }
+                    case "U" ->{
+                        if(!temp.getIsInUse()) {
+                            if (temp.getQuestionMarks() == 2) {
+                                maxNumberOf2Marks--;
+                            } else if (temp.getQuestionMarks() == 4) {
+                                maxNumberOf4Marks--;
+                            }
+                            numberOfCognitiveLevel_U--;
+                            temp.setInUse(true);
+                            output.add(temp);
+                        }
+                    }
                 }
-
-                if (marks == 2) selected2M++;
-                if (marks == 4) selected4M++;
-
-                if (numberOfCognitiveLevel_L == 0 &&
-                        numberOfCognitiveLevel_R == 0 &&
-                        numberOfCognitiveLevel_U == 0 &&
-                        selected2M == max2Marks &&
-                        selected4M == max4Marks)
-                    break;
             }
         }
         return output;
@@ -279,9 +276,4 @@ public class QuestionService {
         }
     }
 
-    private Boolean checkIfPartOfSelectedMappedCO(
-            Question temp, String[] selectedMappedCO){
-        return Arrays.stream(selectedMappedCO)
-                .anyMatch(co -> temp.getMappedCO().equalsIgnoreCase(co));
-    }
 }
