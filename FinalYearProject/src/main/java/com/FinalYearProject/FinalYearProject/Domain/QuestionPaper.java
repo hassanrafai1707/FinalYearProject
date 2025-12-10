@@ -13,8 +13,13 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-//TODO Use indexing to reduce time complexity
-@Table(name = "QuestionPaper")
+@Table(name = "QuestionPaper" , indexes = {
+        @Index(name = "index_question_paper_id", columnList = "id"),
+        @Index(name = "index_question_paper_exam_title_id",columnList = "exam_title"),
+        @Index(name = "index_question_paper_genrated_by",columnList = "generated_by"),
+        @Index(name = "index_approved_by",columnList = "approved_by"),
+        @Index(name = "index_approved", columnList = "approved")
+})
 public class QuestionPaper {
     @Id
     @SequenceGenerator(
@@ -34,8 +39,15 @@ public class QuestionPaper {
     private String examTitle;
 
     @ManyToOne
-    @JoinColumn(nullable = false,name = "User_Id")
+    @JoinColumn(nullable = false,name = "generated_by")
     private User generatedBy;
+
+    @Column(name = "approved")
+    private Boolean approved;
+
+    @ManyToOne
+    @JoinColumn(name = "approved_by",nullable = false)
+    private User approvedBy;
 
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinTable(name = "question_paper_and_qusetion",
