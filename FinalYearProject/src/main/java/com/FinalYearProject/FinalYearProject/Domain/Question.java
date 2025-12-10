@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -73,6 +75,17 @@ public class Question {
     @ManyToOne
     @JoinColumn(nullable = false,name = "User_Id")
     private User createdBy;
+
+    @ManyToMany(mappedBy = "listOfQuestion",fetch = FetchType.LAZY)
+    private Set<QuestionPaper> questionPapers;
+
+    public Set<QuestionPaper> getQuestionPapers() {
+        return questionPapers;
+    }
+
+    public void setQuestionPapers(Set<QuestionPaper> questionPapers) {
+        this.questionPapers = questionPapers;
+    }
 
     public void setCreatedBy(User createdBy) {
         this.createdBy = createdBy;

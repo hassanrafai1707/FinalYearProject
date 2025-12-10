@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -35,14 +37,21 @@ public class QuestionPaper {
     @JoinColumn(nullable = false,name = "User_Id")
     private User generatedBy;
 
-    @ManyToOne
-    @JoinColumn(nullable = false,name = "listOfQuestion" )
-    private Question listOfQuestion;
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinTable(name = "question_paper_and_qusetion",
+            joinColumns = {
+            @JoinColumn(name = "question_paper_id" ,referencedColumnName = "id")
+            },
+            inverseJoinColumns = {
+            @JoinColumn(name = "question_id",referencedColumnName = "id")
+            }
+    )
+    private Set<Question> listOfQuestion;
+
 
     public Long getId() {
         return Id;
     }
-
 
     public String getExamTitle() {
         return examTitle;
@@ -60,11 +69,11 @@ public class QuestionPaper {
         this.generatedBy = generatedBy;
     }
 
-    public Question getListOfQuestion() {
+    public Set<Question> getListOfQuestion() {
         return listOfQuestion;
     }
 
-    public void setListOfQuestion(Question listOfQuestion) {
+    public void setListOfQuestion(Set<Question> listOfQuestion) {
         this.listOfQuestion = listOfQuestion;
     }
 }
