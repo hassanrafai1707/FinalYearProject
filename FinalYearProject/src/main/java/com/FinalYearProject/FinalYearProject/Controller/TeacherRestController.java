@@ -188,7 +188,7 @@ public class TeacherRestController {
                 );
     }
 
-    @GetMapping("/generateBySubjectAndQuestionPaper")
+    @GetMapping("/generateBySubjectNameAndQuestionPaper")
     public ResponseEntity<?> generateBySubjectAndQuestionPaper(@RequestBody DtoForSubjectNameAndMappedCOs_ARU_And_2_4_Marks dto){
         ArrayList<Question> generatedQuestionPaper=questionService.generateBySubjectNameQuestion(
                 dto.getSubjectName(),
@@ -209,8 +209,7 @@ public class TeacherRestController {
     }
 
     @PostMapping("/approveGeneratedQuestionPaper")
-    public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody Map<String,Question[]> request){
-        Question[] approvedQuestions=request.get("generated Question Paper");
+    public ResponseEntity<?> approveGeneratedQuestionPaper(){
         return ResponseEntity.ok(
                 Map.of(
                         "status","Successful"

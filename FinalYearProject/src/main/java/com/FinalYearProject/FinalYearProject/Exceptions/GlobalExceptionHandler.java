@@ -3,6 +3,8 @@ package com.FinalYearProject.FinalYearProject.Exceptions;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.DuplicateQuestionPaperException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
@@ -77,5 +79,15 @@ public class GlobalExceptionHandler  {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnknownException(Exception e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.INTERNAL_SERVER_ERROR,request);
+    }
+
+    @ExceptionHandler(DuplicateQuestionPaperException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateQuestionPaperException(DuplicateEmailException e,HttpServletRequest request){
+        return buildResponse(e, HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(QuestionPaperNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleQuestionPaperNotFoundException(DuplicateQuestionException e, HttpServletRequest request){
+        return buildResponse(e,HttpStatus.NOT_FOUND, request);
     }
 }

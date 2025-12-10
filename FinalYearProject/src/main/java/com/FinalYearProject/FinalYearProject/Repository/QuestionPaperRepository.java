@@ -24,4 +24,6 @@ public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Lon
     @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved")
     public List<QuestionPaper> findByApproved(Boolean approved);
 
+    public Boolean existsByQuestionPaperFingerprint(String questionPaperFingerprint);
+
 }

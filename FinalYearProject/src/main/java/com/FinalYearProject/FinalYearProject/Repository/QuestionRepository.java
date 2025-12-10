@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Repository;
 
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -33,8 +34,6 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO IN : mappedCOs")
     Question[] findValidQuestionWithSubjectName(String subjectName,String[] mappedCOs);
 
-    @Query("SELECT q FROM Question q WHERE q.createdBy.email =:email")
-    List<Question> findByCreatedByUsingEmail(String email);
-    @Query("SELECT q FROM Question q WHERE q.createdBy.id=:Id")
-    List<Question> findByCreatedByUsingId(Long Id);
+    @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
+    List<Question> findByCreatedBy(User user);
 }

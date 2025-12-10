@@ -100,7 +100,7 @@ public class QuestionService {
             throw new UserNotAuthorizesException("User with email is not authorized to make questions"+email);
         }
         else {
-            List<Question> tempQuestion=questionRepository.findByCreatedByUsingEmail(email);
+            List<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser);
             if (!(tempQuestion.isEmpty())){
                 return tempQuestion;
             }
@@ -133,7 +133,7 @@ public class QuestionService {
             throw new UserNotAuthorizesException("User with id is not authorized to make questions"+Id);
         }
         else {
-            List<Question> tempQuestion=questionRepository.findByCreatedByUsingId(Id);
+            List<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser);
             if (!(tempQuestion.isEmpty())){
                 return tempQuestion;
             }

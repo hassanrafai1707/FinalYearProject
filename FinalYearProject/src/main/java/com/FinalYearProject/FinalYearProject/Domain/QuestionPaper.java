@@ -18,7 +18,8 @@ import java.util.Set;
         @Index(name = "index_question_paper_exam_title_id",columnList = "exam_title"),
         @Index(name = "index_question_paper_genrated_by",columnList = "generated_by"),
         @Index(name = "index_approved_by",columnList = "approved_by"),
-        @Index(name = "index_approved", columnList = "approved")
+        @Index(name = "index_approved", columnList = "approved"),
+        @Index(name = "index_question_paper_fingerprint" ,columnList = "question_paper_fingerprint")
 })
 public class QuestionPaper {
     @Id
@@ -35,7 +36,7 @@ public class QuestionPaper {
     @Column(nullable = false,updatable = false)
     private Long Id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String examTitle;
 
     @ManyToOne
@@ -45,8 +46,11 @@ public class QuestionPaper {
     @Column(name = "approved")
     private Boolean approved;
 
+    @Column(name = "question_paper_fingerprint", nullable = false)
+    private String questionPaperFingerprint;
+
     @ManyToOne
-    @JoinColumn(name = "approved_by",nullable = false)
+    @JoinColumn(name = "approved_by")
     private User approvedBy;
 
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
@@ -87,5 +91,29 @@ public class QuestionPaper {
 
     public void setListOfQuestion(Set<Question> listOfQuestion) {
         this.listOfQuestion = listOfQuestion;
+    }
+
+    public Boolean getApproved() {
+        return approved;
+    }
+
+    public void setApproved(Boolean approved) {
+        this.approved = approved;
+    }
+
+    public String getQuestionPaperFingerprint() {
+        return questionPaperFingerprint;
+    }
+
+    public void setQuestionPaperFingerprint(String questionPaperFingerprint) {
+        this.questionPaperFingerprint = questionPaperFingerprint;
+    }
+
+    public User getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(User approvedBy) {
+        this.approvedBy = approvedBy;
     }
 }
