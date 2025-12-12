@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -115,7 +116,7 @@ public class QuestionPaperService {
         String email = authentication.getName();
         User user = userService.findByEmail(email);
         String questionPaperFingerprint;
-        if (user.getRole().equals("ROLE_TEACHER")){
+        if (!user.getRole().equals("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("User not Authorizes to make this request");
         }
         else {
@@ -137,7 +138,7 @@ public class QuestionPaperService {
         try {
             // 1. Convert each question to a stable string representation
             String combined = questions.stream()
-                    .sorted((q1, q2) -> q1.getId().compareTo(q2.getId())) // sort to make deterministic
+                    .sorted(Comparator.comparing(Question::getId)) // sort to make deterministic
                     .map(q -> q.getId() + "|" +
                             q.getSubjectName() + "|" +
                             q.getSubjectCode() + "|" +
@@ -147,7 +148,8 @@ public class QuestionPaperService {
                             q.getQuestionTitle() + "|" +
                             q.getQuestionBody() + "|" +
                             q.getInUse())
-                    .reduce("", (a, b) -> a + b);
+                    .reduce("",String::concat);
+            System.out.println(combined);
             // 2. Hash the combined string
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(combined.getBytes(StandardCharsets.UTF_8));
