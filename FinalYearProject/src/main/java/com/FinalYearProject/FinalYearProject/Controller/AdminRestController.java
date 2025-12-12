@@ -1,5 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForUserIdAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +53,7 @@ public class AdminRestController {
         );
     }
 
+    //TODO add paging
     @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUsers(){
         List<User> AllUsers=userService.findAllUsers();
@@ -152,6 +155,29 @@ public class AdminRestController {
                 Map.of(
                         "states","successful",
                         "message", message
+                )
+        );
+    }
+
+    @PatchMapping("/updateUserPasswordByEmail")
+    public ResponseEntity<?> updatePasswordByEmail(@RequestBody DtoForEmailAndPasswordInRequest dto){
+        User user=userService.updateUserPasswordByEmail(dto.getEmail(),dto.getPassword());
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "states","successful",
+                                "updated user",user
+                        )
+                );
+    }
+
+    @PatchMapping("/updateUserPasswordById")
+    public ResponseEntity<?> updateUserPasswordById(@RequestBody DtoForUserIdAndPasswordInRequest dto){
+        User user=userService.updateUserPasswordById(dto.getId(),dto.getPassword());
+        return ResponseEntity.ok(
+                Map.of(
+                        "states","successful",
+                        "updated user",user
                 )
         );
     }

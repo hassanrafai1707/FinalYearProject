@@ -1,12 +1,12 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
-public class DtoFortUserIdAndPasswordInRequest {
+public class DtoForUserIdAndPasswordInRequest {
     Long Id;
     String password;
 
-    public DtoFortUserIdAndPasswordInRequest(){}
+    public DtoForUserIdAndPasswordInRequest(){}
 
-    public DtoFortUserIdAndPasswordInRequest(Long Id, String password){
+    public DtoForUserIdAndPasswordInRequest(Long Id, String password){
         this.Id=Id;
         this.password=password;
     }

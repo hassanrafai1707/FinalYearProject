@@ -117,7 +117,23 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-    //  DELETE (by user)
+    public User updateUserPasswordByEmail(String email,String password){
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with email "+email));
+        user.setPassword(encoder.encode(password));
+        userRepository.save(user);
+        return user;
+    }
+
+    public User updateUserPasswordById(Long Id,String password){
+        User user=userRepository.findById(Id)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+Id));
+        user.setPassword(encoder.encode(password));
+        userRepository.save(user);
+        return user;
+    }
+
+    //  DELETE (by email)
     public String deleteUserByEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             userRepository.deleteByEmail(email);
