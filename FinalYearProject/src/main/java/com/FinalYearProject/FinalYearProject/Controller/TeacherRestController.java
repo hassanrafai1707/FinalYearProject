@@ -5,11 +5,16 @@ import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
+import org.springframework.data.web.config.SpringDataJacksonConfiguration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +36,15 @@ public class TeacherRestController {
                                 "all Question", questionList
                         )
                 );
+    }
+
+    @GetMapping("/getAllQuestionPaged")
+    public Page<Question>  getAllQuestionsPaged(
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(value = "size",defaultValue = "100") int size
+    ){
+        Pageable pageable= PageRequest.of(pageNo,size);
+        return questionService.getAllQuestionsPaged(pageable);
     }
 
     @GetMapping("/getQuestionById")

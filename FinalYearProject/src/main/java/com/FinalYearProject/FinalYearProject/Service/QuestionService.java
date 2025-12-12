@@ -9,11 +9,13 @@ import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +43,11 @@ public class QuestionService {
             throw new QuestionNotFoundException("no Question in DataBase");
         }
     }
+
+    public Page<Question> getAllQuestionsPaged(Pageable pageable){
+        return questionRepository.findAll(pageable);
+    }
+
     public Question getQuestionById(Long id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
@@ -293,7 +300,7 @@ public class QuestionService {
             int maxNumberOf4Marks
     ) {
         List<Question> allowed = questionRepository.findValidQuestionWithSubjectName(subjectName, mappedCOs);
-        ArrayList<Question> output = new ArrayList<>();
+        List<Question> output = new ArrayList<>();
         if(allowed.isEmpty()){
             throw new QuestionNotFoundException("No questions found for selected subject + CO");
         }
