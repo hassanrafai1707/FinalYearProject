@@ -10,7 +10,6 @@ import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,7 +44,13 @@ public class QuestionService {
     }
 
     public Page<Question> getAllQuestionsPaged(Pageable pageable){
-        return questionRepository.findAll(pageable);
+        Page<Question> temp=questionRepository.findAll(pageable);
+        if (!(temp.isEmpty())){
+            return temp;
+        }
+        else {
+            throw new QuestionNotFoundException("no more Question in DataBase");
+        }
     }
 
     public Question getQuestionById(Long id) {
