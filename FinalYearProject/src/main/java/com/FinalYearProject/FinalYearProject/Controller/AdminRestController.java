@@ -68,7 +68,7 @@ public class AdminRestController {
         );
     }
 
-    @GetMapping("/getAllUsersPaged ")
+    @GetMapping("/getAllUsersPaged")
     public Page<User> getAllUsersPaged(
             @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size
