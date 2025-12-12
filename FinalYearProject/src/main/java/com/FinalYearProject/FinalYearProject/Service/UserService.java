@@ -10,6 +10,7 @@ import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -78,7 +79,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Page<User> findAllUsersPage(Pageable pageable){
+    public Page<User> findAllUsersPage(int pageNo,int size){
+        Pageable pageable= PageRequest.of(pageNo,size);
         Page<User> temp=userRepository.findAll(pageable);
         if (!(temp.isEmpty())){
             return temp;

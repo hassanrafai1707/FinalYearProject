@@ -56,7 +56,6 @@ public class AdminRestController {
         );
     }
 
-    //TODO add paging
     @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUsers(){
         List<User> AllUsers=userService.findAllUsers();
@@ -73,8 +72,7 @@ public class AdminRestController {
             @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size
     ){
-        Pageable pageable= PageRequest.of(pageNo,size);
-        return userService.findAllUsersPage(pageable);
+        return userService.findAllUsersPage(pageNo, size);
     }
 
     @DeleteMapping("/deleteUserByEmail")

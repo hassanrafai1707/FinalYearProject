@@ -9,6 +9,9 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,14 @@ public class StudentRestController {
                                 "all Question", questionService.getAllQuestion()
                         )
                 );
+    }
+
+    @GetMapping("/getAllQuestionPaged")
+    public Page<Question> getAllQuestionsPaged(
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(value = "size",defaultValue = "100") int size
+    ){
+        return questionService.getAllQuestionsPaged(pageNo,size);
     }
 
     @GetMapping("/getQuestionById")

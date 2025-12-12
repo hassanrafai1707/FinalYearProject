@@ -10,7 +10,9 @@ import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.config.SpringDataJacksonConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -43,7 +45,8 @@ public class QuestionService {
         }
     }
 
-    public Page<Question> getAllQuestionsPaged(Pageable pageable){
+    public Page<Question> getAllQuestionsPaged(int pageNo,int size){
+        Pageable pageable= PageRequest.of(pageNo,size);
         Page<Question> temp=questionRepository.findAll(pageable);
         if (!(temp.isEmpty())){
             return temp;

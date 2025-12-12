@@ -43,8 +43,7 @@ public class TeacherRestController {
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
     ){
-        Pageable pageable= PageRequest.of(pageNo,size);
-        return questionService.getAllQuestionsPaged(pageable);
+        return questionService.getAllQuestionsPaged(pageNo,size);
     }
 
     @GetMapping("/getQuestionById")
