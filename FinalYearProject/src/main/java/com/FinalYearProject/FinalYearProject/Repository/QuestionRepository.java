@@ -2,6 +2,8 @@ package com.FinalYearProject.FinalYearProject.Repository;
 
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -36,4 +38,7 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
 
     @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
     List<Question> findByCreatedBy(User user);
+
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode")
+    Page<Question> findBySubjectCode(String subjectCode,Pageable pageable);
 }

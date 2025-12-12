@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.config.SpringDataJacksonConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,8 +21,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-//TODO Use all unused methods in this class
-//TODO Use cache to reduce time for retrieving and computing data
 @Service
 @AllArgsConstructor
 public class QuestionService {
@@ -32,8 +29,6 @@ public class QuestionService {
     private QuestionRepository questionRepository;
     @Autowired
     private UserService userService;
-    @Autowired
-    private RedisService redisService;
 
     public List<Question> getAllQuestion(){
         List<Question> tempQuestion=questionRepository.findAll();
@@ -65,6 +60,15 @@ public class QuestionService {
         List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
+        }
+        throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
+    }
+
+    public Page<Question> findBySubjectCode(String subjectCode,int pageNo,int size){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> temp = questionRepository.findBySubjectCode(subjectCode,pageable);
+        if (!(temp.isEmpty())){
+            return temp;
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
     }
