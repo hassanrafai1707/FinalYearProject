@@ -170,7 +170,7 @@ public class TeacherRestController {
 
     @GetMapping("/generateBySubjectCodeQuestionPaper")
     public ResponseEntity<?> generateBySubjectCodeQuestionPaper(@RequestBody DtoForSubjectCodeAndMappedCOs_ARU_And_2_4_Marks dto){
-        ArrayList<Question> generatedQuestionPaper=questionService.generateBySubjectCodeQuestion(
+        List<Question> generatedQuestionPaper=questionService.generateBySubjectCodeQuestion(
                 dto.getSubjectCode(),
                 dto.getMappedCOs(),
                 dto.getNumberOfCognitiveLevel_A(),
