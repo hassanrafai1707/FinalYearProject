@@ -9,6 +9,8 @@ import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotFo
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,6 +76,16 @@ public class UserService {
     //  READ (all users)
     public List<User> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Page<User> findAllUsersPage(Pageable pageable){
+        Page<User> temp=userRepository.findAll(pageable);
+        if (!(temp.isEmpty())){
+            return temp;
+        }
+        else {
+            throw new UsernameNotFoundException("no more users in db");
+        }
     }
 
     //  READ (by ID)
