@@ -39,12 +39,13 @@ public class UserService {
     private BCryptPasswordEncoder encoder;
 
     //  CREATE user
-    public User saveUser(User user) {
+    public User creatUser(User user) {
         if (existsByEmail(user.getEmail())) {
             throw new DuplicateEmailException( "Email already taken");
         }
 
         user.setIs_enable(false);
+        user.setRole("ROLE_STUDENT");
         user.setPassword(encoder.encode(user.getPassword()));
         user.setExpired(true);
         user.setLocked(true);

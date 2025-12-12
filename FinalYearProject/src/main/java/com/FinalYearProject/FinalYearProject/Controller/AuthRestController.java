@@ -34,7 +34,7 @@ public class AuthRestController {
 
     @PostMapping("/register")
     public ResponseEntity<?> processRegister (@RequestBody User user){
-        User saveUser =userService.saveUser(user);
+        User saveUser =userService.creatUser(user);
         return ResponseEntity.ok(
                 Map.of(
                         "message", "User registered successfully. Please verifyLoginByEmail your email.",
