@@ -1,6 +1,8 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndEmailInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndIdInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForUserIdAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
@@ -192,6 +194,33 @@ public class AdminRestController {
         );
     }
 
+    @PatchMapping("/updateUserRoleById")
+    public ResponseEntity<?> updateUserRoleById(@RequestBody DtoForRoleAndIdInRequest dto){
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","successful",
+                                "updated user", userService.updateUserRoleById(
+                                        dto.getRole(),
+                                        dto.getId()
+                                )
+                        )
+                );
+    }
+
+    @PatchMapping("/updateUserRoleByEmail")
+    public ResponseEntity<?> updateUserRoleByEmail(@RequestBody DtoForRoleAndEmailInRequest dto){
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","successful",
+                                "updated user",userService.updateUserRoleByEmail(
+                                        dto.getRole(),
+                                        dto.getRole()
+                                )
+                        )
+                );
+    }
     @PatchMapping("/updateUserEmail")
     public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
                                                             ){
