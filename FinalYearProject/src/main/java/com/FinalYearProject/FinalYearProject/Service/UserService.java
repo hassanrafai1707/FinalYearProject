@@ -3,9 +3,7 @@ package com.FinalYearProject.FinalYearProject.Service;
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Domain.UserPrincipal;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotFoundException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +131,13 @@ public class UserService {
     }
 
     public User updateUserPasswordByEmail(String email,String password){
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        String AdminEmail=authentication.getName();
+        User adminUser=userRepository.findByEmail(AdminEmail)
+                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
+        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
         User user=userRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found with email "+email));
         user.setPassword(encoder.encode(password));
@@ -141,11 +146,70 @@ public class UserService {
     }
 
     public User updateUserPasswordById(Long Id,String password){
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        String AdminEmail=authentication.getName();
+        User adminUser=userRepository.findByEmail(AdminEmail)
+                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
+        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
         User user=userRepository.findById(Id)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+Id));
         user.setPassword(encoder.encode(password));
         userRepository.save(user);
         return user;
+    }
+
+    public User updateUserRoleById(String role,Long Id){
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        String AdminEmail=authentication.getName();
+        User adminUser=userRepository.findByEmail(AdminEmail)
+                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
+        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        if (
+                role.startsWith("ROLE_")||
+                role.equals("ROLE_ADMIN")||
+                role.equals("ROLE_TEACHER")||
+                role.equals("ROLE_STUDENT")||
+                role.equals("ROLE_SUPERVISOR")
+        ){
+            throw new UnacceptableRequestException("the role not formated properly");
+        }
+        else {
+            User user =userRepository.findById(Id)
+                    .orElseThrow(()-> new UserNotFoundException("User not found with ID :"+Id));
+            user.setRole(role);
+            userRepository.save(user);
+            return user;
+        }
+    }
+
+    public User updateUserRoleByEmail(String email,String role){
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        String AdminEmail=authentication.getName();
+        User adminUser=userRepository.findByEmail(AdminEmail)
+                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
+        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        if (
+                role.startsWith("ROLE_")||
+                role.equals("ROLE_ADMIN")||
+                role.equals("ROLE_TEACHER")||
+                role.equals("ROLE_STUDENT")||
+                role.equals("ROLE_SUPERVISOR")
+        ){
+            throw new UnacceptableRequestException("the role not formated properly");
+        }
+        else {
+            User user=userRepository.findByEmail(email)
+                    .orElseThrow(()-> new UserNotFoundException("User not found with email "+email));
+            user.setRole(role);
+            userRepository.save(user);
+            return user;
+        }
     }
 
     //  DELETE (by email)

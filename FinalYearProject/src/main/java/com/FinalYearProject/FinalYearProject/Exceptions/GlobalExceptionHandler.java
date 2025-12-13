@@ -5,10 +5,7 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.Questi
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.DuplicateQuestionPaperException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.DuplicateEmailException;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserLockedException;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotFoundException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -61,6 +58,10 @@ public class GlobalExceptionHandler  {
         return buildResponse(e,HttpStatus.CONFLICT,request);
     }
 
+    @ExceptionHandler(UnacceptableRequestException.class)
+    public ResponseEntity<ErrorResponse>handleUnacceptableRequest(UnacceptableRequestException e, HttpServletRequest request){
+        return buildResponse(e,HttpStatus.BAD_REQUEST,request);
+    }
      //Question error handler
     @ExceptionHandler(QuestionNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleQuestionNotFound(QuestionNotFoundException e, HttpServletRequest request){
