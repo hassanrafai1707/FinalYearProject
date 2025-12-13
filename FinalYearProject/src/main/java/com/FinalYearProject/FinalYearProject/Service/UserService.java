@@ -111,8 +111,7 @@ public class UserService {
     //  UPDATE
 
     public User updateUserEmail(String NewEmail) {
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String email=authentication.getName();
+        String email=UserUtil.getUserAuthentication().getUsername();
         User existingUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found "));
 
@@ -122,8 +121,7 @@ public class UserService {
     }
 
     public User updateUserPassword(String newPassword){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email= authentication.getName();
+        String email= UserUtil.getUserAuthentication().getUsername();
         User existingUser=userRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"));
 
@@ -132,12 +130,10 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
+    //todo take admin password and add a if
     public User updateUserPasswordByEmail(String email,String password){
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String AdminEmail=authentication.getName();
-        User adminUser=userRepository.findByEmail(AdminEmail)
-                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
-        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+        String adminRole=UserUtil.getUserAuthentication().getAuthorities().toString();
+        if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         User user=userRepository.findByEmail(email)
@@ -147,12 +143,10 @@ public class UserService {
         return user;
     }
 
+    //todo take admin password and add a if
     public User updateUserPasswordById(Long Id,String password){
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String AdminEmail=authentication.getName();
-        User adminUser=userRepository.findByEmail(AdminEmail)
-                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
-        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+        String adminRole=UserUtil.getUserAuthentication().getAuthorities().toString();
+        if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         User user=userRepository.findById(Id)
