@@ -143,11 +143,14 @@ public class UserService {
         return user;
     }
 
-    //todo take admin password and add a if
-    public User updateUserPasswordById(Long Id,String password){
+    public User updateUserPasswordById(Long Id,String password,String adminPassword){
         String adminRole=UserUtil.getUserAuthentication().getAuthorities().toString();
+        String tempAdminPassword=UserUtil.getUserAuthentication().getPassword();
         if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        if (!(adminPassword.equals(tempAdminPassword))){
+            throw new WrongPasswordException("You gave the wrong password");
         }
         User user=userRepository.findById(Id)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+Id));

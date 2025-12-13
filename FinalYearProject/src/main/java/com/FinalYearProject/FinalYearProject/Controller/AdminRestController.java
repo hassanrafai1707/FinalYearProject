@@ -184,7 +184,11 @@ public class AdminRestController {
 
     @PatchMapping("/updateUserPasswordById")
     public ResponseEntity<?> updateUserPasswordById(@RequestBody DtoForUserIdAndPasswordInRequest dto){
-        User user=userService.updateUserPasswordById(dto.getId(),dto.getPassword());
+        User user=userService.updateUserPasswordById(
+                dto.getId(),
+                dto.getPassword(),
+                dto.getAdminPassword()
+        );
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",

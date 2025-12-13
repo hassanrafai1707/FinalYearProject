@@ -62,6 +62,11 @@ public class GlobalExceptionHandler  {
     public ResponseEntity<ErrorResponse>handleUnacceptableRequest(UnacceptableRequestException e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.BAD_REQUEST,request);
     }
+
+    @ExceptionHandler(WrongPasswordException.class)
+    public ResponseEntity<ErrorResponse> handleWrongPasswordException(WrongPasswordException e,HttpServletRequest request){
+        return buildResponse(e,HttpStatus.FORBIDDEN,request);
+    }
      //Question error handler
     @ExceptionHandler(QuestionNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleQuestionNotFound(QuestionNotFoundException e, HttpServletRequest request){
