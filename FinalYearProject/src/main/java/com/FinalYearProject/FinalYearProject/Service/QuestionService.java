@@ -81,7 +81,6 @@ public class QuestionService {
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
     }
 
-
     public List<Question> findBySubjectCodeMappedCOCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel){
         List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
         if (!(tempQuestions.isEmpty())){
@@ -94,6 +93,15 @@ public class QuestionService {
         List<Question> tempQuestion=questionRepository.findBySubjectName(subjectName);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
+        }
+        throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
+    }
+
+    Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> temp=questionRepository.findBySubjectName(subjectName,pageable);
+        if (!(temp.isEmpty())){
+            return temp;
         }
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
@@ -186,7 +194,7 @@ public class QuestionService {
         else {
             // possible to remove this part in future as we are taking email from security context holder so no way to forge
             if (!user.getRole().equalsIgnoreCase("ROLE_TEACHER")){
-                throw new UserNotAuthorizesException("User UnAuthorised to make this request");
+                throw new UserNotAuthorizesException("User unauthorised to make this request");
             }
             else {
                 question.setQuestionTitle(questionTitle);
@@ -224,6 +232,9 @@ public class QuestionService {
         for (Question question:allowed){
             if (question.getInUse()) {
                 continue;
+            }
+            if(maxNumberOf2Marks==0 && maxNumberOf4Marks==0){
+                break;
             }
             else {
                 if (
@@ -320,6 +331,9 @@ public class QuestionService {
         for (Question question:allowed){
             if (question.getInUse()) {
                 continue;
+            }
+            if(maxNumberOf2Marks==0 && maxNumberOf4Marks==0){
+                break;
             }
             else {
                 if (

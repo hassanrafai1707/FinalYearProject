@@ -16,7 +16,9 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
 
     //simple Query handled by spring boot
     List<Question> findBySubjectCode(String subjectCode);
+    Page<Question> findBySubjectCode(String subjectCode,Pageable pageable);
     List<Question> findBySubjectName(String subjectName);
+    Page<Question> findBySubjectName(String subjectName,Pageable pageable);
     Boolean existsByQuestionTitle(String question);
     Optional<Question> findByQuestionTitle(String questionTitle);
 
@@ -39,6 +41,4 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
     List<Question> findByCreatedBy(User user);
 
-    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode")
-    Page<Question> findBySubjectCode(String subjectCode,Pageable pageable);
 }
