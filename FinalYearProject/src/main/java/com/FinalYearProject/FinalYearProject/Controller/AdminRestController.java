@@ -1,16 +1,14 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndEmailInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndIdInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndIdAndPassworedInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForUserIdAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -195,28 +193,30 @@ public class AdminRestController {
     }
 
     @PatchMapping("/updateUserRoleById")
-    public ResponseEntity<?> updateUserRoleById(@RequestBody DtoForRoleAndIdInRequest dto){
+    public ResponseEntity<?> updateUserRoleById(@RequestBody DtoForRoleAndIdAndPassworedInRequest dto){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
                                 "updated user", userService.updateUserRoleById(
                                         dto.getRole(),
-                                        dto.getId()
+                                        dto.getId(),
+                                        dto.getPassword()
                                 )
                         )
                 );
     }
 
     @PatchMapping("/updateUserRoleByEmail")
-    public ResponseEntity<?> updateUserRoleByEmail(@RequestBody DtoForRoleAndEmailInRequest dto){
+    public ResponseEntity<?> updateUserRoleByEmail(@RequestBody DtoForRoleAndEmailAndPasswordInRequest dto){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
                                 "updated user",userService.updateUserRoleByEmail(
+                                        dto.getEmail(),
                                         dto.getRole(),
-                                        dto.getRole()
+                                        dto.getPassword()
                                 )
                         )
                 );

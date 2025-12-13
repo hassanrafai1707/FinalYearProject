@@ -2,9 +2,9 @@ package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
-import com.FinalYearProject.FinalYearProject.Domain.UserPrincipal;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
+import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -110,10 +110,11 @@ public class UserService {
 
     //  UPDATE
 
-    public User updateUserEmail(String email) {
-        UserPrincipal temp= (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User existingUser = userRepository.findById(test().getId())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + temp.getId()));
+    public User updateUserEmail(String NewEmail) {
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        String email=authentication.getName();
+        User existingUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found "));
 
         existingUser.setEmail(email);
 
@@ -121,9 +122,10 @@ public class UserService {
     }
 
     public User updateUserPassword(String newPassword){
-        UserPrincipal temp=(UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User existingUser=userRepository.findById(temp.getId())
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+temp.getId()));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email= authentication.getName();
+        User existingUser=userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"));
 
         existingUser.setPassword(encoder.encode(newPassword));
 
@@ -160,13 +162,14 @@ public class UserService {
         return user;
     }
 
-    public User updateUserRoleById(String role,Long Id){
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String AdminEmail=authentication.getName();
-        User adminUser=userRepository.findByEmail(AdminEmail)
-                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
-        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+    public User updateUserRoleById(String role,Long Id,String password){
+        String adminRole= UserUtil.getUserAuthentication().getAuthorities().toString();
+        String adminPassword=UserUtil.getUserAuthentication().getPassword();
+        if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        if (!(adminPassword.equals(encoder.encode(password)))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
         }
         if (
                 role.startsWith("ROLE_")||
@@ -186,13 +189,14 @@ public class UserService {
         }
     }
 
-    public User updateUserRoleByEmail(String email,String role){
-        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-        String AdminEmail=authentication.getName();
-        User adminUser=userRepository.findByEmail(AdminEmail)
-                .orElseThrow(()-> new UserNotAuthorizesException("User not Authorizes to make this request"));
-        if (!(adminUser.getRole().equals("ROLE_ADMIN"))){
+    public User updateUserRoleByEmail(String email,String role,String password){
+        String adminRole= UserUtil.getUserAuthentication().getAuthorities().toString();
+        String adminPassword=UserUtil.getUserAuthentication().getPassword();
+        if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        if (!(adminPassword.equals(encoder.encode(password)))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
         }
         if (
                 role.startsWith("ROLE_")||
@@ -235,7 +239,7 @@ public class UserService {
     public String deleteUserInBatchById(Long[] ids) {
         try {
             userRepository.deleteUserInBatchById(ids);
-            return "all users with Ids"+ids+"deleted ";
+            return "all users with Ids deleted ";
         }
         catch (UserNotFoundException e){
             throw new UserNotFoundException(e.getMessage());
@@ -245,7 +249,7 @@ public class UserService {
     public String deleteUserInBatchEmail(String[] emails){
         try {
             userRepository.deleteUserInBatchByEmail(emails);
-            return "all users with emails "+emails+" deleted";
+            return "all users with emails  deleted";
         }
         catch (UserNotFoundException e){
             throw new UserNotFoundException(e.getMessage());
@@ -311,9 +315,6 @@ public class UserService {
                 throw new UserLockedException("Login failed due to user is locked");
             }
             else {
-                foundUser.setIs_enable(true);
-                userRepository.save(foundUser);
-
                 String token= jwtService.jwtToken(email, foundUser.getRole());
                 return Map.of(
                         "token", token,
@@ -365,9 +366,6 @@ public class UserService {
         }
     }
 
-    public UserPrincipal test(){
-        return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
     public Boolean existsById(Long Id){
         if (userRepository.existsById(Id)){
             return Boolean.TRUE;
