@@ -86,20 +86,17 @@ public class AdminRestController {
         );
     }
 
-    //todo change
     @DeleteMapping("/deleteUserById")
-    public ResponseEntity<?> deleteById( @RequestBody Map<String,Long> request){
-        Long Id= request.get("id");
-        String message=userService.deleteUserById(Id);
+    public ResponseEntity<?> deleteById( @RequestBody DtoForIdAndAdminPasswordInRequest dto){
+        userService.deleteUserById(dto.getId(),dto.getAdminPassword());
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",
-                        "message",message
+                        "message","users with id deleted successfully"
                 )
         );
     }
 
-    //todo change
     @DeleteMapping("/deleteUsersInBatchByID")
     public ResponseEntity<?> deleteUsersInBatchByID(@RequestBody DtoForIdsAndPasswordInRequest dto){
         userService.deleteUserInBatchById(dto.getIds(),dto.getAdminPassword());

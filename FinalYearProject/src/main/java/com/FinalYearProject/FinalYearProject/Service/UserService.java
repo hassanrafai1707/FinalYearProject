@@ -131,7 +131,6 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-    //todo take admin password and add a if
     public User updateUserPasswordByEmail(String email,String password,String adminPassword){
         User adminUser=userRepository.findByEmail(UserUtil.getUserAuthentication().getUsername()).orElseThrow(()-> new UsernameNotFoundException("try again some thing went wrong user not found"));
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
@@ -232,12 +231,21 @@ public class UserService {
     }
 
     //  DELETE (by ID)
-    public String deleteUserById(Long id) {
-        if (userRepository.existsById(id)) {
+    @Transactional
+    public void deleteUserById(Long id , String adminPassword) {
+        User adminUsers=userRepository.findByEmail(
+                UserUtil.getUserAuthentication().getUsername()
+        ).orElseThrow(
+                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+        );
+        if (!(adminUsers.getRole().equals("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not authorized to make this request");
+        }
+        if (!(encoder.matches(adminPassword,adminUsers.getPassword()))){
+            throw new WrongPasswordException("wrong password try again");
+        }
+        else {
             userRepository.deleteById(id);
-            return "deleted successfully";
-        } else {
-            throw new UsernameNotFoundException("User not found with id: " + id);
         }
     }
 
