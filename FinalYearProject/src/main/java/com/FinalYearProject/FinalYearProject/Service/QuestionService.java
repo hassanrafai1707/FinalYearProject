@@ -7,6 +7,8 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.Unacce
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
+import com.FinalYearProject.FinalYearProject.Util.QuestionUtil;
+import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -141,7 +144,7 @@ public class QuestionService {
     public Question findQuestionByQuestionBody(String questionBody){
         return questionRepository.
                 findByQuestionTitle(
-                        sha256(questionBody)
+                        QuestionUtil.sha256(questionBody)
                 ).orElseThrow(
                         ()-> new QuestionNotFoundException("no question with this body")
                 );
@@ -149,7 +152,7 @@ public class QuestionService {
 
     public void deleteQuestionByQuestionBody(String questionBody){
         Question temp=questionRepository.findByQuestionTitle(
-                sha256(questionBody)
+                QuestionUtil.sha256(questionBody)
         ).orElseThrow(
                 ()-> new QuestionNotFoundException("no question with this body")
         );
@@ -171,10 +174,10 @@ public class QuestionService {
         }
     }
 
+    @Transactional
     public Question addQuestion(Question question) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email=authentication.getName();
-        String questionTitle=sha256(question.getQuestionBody());
+        String email= UserUtil.getUserAuthentication().getUsername();
+        String questionTitle=QuestionUtil.sha256(question.getQuestionBody());
         System.out.println(email+"in security context holder");
         User user=userService.findByEmail(email);
         if (
@@ -423,20 +426,6 @@ public class QuestionService {
         }
         else {
             return Boolean.TRUE;
-        }
-    }
-
-    private String sha256(String input){
-        try {
-            MessageDigest messageDigest =MessageDigest.getInstance("SHA-256");
-            byte[] encoderHash = messageDigest.digest(input.getBytes(StandardCharsets.UTF_8));
-            StringBuilder temp= new StringBuilder();
-            for (byte b : encoderHash){
-                temp.append(String.format("%02x",b));
-            }
-            return temp.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
         }
     }
 

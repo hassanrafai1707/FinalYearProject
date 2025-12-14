@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 @RequestMapping("${app.version}/admin")
 @RestController
-//TODO for all admin functions ask for password
 public class AdminRestController {
     @Autowired
     private UserService userService;
