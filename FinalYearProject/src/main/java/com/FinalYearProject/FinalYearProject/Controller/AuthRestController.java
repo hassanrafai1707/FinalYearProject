@@ -1,6 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAnd2PasswordsInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ public class AuthRestController {
     private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> processLoginByEmail(@RequestBody DtoForEmailAndPasswordInRequest dto){
+    public ResponseEntity<?> processLoginByEmail(@RequestBody DtoForEmailAnd2PasswordsInRequest dto){
         Map<String,Object> temp=userService.verifyLoginByEmail(dto.getEmail(), dto.getPassword());
         User user=(User) temp.get("user");
         return ResponseEntity

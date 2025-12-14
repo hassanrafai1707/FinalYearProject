@@ -1,6 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAnd2PasswordsInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndEmailAndPasswordInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndIdAndPassworedInRequest;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForUserIdAndPasswordInRequest;
@@ -179,7 +179,7 @@ public class AdminRestController {
     }
 
     @PatchMapping("/updateUserPasswordByEmail")
-    public ResponseEntity<?> updatePasswordByEmail(@RequestBody DtoForEmailAndPasswordInRequest dto){
+    public ResponseEntity<?> updatePasswordByEmail(@RequestBody DtoForEmailAnd2PasswordsInRequest dto){
         User user=userService.updateUserPasswordByEmail(
                 dto.getEmail(),
                 dto.getPassword(),

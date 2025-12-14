@@ -1,15 +1,13 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
-public class DtoForEmailAndPasswordInRequest {
+public class DtoForEmailAndAdminPasswordInRequest {
     String email;
-    String password;
     String adminPassword;
 
-    public DtoForEmailAndPasswordInRequest(){}
+    public DtoForEmailAndAdminPasswordInRequest(){}
 
-    public DtoForEmailAndPasswordInRequest(String email, String password ,String adminPassword){
+    public DtoForEmailAndAdminPasswordInRequest(String email,String adminPassword){
         this.email=email;
-        this.password=password;
         this.adminPassword=adminPassword;
     }
 
@@ -19,14 +17,6 @@ public class DtoForEmailAndPasswordInRequest {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getAdminPassword() {
