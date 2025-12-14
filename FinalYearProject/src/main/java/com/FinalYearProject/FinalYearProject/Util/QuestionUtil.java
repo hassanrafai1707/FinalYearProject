@@ -21,4 +21,20 @@ public class QuestionUtil {
             throw new RuntimeException(e);
         }
     }
+
+    public static Boolean checkIfQuestionBodyIsAcceptable(String questionBody){
+        int counter =0;
+
+        for (int i = 0; i < questionBody.length(); i++) {
+            if (questionBody.charAt(i)==' '){
+                counter++;
+            }
+        }
+        if (counter>=questionBody.length()/4){
+            return Boolean.FALSE;
+        }
+        else {
+            return Boolean.TRUE;
+        }
+    }
 }

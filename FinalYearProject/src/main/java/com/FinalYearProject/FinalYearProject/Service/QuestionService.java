@@ -261,7 +261,7 @@ public class QuestionService {
         User user=userService.findByEmail(email);
         if (
                 question.getQuestionBody().isEmpty()||
-                !checkIfQuestionBodyIsAcceptable(question.getQuestionBody())
+                !QuestionUtil.checkIfQuestionBodyIsAcceptable(question.getQuestionBody())
         ){
             throw new UnacceptableQuestion("Unacceptable Question due to eather no question body or more spaces that words ");
         }
@@ -490,23 +490,6 @@ public class QuestionService {
                 .stream()
                 .sorted(Comparator.comparing(Question::getQuestionMarks))
                 .toList();
-    }
-
-    //todo put in util class
-    private Boolean checkIfQuestionBodyIsAcceptable(String questionBody){
-        int counter =0;
-
-        for (int i = 0; i < questionBody.length(); i++) {
-            if (questionBody.charAt(i)==' '){
-                counter++;
-            }
-        }
-        if (counter>=questionBody.length()/4){
-            return Boolean.FALSE;
-        }
-        else {
-            return Boolean.TRUE;
-        }
     }
 
 }
