@@ -221,6 +221,7 @@ public class UserService {
     }
 
     //  DELETE (by email)
+    @Transactional
     public String deleteUserByEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             userRepository.deleteByEmail(email);
@@ -249,6 +250,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void deleteUserInBatchById(List<Long> ids , String adminPassword) {
         User adminUser=userRepository.findById(
                 UserUtil.getUserAuthentication().getId()
@@ -266,6 +268,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void deleteUserInBatchEmail(List<String> emails , String adminPassword){
         User adminUser=userRepository.findById(
                 UserUtil.getUserAuthentication().getId()
@@ -366,7 +369,7 @@ public class UserService {
             ) {
                 userRepository.updateIsEnableLockedExpiredToTrue(conformation.getUser().getEmail());
 
-                redisService.delete(token);//delete conformation after verifying token and otp
+                redisService.delete(email);//delete conformation after verifying token and otp
 
                 return Boolean.TRUE;
             }
