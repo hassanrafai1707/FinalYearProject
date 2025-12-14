@@ -1,9 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAnd2PasswordsInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndEmailAndPasswordInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForRoleAndIdAndPassworedInRequest;
-import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForUserIdAndPasswordInRequest;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -104,12 +101,12 @@ public class AdminRestController {
 
     //todo change
     @DeleteMapping("/deleteUsersInBatchByID")
-    public ResponseEntity<?> deleteUsersInBatchByID(@RequestBody Map<String,Long[]> requst){
-        Long[] ids=requst.get("ids");
+    public ResponseEntity<?> deleteUsersInBatchByID(@RequestBody DtoForIdsAndPasswordInRequest dto){
+        userService.deleteUserInBatchById(dto.getIds(),dto.getAdminPassword());
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "message",userService.deleteUserInBatchById(ids)
+                        "message","all users with ids deleted successfully"
                 )
         );
     }

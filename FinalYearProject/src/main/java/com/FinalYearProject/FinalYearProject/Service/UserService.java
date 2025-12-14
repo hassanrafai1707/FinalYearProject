@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -205,10 +206,10 @@ public class UserService {
         }
         if (
                 role.startsWith("ROLE_")||
-                role.equals("ROLE_ADMIN")||
-                role.equals("ROLE_TEACHER")||
-                role.equals("ROLE_STUDENT")||
-                role.equals("ROLE_SUPERVISOR")
+                !role.equals("ROLE_ADMIN")||
+                !role.equals("ROLE_TEACHER")||
+                !role.equals("ROLE_STUDENT")||
+                !role.equals("ROLE_SUPERVISOR")
         ){
             throw new UnacceptableRequestException("the role not formated properly");
         }
@@ -241,13 +242,20 @@ public class UserService {
         }
     }
 
-    public String deleteUserInBatchById(Long[] ids) {
-        try {
-            userRepository.deleteUserInBatchById(ids);
-            return "all users with Ids deleted ";
+    public void deleteUserInBatchById(List<Long> ids , String adminPassword) {
+        User adminUser=userRepository.findById(
+                UserUtil.getUserAuthentication().getId()
+        ).orElseThrow(
+                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+         );
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not authorized to make this request");
         }
-        catch (UserNotFoundException e){
-            throw new UserNotFoundException(e.getMessage());
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("wrong password");
+        }
+        else {
+            userRepository.deleteUserInBatchById(ids);
         }
     }
 
