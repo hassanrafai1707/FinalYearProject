@@ -25,11 +25,15 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     // complex query handled by @Query
     @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO")
     List<Question> findBySubjectCodeAndMappedCO(String subjectCode, String mappedCO);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO")
+    Page<Question> findBySubjectCodeAndMappedCO(String subjectCode, String mappedCO,Pageable pageable);
     @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel")
     List<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel);
 
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO")
     List<Question> findBySubjectNameAndMappedCO(String subjectName ,String mappedCO);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO")
+    Page<Question> findBySubjectNameAndMappedCO(String subjectName ,String mappedCO,Pageable pageable);
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel")
     List<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(String subjectName ,String mappedCO ,String cognitiveLevel);
 
@@ -40,7 +44,6 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
 
     @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
     List<Question> findByCreatedBy(User user);
-
     @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
     Page<Question> findByCreatedBy(User user , Pageable pageable);
 }
