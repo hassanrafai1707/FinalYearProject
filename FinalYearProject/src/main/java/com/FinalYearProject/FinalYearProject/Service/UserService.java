@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class UserService {
     private BCryptPasswordEncoder encoder;
 
     //  CREATE user
+    @Transactional
     public User creatUser(User user) {
         if (existsByEmail(user.getEmail())) {
             throw new DuplicateEmailException( "Email already taken");
@@ -73,7 +75,14 @@ public class UserService {
 
     //  READ (all users)
     public List<User> findAllUsers() {
-        return userRepository.findAll();
+        return userRepository
+                .findAll()
+                .stream()
+                .sorted(
+                        Comparator.comparing(
+                                User::getId
+                        )
+                ).toList();
     }
 
     public Page<User> findAllUsersPage(int pageNo,int size){
@@ -293,28 +302,48 @@ public class UserService {
     }
 
     //  Suspend User
-    public String suspendUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
-
-        user.setLocked(true);
-        user.setExpired(true);
-
-        userRepository.save(user);
-
-        return "User Suspend successfully";
+    public User suspendUserById(Long id , String adminPassword) {
+        User adminUser=userRepository.findByEmail(
+                UserUtil.getUserAuthentication().getUsername()
+        ).orElseThrow(
+                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+        );
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not authorized to make this request");
+        }
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("wrong password");
+        }
+        else {
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+            user.setLocked(true);
+            user.setExpired(true);
+            userRepository.save(user);
+            return user;
+        }
     }
 
-    public String unsuspendUserById(Long id){
-        User user = userRepository.findById(id)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with id: " + id));
-
-        user.setExpired(false);
-        user.setLocked(false);
-
-        userRepository.save(user);
-
-        return "User Suspend successfully";
+    public User unsuspendUserById(Long id,String adminPassword){
+        User adminUser=userRepository.findByEmail(
+                UserUtil.getUserAuthentication().getUsername()
+        ).orElseThrow(
+                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+        );
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not authorized to make this request");
+        }
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("wrong password");
+        }
+        else {
+            User user = userRepository.findById(id)
+                    .orElseThrow(()-> new UsernameNotFoundException("User not found with id: " + id));
+            user.setExpired(false);
+            user.setLocked(false);
+            userRepository.save(user);
+            return user;
+        }
     }
 
     public String suspendUserByEmail(String email){
