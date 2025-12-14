@@ -29,6 +29,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("DELETE User u WHERE u.Id IN:Ids")
     public void deleteUserInBatchById(List<Long> Ids);
-    @Query("DELETE User u WHERE u.email IN:email")
-    public void deleteUserInBatchByEmail(String[] emails);
+    @Transactional
+    @Modifying
+    @Query("DELETE User u WHERE u.email IN:emails")
+    public void deleteUserInBatchByEmail(List<String> emails);
 }

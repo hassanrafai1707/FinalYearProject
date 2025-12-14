@@ -259,13 +259,20 @@ public class UserService {
         }
     }
 
-    public String deleteUserInBatchEmail(String[] emails){
-        try {
-            userRepository.deleteUserInBatchByEmail(emails);
-            return "all users with emails  deleted";
+    public void deleteUserInBatchEmail(List<String> emails , String adminPassword){
+        User adminUser=userRepository.findById(
+                UserUtil.getUserAuthentication().getId()
+        ).orElseThrow(
+                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+        );
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not authorized to make this request");
         }
-        catch (UserNotFoundException e){
-            throw new UserNotFoundException(e.getMessage());
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("wrong password");
+        }
+        else {
+            userRepository.deleteUserInBatchByEmail(emails);
         }
     }
 

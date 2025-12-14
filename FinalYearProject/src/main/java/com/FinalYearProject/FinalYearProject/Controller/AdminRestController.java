@@ -111,14 +111,13 @@ public class AdminRestController {
         );
     }
 
-    //todo change
     @DeleteMapping("/deleteUsersInBatchByEmail")
-    public ResponseEntity<?> deleteUsersInBatchByEmail(@RequestBody Map<String,String[]> request){
-        String[] emails=request.get("emails");
+    public ResponseEntity<?> deleteUsersInBatchByEmail(@RequestBody DtoForEmailsAndPasswordInRequest dto){
+        userService.deleteUserInBatchEmail(dto.getEmails(),dto.getAdminPassword());
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "message",userService.deleteUserInBatchEmail(emails)
+                        "message","all users deleted successfully with emails"
                 )
         );
     }
@@ -235,6 +234,7 @@ public class AdminRestController {
                         )
                 );
     }
+
     @PatchMapping("/updateUserEmail")
     public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
                                                             ){
