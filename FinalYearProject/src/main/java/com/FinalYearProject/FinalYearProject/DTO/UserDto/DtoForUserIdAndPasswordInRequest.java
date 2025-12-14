@@ -1,24 +1,24 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
 public class DtoForUserIdAndPasswordInRequest {
-    Long Id;
+    Long id;
     String password;
     String adminPassword;
 
     public DtoForUserIdAndPasswordInRequest(){}
 
-    public DtoForUserIdAndPasswordInRequest(Long Id, String password,String adminPassword){
-        this.Id=Id;
+    public DtoForUserIdAndPasswordInRequest(Long id, String password,String adminPassword){
+        this.id =id;
         this.password=password;
         this.adminPassword=adminPassword;
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getPassword() {

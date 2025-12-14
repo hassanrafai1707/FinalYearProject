@@ -169,7 +169,7 @@ public class AdminRestController {
                 )
         );
     }
-
+//todo change
     @PatchMapping("/updateUserPasswordByEmail")
     public ResponseEntity<?> updatePasswordByEmail(@RequestBody DtoForEmailAndPasswordInRequest dto){
         User user=userService.updateUserPasswordByEmail(dto.getEmail(),dto.getPassword());
