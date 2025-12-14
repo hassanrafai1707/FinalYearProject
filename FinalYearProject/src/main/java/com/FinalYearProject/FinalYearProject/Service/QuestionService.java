@@ -125,7 +125,7 @@ public class QuestionService {
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
-        throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO);
+        throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped "+mappedCO);
     }
 
     public Page<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO,int pageNo,int size){
@@ -135,7 +135,7 @@ public class QuestionService {
             return tempQuestion;
         }
         else {
-            throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO);
+            throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+" and Mapped "+mappedCO);
         }
     }
 

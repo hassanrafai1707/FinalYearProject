@@ -150,6 +150,22 @@ public class TeacherRestController {
                 );
     }
 
+    @GetMapping("/findBySubjectName-MappedCOPaged")
+    public PagedModel<Question> findBySubjectNameMappedCO(
+            @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size,
+            @RequestBody DtoForSubjectNameAndMappedCO dto
+    ){
+        return new PagedModel<>(
+                questionService.findBySubjectNameMappedCO(
+                        dto.getSubjectName(),
+                        dto.getMappedCO(),
+                        pageNo,
+                        size
+                )
+        );
+    }
+
     @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
     public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(@RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto){
     return ResponseEntity
