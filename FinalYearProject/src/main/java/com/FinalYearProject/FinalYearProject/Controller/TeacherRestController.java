@@ -8,6 +8,7 @@ import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,6 +66,16 @@ public class TeacherRestController {
                                 "list of all questions with CO" ,questions
                         )
                 );
+    }
+
+    @GetMapping("/findBySubjectCodePagged")
+    public PagedModel<Question> findBySubjectCode(
+            @RequestParam(value = "pageNo" ,defaultValue = "0") int page,
+            @RequestParam(value = "size" , defaultValue = "100") int size,
+            @RequestBody Map<String,String> request
+    ){
+        String subjectCode =request.get("subjectCode");
+        return new PagedModel<>(questionService.findBySubjectCode(subjectCode,page,size));
     }
 
     @GetMapping("/findBySubjectCode-MappedCO")
@@ -137,33 +148,6 @@ public class TeacherRestController {
                             )
                     )
             );
-    }
-
-    //TODO remove both functions below as teacher doesn't need it
-    @GetMapping("/findByCreatedByUsingEmail")
-    public ResponseEntity<?> findByCreatedByUsingEmail(@RequestBody Map<String,String> request){
-        String email= request.get("email");
-        List<Question> questions = questionService.findByCreatedByUsingEmail(email);
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with CO" ,questions
-                        )
-                );
-    }
-
-    @GetMapping("/findByCreatedByUsingId")
-    public ResponseEntity<?> findByCreatedByUsingId(@RequestBody Map<String,Long> request){
-        Long Id=request.get("id");
-        List<Question> questions =questionService.findByCreatedByUsingId(Id);
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with CO" ,questions
-                        )
-                );
     }
 
     @PostMapping("/addQuestion")
