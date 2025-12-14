@@ -131,10 +131,13 @@ public class UserService {
     }
 
     //todo take admin password and add a if
-    public User updateUserPasswordByEmail(String email,String password){
-        String adminRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(adminRole.contains("ROLE_ADMIN"))){
+    public User updateUserPasswordByEmail(String email,String password,String adminPassword){
+        User adminUser=userRepository.findByEmail(UserUtil.getUserAuthentication().getUsername()).orElseThrow(()-> new UsernameNotFoundException("try again some thing went wrong user not found"));
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("You gave the wrong password");
         }
         User user=userRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found with email "+email));
@@ -144,7 +147,13 @@ public class UserService {
     }
 
     public User updateUserPasswordById(Long Id,String password,String adminPassword){
-        User adminUser=userRepository.findByEmail(UserUtil.getUserAuthentication().getUsername()).orElseThrow(()-> new UsernameNotFoundException("try again some thing went wrong user not found"));
+
+        User adminUser=userRepository.findByEmail(
+                UserUtil.getUserAuthentication().getUsername()
+        ).orElseThrow(
+                ()-> new UsernameNotFoundException("try again some thing went wrong user not found")
+        );
+
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }

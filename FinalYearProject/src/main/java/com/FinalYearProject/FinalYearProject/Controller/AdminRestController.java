@@ -76,6 +76,7 @@ public class AdminRestController {
         return userService.findAllUsersPage(pageNo, size);
     }
 
+    //todo change
     @DeleteMapping("/deleteUserByEmail")
      public ResponseEntity<?> deleteUserByEmail(@RequestBody Map<String,String> request){
         String email=request.get("email");
@@ -88,6 +89,7 @@ public class AdminRestController {
         );
     }
 
+    //todo change
     @DeleteMapping("/deleteUserById")
     public ResponseEntity<?> deleteById( @RequestBody Map<String,Long> request){
         Long Id= request.get("id");
@@ -100,6 +102,7 @@ public class AdminRestController {
         );
     }
 
+    //todo change
     @DeleteMapping("/deleteUsersInBatchByID")
     public ResponseEntity<?> deleteUsersInBatchByID(@RequestBody Map<String,Long[]> requst){
         Long[] ids=requst.get("ids");
@@ -111,6 +114,7 @@ public class AdminRestController {
         );
     }
 
+    //todo change
     @DeleteMapping("/deleteUsersInBatchByEmail")
     public ResponseEntity<?> deleteUsersInBatchByEmail(@RequestBody Map<String,String[]> request){
         String[] emails=request.get("emails");
@@ -122,6 +126,7 @@ public class AdminRestController {
         );
     }
 
+    //todo change
     @PatchMapping("/suspendUserById")
     public ResponseEntity<?> suspendUserById(@RequestBody Map<String,Long> request){
         Long Id= request.get("id");
@@ -134,6 +139,7 @@ public class AdminRestController {
         );
     }
 
+    //todo change
     @PatchMapping("/unsuspendUserById")
     public ResponseEntity<?> unsuspendUserById(@RequestBody Map<String,Long> request){
         Long Id= request.get("id");
@@ -146,6 +152,7 @@ public class AdminRestController {
         );
     }
 
+    //todo change
     @PatchMapping("/suspendUserByEmail")
     public ResponseEntity<?> suspendUserByEmail(@RequestBody Map<String,String> request){
         String email=request.get("email");
@@ -158,6 +165,7 @@ public class AdminRestController {
         );
     }
 
+    //todo change
     @PatchMapping("/unsuspendUserByEmail")
     public ResponseEntity<?> unsuspendUserByEmail(@RequestBody Map<String,String> request){
         String email=request.get("email");
@@ -169,10 +177,14 @@ public class AdminRestController {
                 )
         );
     }
-//todo change
+
     @PatchMapping("/updateUserPasswordByEmail")
     public ResponseEntity<?> updatePasswordByEmail(@RequestBody DtoForEmailAndPasswordInRequest dto){
-        User user=userService.updateUserPasswordByEmail(dto.getEmail(),dto.getPassword());
+        User user=userService.updateUserPasswordByEmail(
+                dto.getEmail(),
+                dto.getPassword(),
+                dto.getAdminPassword()
+        );
         return ResponseEntity
                 .ok(
                         Map.of(
