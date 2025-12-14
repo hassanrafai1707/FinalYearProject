@@ -346,26 +346,48 @@ public class UserService {
         }
     }
 
-    public String suspendUserByEmail(String email){
-        User user=userRepository.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException( "User not found with email"+email));
-
-        user.setExpired(true);
-        user.setLocked(true);
-
-        userRepository.save(user);
-        return "User Suspend successfully";
+    public User suspendUserByEmail(String email, String adminPassword){
+        User adminUser=userRepository.findByEmail(
+            UserUtil.getUserAuthentication().getUsername()
+    ).orElseThrow(
+            ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+    );
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not authorized to make this request");
+        }
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("wrong password");
+        }
+        else {
+            User user=userRepository.findByEmail(email)
+                    .orElseThrow(()-> new UsernameNotFoundException( "User not found with email"+email));
+            user.setExpired(true);
+            user.setLocked(true);
+            userRepository.save(user);
+            return user;
+        }
     }
 
-    public String unsuspendUserByEmail(String email){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with email"+email));
-
-        user.setExpired(false);
-        user.setLocked(false);
-
-        userRepository.save(user);
-        return "User Suspend successfully";
+    public User unsuspendUserByEmail(String email,String adminPassword){
+        User adminUser=userRepository.findByEmail(
+                UserUtil.getUserAuthentication().getUsername()
+        ).orElseThrow(
+                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+        );
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
+            throw new UserNotAuthorizesException("User not authorized to make this request");
+        }
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("wrong password");
+        }
+        else {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(()-> new UsernameNotFoundException("User not found with email"+email));
+            user.setExpired(false);
+            user.setLocked(false);
+            userRepository.save(user);
+            return user;
+        }
     }
     //  VERIFY LOGIN
     public Map<String,Object> verifyLoginByEmail(String email, String password) {

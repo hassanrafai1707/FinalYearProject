@@ -139,28 +139,24 @@ public class AdminRestController {
         );
     }
 
-    //todo change
     @PatchMapping("/suspendUserByEmail")
-    public ResponseEntity<?> suspendUserByEmail(@RequestBody Map<String,String> request){
-        String email=request.get("email");
-        String message = userService.suspendUserByEmail(email);
+    public ResponseEntity<?> suspendUserByEmail(@RequestBody DtoForEmailAndAdminPasswordInRequest dto){
+        User user= userService.suspendUserByEmail(dto.getEmail(),dto.getAdminPassword());
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",
-                        "message", message
+                        "message", user
                 )
         );
     }
 
-    //todo change
     @PatchMapping("/unsuspendUserByEmail")
-    public ResponseEntity<?> unsuspendUserByEmail(@RequestBody Map<String,String> request){
-        String email=request.get("email");
-        String message=userService.unsuspendUserByEmail(email);
+    public ResponseEntity<?> unsuspendUserByEmail(@RequestBody DtoForEmailAndAdminPasswordInRequest dto){
+        User user =userService.unsuspendUserByEmail(dto.getEmail(),dto.getAdminPassword());
         return ResponseEntity.ok(
                 Map.of(
                         "states","successful",
-                        "message", message
+                        "message", user
                 )
         );
     }
