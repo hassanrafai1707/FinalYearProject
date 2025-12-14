@@ -100,7 +100,7 @@ public class QuestionService {
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
 
-    Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
+    public Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> temp=questionRepository.findBySubjectName(subjectName,pageable);
         if (!(temp.isEmpty())){
@@ -141,6 +141,34 @@ public class QuestionService {
         }
     }
 
+    public List<Question> getAllQuestionsByCurrentUser(){
+        String email=UserUtil.getUserAuthentication().getUsername();
+        String role=UserUtil.getUserAuthentication().getAuthorities().toString();
+        if (!(role.contains("ROLE_TEACHER"))){
+            throw new UserNotAuthorizesException("You are not authorized to make this request");
+        }
+        else {
+            List<Question> questions=findByCreatedByUsingEmail(email);
+            if (!(questions.isEmpty())){
+                return questions;
+            }
+            else {
+                throw new QuestionNotFoundException("You have made no questions");
+            }
+        }
+    }
+
+//    public Page<Question> getAllQuestionsByCurrentUser(int pageNo,int size){
+//        String email=UserUtil.getUserAuthentication().getUsername();
+//        String role=UserUtil.getUserAuthentication().getAuthorities().toString();
+//        if (!(role.contains("ROLE_TEACHER"))){
+//            throw new UserNotAuthorizesException("You are not authorized to make this request");
+//        }
+//        else {
+//            List<Question> questions;
+//
+//        }
+//    }
     public Question findQuestionByQuestionBody(String questionBody){
         return questionRepository.
                 findByQuestionTitle(
@@ -413,6 +441,7 @@ public class QuestionService {
                 .toList();
     }
 
+    //todo put in util class
     private Boolean checkIfQuestionBodyIsAcceptable(String questionBody){
         int counter =0;
 

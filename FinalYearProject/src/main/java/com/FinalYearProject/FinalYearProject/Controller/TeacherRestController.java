@@ -3,6 +3,7 @@ package com.FinalYearProject.FinalYearProject.Controller;
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,8 @@ public class TeacherRestController {
     private UserService userService;
     @Autowired
     private QuestionService questionService;
-
+    @Autowired
+    private QuestionPaperService questionPaperService;
     @GetMapping("/getAllQuestion")
     public ResponseEntity<?> getAllQuestion(){
         List<Question> questionList=questionService.getAllQuestion();
@@ -137,6 +139,7 @@ public class TeacherRestController {
             );
     }
 
+    //TODO remove both functions below as teacher doesn't need it
     @GetMapping("/findByCreatedByUsingEmail")
     public ResponseEntity<?> findByCreatedByUsingEmail(@RequestBody Map<String,String> request){
         String email= request.get("email");
@@ -212,6 +215,18 @@ public class TeacherRestController {
                         Map.of(
                                 "status","Successful",
                                 "generated Question Paper",generatedQuestionPaper
+                        )
+                );
+    }
+
+    @GetMapping("/getYourQuestion")
+    public ResponseEntity<?> getYourQuestion(){
+        List<Question> allQuestionPapersGeneratedByUser=questionService.getAllQuestionsByCurrentUser();
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "all your questions " ,allQuestionPapersGeneratedByUser
                         )
                 );
     }
