@@ -84,6 +84,17 @@ public class QuestionService {
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
     }
 
+    public Page<Question> findBySubjectCodeMappedCO(String subjectCode,String mappedCO, int pageNo, int size){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCO(subjectCode,mappedCO,pageable);
+        if (!(tempQuestions.isEmpty())){
+            return tempQuestions;
+        }
+        else {
+            throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
+        }
+    }
+
     public List<Question> findBySubjectCodeMappedCOCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel){
         List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
         if (!(tempQuestions.isEmpty())){
@@ -115,6 +126,17 @@ public class QuestionService {
             return tempQuestion;
         }
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO);
+    }
+
+    public Page<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO,int pageNo,int size){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(subjectName,mappedCO,pageable);
+        if (!(tempQuestion.isEmpty())){
+            return tempQuestion;
+        }
+        else {
+            throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO);
+        }
     }
 
     public List<Question> findBySubjectNameMappedCOCognitiveLevel(String subjectName,String mappedCO,String cognitiveLevel){
@@ -158,6 +180,39 @@ public class QuestionService {
         }
     }
 
+    public List<Question> findByCreatedByUsingId(Long Id){
+        User tempUser=userService.findUserById(Id);
+        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
+            throw new UserNotAuthorizesException("User with id is not authorized to make questions"+Id);
+        }
+        else {
+            List<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser);
+            if (!(tempQuestion.isEmpty())){
+                return tempQuestion;
+            }
+            else {
+                throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
+            }
+        }
+    }
+
+    public Page<Question> findByCreatedByUsingId(Long Id,int pageNo,int size){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        User tempUser=userService.findUserById(Id);
+        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
+            throw new UserNotAuthorizesException("User with id is not authorized to make questions"+Id);
+        }
+        else {
+            Page<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser,pageable);
+            if (!(tempQuestion.isEmpty())){
+                return tempQuestion;
+            }
+            else {
+                throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
+            }
+        }
+    }
+
     public List<Question> getAllQuestionsByCurrentUser(){
         String email=UserUtil.getUserAuthentication().getUsername();
         String role=UserUtil.getUserAuthentication().getAuthorities().toString();
@@ -196,21 +251,6 @@ public class QuestionService {
                 ()-> new QuestionNotFoundException("no question with this body")
         );
         questionRepository.delete(temp);
-    }
-    public List<Question> findByCreatedByUsingId(Long Id){
-        User tempUser=userService.findUserById(Id);
-        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
-            throw new UserNotAuthorizesException("User with id is not authorized to make questions"+Id);
-        }
-        else {
-            List<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser);
-            if (!(tempQuestion.isEmpty())){
-                return tempQuestion;
-            }
-            else {
-                throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
-            }
-        }
     }
 
     @Transactional
