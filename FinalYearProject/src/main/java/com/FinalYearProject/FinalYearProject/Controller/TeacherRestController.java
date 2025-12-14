@@ -90,6 +90,22 @@ public class TeacherRestController {
                 );
     }
 
+    @GetMapping("/findBySubjectCode-MappedCOPaged")
+    public PagedModel<Question> findBySubjectCodeMappedCO(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestBody DtoForSubjectCodeAndMappedCO dto
+    ){
+        return new PagedModel<>(
+                questionService.findBySubjectCodeMappedCO(
+                        dto.getSubjectCode(),
+                        dto.getMappedCO(),
+                        pageNo,
+                        size
+                )
+        );
+    }
+
     @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
     private ResponseEntity<?> findByCognitiveLevel(@RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto){
         List<Question> questions=questionService.findBySubjectCodeMappedCOCognitiveLevel(
