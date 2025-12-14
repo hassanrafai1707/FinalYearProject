@@ -205,11 +205,10 @@ public class UserService {
             throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
         }
         if (
-                role.startsWith("ROLE_")||
-                !role.equals("ROLE_ADMIN")||
-                !role.equals("ROLE_TEACHER")||
-                !role.equals("ROLE_STUDENT")||
-                !role.equals("ROLE_SUPERVISOR")
+                !(role.contains("ROLE_ADMIN"))
+                || !(role.contains("ROLE_TEACHER"))
+                || !(role.contains("ROLE_STUDENT"))
+                || !(role.contains("ROLE_SUPERVISOR"))
         ){
             throw new UnacceptableRequestException("the role not formated properly");
         }
