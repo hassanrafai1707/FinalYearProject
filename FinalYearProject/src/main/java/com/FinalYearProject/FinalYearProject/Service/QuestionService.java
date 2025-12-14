@@ -66,7 +66,7 @@ public class QuestionService {
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
     }
-    //TODO user this metho
+
     public Page<Question> findBySubjectCode(String subjectCode,int pageNo,int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> temp = questionRepository.findBySubjectCode(subjectCode,pageable);
@@ -99,7 +99,7 @@ public class QuestionService {
         }
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
-    //TODO user this metho
+
     public Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> temp=questionRepository.findBySubjectName(subjectName,pageable);

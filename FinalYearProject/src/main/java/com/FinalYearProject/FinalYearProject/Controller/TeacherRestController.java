@@ -119,6 +119,22 @@ public class TeacherRestController {
                 );
     }
 
+    @GetMapping("/findBySubjectNamePaged")
+    public PagedModel<Question> findBySubjectName(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestBody Map<String,String> request
+    ){
+        String subjectName=request.get("subjectName");
+        return new PagedModel<>(
+                questionService.findBySubjectName(
+                        subjectName,
+                        pageNo,
+                        size
+                )
+        );
+    }
+
     @GetMapping("/findBySubjectName-MappedCO")
     public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
         return ResponseEntity
