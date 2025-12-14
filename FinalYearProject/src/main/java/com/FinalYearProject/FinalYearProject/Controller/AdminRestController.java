@@ -6,6 +6,7 @@ import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,11 +66,11 @@ public class AdminRestController {
     }
 
     @GetMapping("/getAllUsersPaged")
-    public Page<User> getAllUsersPaged(
+    public PagedModel<User> getAllUsersPaged(
             @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size
     ){
-        return userService.findAllUsersPage(pageNo, size);
+        return new PagedModel<>(userService.findAllUsersPage(pageNo, size));
     }
 
     @DeleteMapping("/deleteUserByEmail")

@@ -37,11 +37,11 @@ public class TeacherRestController {
     }
 
     @GetMapping("/getAllQuestionPaged")
-    public Page<Question>  getAllQuestionsPaged(
+    public PagedModel<Question>  getAllQuestionsPaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
     ){
-        return questionService.getAllQuestionsPaged(pageNo,size);
+        return new PagedModel<>(questionService.getAllQuestionsPaged(pageNo,size));
     }
 
     @GetMapping("/getQuestionById")
