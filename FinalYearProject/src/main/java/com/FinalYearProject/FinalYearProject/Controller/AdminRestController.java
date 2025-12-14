@@ -73,15 +73,13 @@ public class AdminRestController {
         return userService.findAllUsersPage(pageNo, size);
     }
 
-    //todo change
     @DeleteMapping("/deleteUserByEmail")
-     public ResponseEntity<?> deleteUserByEmail(@RequestBody Map<String,String> request){
-        String email=request.get("email");
-        String Message=userService.deleteUserByEmail(email);
+     public ResponseEntity<?> deleteUserByEmail(@RequestBody DtoForEmailAndAdminPasswordInRequest dto){
+        userService.deleteUserByEmail(dto.getEmail(),dto.getAdminPassword());
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "message",Message
+                        "message","users with email deleted successfully"
                 )
         );
     }

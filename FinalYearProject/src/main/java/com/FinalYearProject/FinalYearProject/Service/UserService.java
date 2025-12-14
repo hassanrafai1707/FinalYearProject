@@ -13,14 +13,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -222,12 +220,20 @@ public class UserService {
 
     //  DELETE (by email)
     @Transactional
-    public String deleteUserByEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
+    public void deleteUserByEmail(String email,String adminPassword) {
+        User adminUser=userRepository.findByEmail(
+                UserUtil.getUserAuthentication().getUsername()
+        ).orElseThrow(
+                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
+        );
+        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
+             throw new UserNotAuthorizesException("User not authorized to make this request");
+        }
+        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+            throw new WrongPasswordException("wrong password");
+        }
+        else {
             userRepository.deleteByEmail(email);
-            return "User deleted successfully";
-        } else {
-            throw new UsernameNotFoundException("User not found with email: " + email);
         }
     }
 
