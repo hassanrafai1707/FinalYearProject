@@ -66,7 +66,7 @@ public class QuestionService {
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
     }
-
+    //TODO user this metho
     public Page<Question> findBySubjectCode(String subjectCode,int pageNo,int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> temp = questionRepository.findBySubjectCode(subjectCode,pageable);
@@ -99,7 +99,7 @@ public class QuestionService {
         }
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
-
+    //TODO user this metho
     public Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> temp=questionRepository.findBySubjectName(subjectName,pageable);
@@ -141,6 +141,23 @@ public class QuestionService {
         }
     }
 
+    public Page<Question> findByCreatedByUsingEmail(String email, int pageNo,int size){
+        User tempUser= userService.findByEmail(email);
+        Pageable pageable= PageRequest.of(pageNo,size);
+        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
+            throw new UserNotAuthorizesException("User with email is not authorized to make questions"+email);
+        }
+        else {
+            Page<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser,pageable);
+            if (!(tempQuestion.isEmpty())){
+                return tempQuestion;
+            }
+            else {
+                throw new QuestionNotFoundException("User with the email has not created any Question"+email);
+            }
+        }
+    }
+
     public List<Question> getAllQuestionsByCurrentUser(){
         String email=UserUtil.getUserAuthentication().getUsername();
         String role=UserUtil.getUserAuthentication().getAuthorities().toString();
@@ -148,27 +165,21 @@ public class QuestionService {
             throw new UserNotAuthorizesException("You are not authorized to make this request");
         }
         else {
-            List<Question> questions=findByCreatedByUsingEmail(email);
-            if (!(questions.isEmpty())){
-                return questions;
-            }
-            else {
-                throw new QuestionNotFoundException("You have made no questions");
-            }
+            return findByCreatedByUsingEmail(email);
         }
     }
 
-//    public Page<Question> getAllQuestionsByCurrentUser(int pageNo,int size){
-//        String email=UserUtil.getUserAuthentication().getUsername();
-//        String role=UserUtil.getUserAuthentication().getAuthorities().toString();
-//        if (!(role.contains("ROLE_TEACHER"))){
-//            throw new UserNotAuthorizesException("You are not authorized to make this request");
-//        }
-//        else {
-//            List<Question> questions;
-//
-//        }
-//    }
+    public Page<Question> getAllQuestionsByCurrentUser(int pageNo,int size){
+        String email=UserUtil.getUserAuthentication().getUsername();
+        String role=UserUtil.getUserAuthentication().getAuthorities().toString();
+        if (!(role.contains("ROLE_TEACHER"))){
+            throw new UserNotAuthorizesException("You are not authorized to make this request");
+        }
+        else {
+           return findByCreatedByUsingEmail(email,pageNo,size);
+        }
+    }
+
     public Question findQuestionByQuestionBody(String questionBody){
         return questionRepository.
                 findByQuestionTitle(

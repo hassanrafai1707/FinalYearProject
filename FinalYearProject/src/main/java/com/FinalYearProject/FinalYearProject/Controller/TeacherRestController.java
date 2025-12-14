@@ -231,6 +231,14 @@ public class TeacherRestController {
                 );
     }
 
+    @GetMapping("/getYourQuestionPaged")
+    public Page<Question> getYourQuestion(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size
+    ){
+        return questionService.getAllQuestionsByCurrentUser(pageNo, size);
+    }
+
     @PostMapping("/approveGeneratedQuestionPaper")
     public ResponseEntity<?> approveGeneratedQuestionPaper(){
         return ResponseEntity.ok(
