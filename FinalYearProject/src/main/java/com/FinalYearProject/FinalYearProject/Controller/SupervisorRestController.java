@@ -5,7 +5,9 @@ import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAn
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCO;
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCOAndCognitiveLevel;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class SupervisorRestController {
     private UserService userService;
     @Autowired
     private QuestionService questionService;
+    @Autowired
+    private QuestionPaperService questionPaperService;
 
     @GetMapping("/getAllQuestion")
     public ResponseEntity<?> getAllQuestion(){
@@ -222,6 +226,188 @@ public class SupervisorRestController {
                                 "list of all questions with CO" ,questions
                         )
                 );
+    }
+
+    @GetMapping("/getAllQuestionsPaper")
+    public ResponseEntity<?> getAllQuestionPapers(){
+        return ResponseEntity.
+                ok(
+                        Map.of(
+                                "status","Successful",
+                                "allQuestionsPaper",questionPaperService.getAllQuestionPapers()
+                        )
+                );
+    }
+
+    @GetMapping("/getAllQuestionsPaperPaged")
+    public PagedModel<QuestionPaper> getAllQuestionsPaper(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size
+    ){
+        return new PagedModel<>(questionPaperService.getAllQuestionPapers(pageNo, size));
+    }
+
+    @GetMapping("findQuestionPaperById")
+    public ResponseEntity<?> getAllQuestionPapers(
+            @RequestBody Map<String,Long> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "questionPaper",questionPaperService.findById(request.get("id"))
+                )
+        );
+    }
+
+    @GetMapping("/findByExamTitle")
+    public ResponseEntity<?> findByExamTitle(
+            @RequestBody Map<String,String> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "questionPaper",questionPaperService.findByExamTitle(request.get("examTitle"))
+                )
+        );
+    }
+
+    @GetMapping("/findByGeneratedByUsingEmail")
+    public ResponseEntity<?> findByGeneratedByUsingEmail(
+            @RequestBody Map<String,String> request
+    ){
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "questionPaper",questionPaperService.findByGeneratedByUsingEmail(request.get("email"))
+                        )
+                );
+    }
+
+    @GetMapping("/findByGeneratedByUsingEmailPaged")
+    public PagedModel<QuestionPaper> findByGeneratedByUsingEmail(
+            @RequestParam(value = "pageNo" ,defaultValue =  "0") int pageNo,
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestBody Map<String,String> request
+    ){
+        return new PagedModel<>(questionPaperService.
+                        findByGeneratedByUsingEmail(
+                                request.get("email"),
+                                pageNo,
+                                size
+                        )
+        );
+    }
+
+    @GetMapping("/findByGeneratedByUsingId")
+    public ResponseEntity<?> findByGeneratedByUsingId(
+            @RequestBody Map<String,Long> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "questionPaper",questionPaperService.findByGeneratedByUsingId(request.get("id"))
+                )
+        );
+    }
+
+    @GetMapping("/findByGeneratedByUsingIdPaged")
+    public PagedModel<QuestionPaper> findByGeneratedByUsingId(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestBody Map<String,Long> request
+    ){
+        return new PagedModel<>(questionPaperService.findByGeneratedByUsingId(request.get("id"),pageNo,size));
+    }
+
+    @GetMapping("/findByApprovedByUsingEmail")
+    public ResponseEntity<?> findByApprovedByUsingEmail(
+            @RequestBody Map<String,String> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "questionPaper",questionPaperService.findByApprovedByUsingEmail(request.get("email"))
+                )
+        );
+    }
+
+    @GetMapping("/findByApprovedByUsingEmailPaged")
+    public PagedModel<QuestionPaper> findByApprovedByUsingEmail(
+            @RequestParam(value = "pageNo" ,defaultValue =  "0") int pageNo,
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestBody Map<String,String> request
+    ){
+        return new PagedModel<>(
+                questionPaperService.findByApprovedByUsingEmail(
+                        request.get("email"),
+                        pageNo,
+                        size
+                )
+        );
+    }
+
+    @GetMapping("/findByApprovedByUsingId")
+    public ResponseEntity<?> findByApprovedByUsingId(
+            @RequestBody Map<String,Long> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "questionPaper",questionPaperService.findByApprovedByUsingId(request.get("id"))
+                )
+        );
+    }
+
+    @GetMapping("/findByApprovedByUsingIdPaged")
+    public PagedModel<QuestionPaper> findByApprovedByUsingId(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestBody Map<String,Long> request
+    ){
+        return new PagedModel<>(
+                questionPaperService.findByApprovedByUsingId(
+                        request.get("id"),
+                        pageNo,
+                        size
+                )
+        );
+    }
+
+    @GetMapping("/findApproved")
+    public ResponseEntity<?> findApproved(){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "questionPaper",questionPaperService.findApproved()
+                )
+        );
+    }
+
+    @GetMapping("/findApprovedPaged")
+    public PagedModel<QuestionPaper> findApproved(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size
+    ){
+        return new PagedModel<>(questionPaperService.findApproved(pageNo, size));
+    }
+
+    @GetMapping("/findNotApproved")
+    public ResponseEntity<?> findNotApproved(){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "questionPaper",questionPaperService.findNotApproved()
+                )
+        );
+    }
+
+    @GetMapping("/findNotApprovedPaged")
+    public PagedModel<QuestionPaper> findNotApproved(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size
+    ){
+        return new PagedModel<>(questionPaperService.findNotApproved(pageNo, size));
     }
 
     @PatchMapping("/updateUserEmail")
