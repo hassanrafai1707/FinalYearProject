@@ -18,9 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +39,17 @@ public class QuestionPaperService {
         }
         else {
             return questionPapers;
+        }
+    }
+
+    public Page<QuestionPaper> getAllQuestionPapers(int pageNo , int size){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<QuestionPaper> questionPaperPage=questionPaperRepository.findAll(pageable);
+        if (!(questionPaperPage.isEmpty())){
+            return questionPaperPage;
+        }
+        else {
+            throw new QuestionPaperNotFoundException("no question paper in db ");
         }
     }
 
