@@ -50,7 +50,7 @@ public class QuestionPaper {
     private String questionPaperFingerprint;
 
     @ManyToOne
-    @JoinColumn(name = "approved_by")
+    @JoinColumn(name = "approved_by", nullable = true)
     private User approvedBy;
 
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)

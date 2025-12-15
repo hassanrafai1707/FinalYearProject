@@ -8,20 +8,20 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.D
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionPaperRepository;
-import com.FinalYearProject.FinalYearProject.Util.QuestionPaperUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +31,8 @@ public class QuestionPaperService {
     private QuestionPaperRepository questionPaperRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private QuestionService questionService;
 
     private List<QuestionPaper> getAllQuestionPapers(){
         List<QuestionPaper> questionPapers=questionPaperRepository.findAll();
@@ -187,26 +189,55 @@ public class QuestionPaperService {
         }
     }
 
-    public QuestionPaper addQuestionPaper(QuestionPaper questionPaper){
+    @Transactional
+    public QuestionPaper addQuestionPaper(QuestionPaper questionPaper) throws BadRequestException{
         String email = UserUtil.getUserAuthentication().getUsername();
         User user = userService.findByEmail(email);
+        List<Long>Ids=questionPaper.getListOfQuestion()
+                .stream()
+                .sorted(Comparator.comparing(Question::getId))
+                .map(Question::getId)
+                .toList();
         String questionPaperFingerprint;
+        Set<Question> questions;
         if (!user.getRole().equals("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("User not Authorizes to make this request");
         }
         else {
-            questionPaperFingerprint= QuestionPaperUtil.sha256(questionPaper.getListOfQuestion());
-            if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)){
-                throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
+            questions= new HashSet<>(questionService.getQuestionByIds(Ids));
+            if (!(Ids.size()==questions.size())){
+                throw new BadRequestException("there are a few band questions");
             }
             else {
-                questionPaper.setGeneratedBy(user);
-                questionPaper.setApproved(Boolean.FALSE);
-                questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
-                questionPaperRepository.save(questionPaper);
+                questionPaperFingerprint = sha256FingerPrintUsingIds(Ids);
+                if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)) {
+                    throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
+                } else {
+                    questionPaper.setListOfQuestion(questions);
+                    questionPaper.setGeneratedBy(user);
+                    questionPaper.setApproved(Boolean.FALSE);
+                    questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
+                    questionPaperRepository.save(questionPaper);
+                }
             }
         }
         return questionPaper;
     }
 
+    private String sha256FingerPrintUsingIds(List<Long> Ids){
+        try{
+            String temp=Ids.toString();
+            System.out.println(temp);
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashCode=md.digest(temp.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex=new StringBuilder();
+            for (byte h :hashCode){
+                hex.append(String.format("%02x",h));
+            }
+            System.out.println(hex);
+            return hex.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -59,6 +59,14 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
     }
 
+    public List<Question> getQuestionByIds(List<Long> Ids){
+        List<Question> temp =questionRepository.findAllById(Ids);
+        for (Question question:temp){
+            System.out.println(question);
+        }
+        return temp;
+    }
+
     public List<Question> findBySubjectCode(String subjectCode){
         List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
         if (!(tempQuestion.isEmpty())){

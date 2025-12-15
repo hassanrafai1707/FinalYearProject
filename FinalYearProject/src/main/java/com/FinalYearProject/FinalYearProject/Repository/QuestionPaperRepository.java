@@ -17,9 +17,6 @@ public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Lon
     @Query("select q from QuestionPaper q where q.examTitle=:examTitle")
     public Optional<QuestionPaper> findByExamTitle(String examTitle);
 
-    @Query("select q from QuestionPaper q where q.examTitle=:examTitle")
-    public Page<QuestionPaper> findByExamTitle(String examTitle , Pageable pageable);
-
     @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy")
     public List<QuestionPaper> findByGeneratedBy(User generatedBy);
 

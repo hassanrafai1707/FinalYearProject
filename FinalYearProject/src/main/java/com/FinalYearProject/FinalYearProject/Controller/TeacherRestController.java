@@ -2,10 +2,12 @@ package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedModel;
@@ -271,11 +273,13 @@ public class TeacherRestController {
         return questionService.getAllQuestionsByCurrentUser(pageNo, size);
     }
 
+    @SneakyThrows
     @PostMapping("/approveGeneratedQuestionPaper")
-    public ResponseEntity<?> approveGeneratedQuestionPaper(){
+    public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody QuestionPaper questions){
         return ResponseEntity.ok(
                 Map.of(
-                        "status","Successful"
+                        "status","Successful",
+                        "saved question paper",questionPaperService.addQuestionPaper(questions)
                 )
         );
     }
