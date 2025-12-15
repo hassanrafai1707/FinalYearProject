@@ -8,6 +8,7 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.D
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionPaperRepository;
+import com.FinalYearProject.FinalYearProject.Util.QuestionPaperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -120,7 +121,7 @@ public class QuestionPaperService {
             throw new UserNotAuthorizesException("User not Authorizes to make this request");
         }
         else {
-            questionPaperFingerprint=sha256(questionPaper.getListOfQuestion());
+            questionPaperFingerprint= QuestionPaperUtil.sha256(questionPaper.getListOfQuestion());
             if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)){
                 throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
             }
@@ -134,36 +135,4 @@ public class QuestionPaperService {
         return questionPaper;
     }
 
-    private String sha256(Set<Question> questions) {
-        try {
-            // 1. Convert each question to a stable string representation
-            String combined = questions.stream()
-                    .sorted(Comparator.comparing(Question::getId)) // sort to make deterministic
-                    .map(q -> q.getId() + "|" +
-                            q.getSubjectName() + "|" +
-                            q.getSubjectCode() + "|" +
-                            q.getMappedCO() + "|" +
-                            q.getCognitiveLevel() + "|" +
-                            q.getQuestionMarks() + "|" +
-                            q.getQuestionTitle() + "|" +
-                            q.getQuestionBody() + "|" +
-                            q.getInUse())
-                    .reduce("",String::concat);
-            System.out.println(combined);
-            // 2. Hash the combined string
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(combined.getBytes(StandardCharsets.UTF_8));
-
-            // 3. Convert hash to hex
-            StringBuilder hex = new StringBuilder();
-            for (byte b : hash) {
-                hex.append(String.format("%02x", b));
-            }
-
-            return hex.toString();
-
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

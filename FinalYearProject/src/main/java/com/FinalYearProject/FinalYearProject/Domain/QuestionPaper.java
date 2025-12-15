@@ -15,7 +15,7 @@ import java.util.Set;
 @Entity
 @Table(name = "QuestionPaper" , indexes = {
         @Index(name = "index_question_paper_id", columnList = "id"),
-        @Index(name = "index_question_paper_exam_title_id",columnList = "exam_title"),
+        @Index(name = "index_question_paper_exam_title",columnList = "exam_title"),
         @Index(name = "index_question_paper_genrated_by",columnList = "generated_by"),
         @Index(name = "index_approved_by",columnList = "approved_by"),
         @Index(name = "index_approved", columnList = "approved"),
