@@ -8,6 +8,7 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.D
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionPaperRepository;
+import com.FinalYearProject.FinalYearProject.Util.QuestionPaperUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class QuestionPaperService {
     @Autowired
     private QuestionService questionService;
 
-    private List<QuestionPaper> getAllQuestionPapers(){
+    public List<QuestionPaper> getAllQuestionPapers(){
         List<QuestionPaper> questionPapers=questionPaperRepository.findAll();
         if (questionPapers.isEmpty()){
             throw new QuestionPaperNotFoundException("no question paper in db");
@@ -209,7 +210,7 @@ public class QuestionPaperService {
                 throw new BadRequestException("there are a few band questions");
             }
             else {
-                questionPaperFingerprint = sha256FingerPrintUsingIds(Ids);
+                questionPaperFingerprint = QuestionPaperUtil.sha256FingerPrintUsingIds(Ids);
                 if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)) {
                     throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
                 } else {
@@ -224,20 +225,4 @@ public class QuestionPaperService {
         return questionPaper;
     }
 
-    private String sha256FingerPrintUsingIds(List<Long> Ids){
-        try{
-            String temp=Ids.toString();
-            System.out.println(temp);
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hashCode=md.digest(temp.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hex=new StringBuilder();
-            for (byte h :hashCode){
-                hex.append(String.format("%02x",h));
-            }
-            System.out.println(hex);
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
