@@ -26,6 +26,7 @@ public class TeacherRestController {
     private QuestionService questionService;
     @Autowired
     private QuestionPaperService questionPaperService;
+
     @GetMapping("/getAllQuestion")
     public ResponseEntity<?> getAllQuestion(){
         List<Question> questionList=questionService.getAllQuestion();

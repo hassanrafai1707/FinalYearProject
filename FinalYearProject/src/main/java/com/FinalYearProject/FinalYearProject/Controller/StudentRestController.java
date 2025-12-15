@@ -9,9 +9,6 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,17 +26,18 @@ public class StudentRestController {
 
     @GetMapping("/getAllQuestion")
     public ResponseEntity<?> getAllQuestion(){
+        List<Question> questionList=questionService.getAllQuestion();
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","Successful",
-                                "all Question", questionService.getAllQuestion()
+                                "all Question", questionList
                         )
                 );
     }
 
     @GetMapping("/getAllQuestionPaged")
-    public PagedModel<Question> getAllQuestionsPaged(
+    public PagedModel<Question>  getAllQuestionsPaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
     ){
@@ -47,55 +45,12 @@ public class StudentRestController {
     }
 
     @GetMapping("/getQuestionById")
-    public ResponseEntity<?> getQuestionById(@RequestBody Map<String, Long> request){
+    public ResponseEntity<?> getQuestionById (@RequestBody Map<String,Long> request){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","Successful",
-                                "Question",questionService.getQuestionById(request.get("id"))
-                        )
-                );
-    }
-
-    @GetMapping("/findBySubjectName")
-    public ResponseEntity<?> findBySubjectName(@RequestBody Map<String,String> request){
-        String subjectName = request.get("subjectName");
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name" ,questionService.findBySubjectName(subjectName)
-                        )
-                );
-    }
-
-    @GetMapping("/findBySubjectName-MappedCO")
-    public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name and mapped CO",
-                                questionService.findBySubjectNameMappedCO(
-                                        dto.getSubjectName(),
-                                        dto.getMappedCO()
-                                )
-                        )
-                );
-    }
-
-    @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
-    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(@RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status" ,"Successful",
-                                "list of all questions with subject name and mapped CO and cognitive level",
-                                questionService.findBySubjectNameMappedCOCognitiveLevel(
-                                        dto.getSubjectName(),
-                                        dto.getMappedCO(),
-                                        dto.getCognitiveLevel()
-                                )
+                                "question with giver id",questionService.getQuestionById(request.get("id"))
                         )
                 );
     }
@@ -113,6 +68,16 @@ public class StudentRestController {
                 );
     }
 
+    @GetMapping("/findBySubjectCodePagged")
+    public PagedModel<Question> findBySubjectCode(
+            @RequestParam(value = "pageNo" ,defaultValue = "0") int page,
+            @RequestParam(value = "size" , defaultValue = "100") int size,
+            @RequestBody Map<String,String> request
+    ){
+        String subjectCode =request.get("subjectCode");
+        return new PagedModel<>(questionService.findBySubjectCode(subjectCode,page,size));
+    }
+
     @GetMapping("/findBySubjectCode-MappedCO")
     public ResponseEntity<?> findBySubjectCodeMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
         List<Question> question=questionService.findBySubjectCodeMappedCO(dto.getSubjectCode(), dto.getMappedCO());
@@ -123,6 +88,22 @@ public class StudentRestController {
                                 "list of all questions with subject name and mapped CO" ,question
                         )
                 );
+    }
+
+    @GetMapping("/findBySubjectCode-MappedCOPaged")
+    public PagedModel<Question> findBySubjectCodeMappedCO(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestBody DtoForSubjectCodeAndMappedCO dto
+    ){
+        return new PagedModel<>(
+                questionService.findBySubjectCodeMappedCO(
+                        dto.getSubjectCode(),
+                        dto.getMappedCO(),
+                        pageNo,
+                        size
+                )
+        );
     }
 
     @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
@@ -137,6 +118,82 @@ public class StudentRestController {
                         Map.of(
                                 "status","Successful",
                                 "list of all questions with subject code and mapped CO and cognitive level",questions
+                        )
+                );
+    }
+
+    @GetMapping("/findBySubjectName")
+    public ResponseEntity<?> findBySubjectName(@RequestBody Map<String,String> request){
+        String subjectName = request.get("subjectName");
+        List<Question> questions=questionService.findBySubjectName(subjectName);
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "list of all questions with subject name" ,questions
+                        )
+                );
+    }
+
+    @GetMapping("/findBySubjectNamePaged")
+    public PagedModel<Question> findBySubjectName(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestBody Map<String,String> request
+    ){
+        String subjectName=request.get("subjectName");
+        return new PagedModel<>(
+                questionService.findBySubjectName(
+                        subjectName,
+                        pageNo,
+                        size
+                )
+        );
+    }
+
+    @GetMapping("/findBySubjectName-MappedCO")
+    public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","Successful",
+                                "list of all questions with subject name and mapped CO",
+                                questionService.findBySubjectNameMappedCO(
+                                        dto.getSubjectName(),
+                                        dto.getMappedCO()
+                                )
+                        )
+                );
+    }
+
+    @GetMapping("/findBySubjectName-MappedCOPaged")
+    public PagedModel<Question> findBySubjectNameMappedCO(
+            @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size,
+            @RequestBody DtoForSubjectNameAndMappedCO dto
+    ){
+        return new PagedModel<>(
+                questionService.findBySubjectNameMappedCO(
+                        dto.getSubjectName(),
+                        dto.getMappedCO(),
+                        pageNo,
+                        size
+                )
+        );
+    }
+
+    @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
+    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(@RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto){
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status" ,"Successful",
+                                "list of all questions with subject name and mapped CO and cognitive level",
+                                questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                        dto.getSubjectName(),
+                                        dto.getMappedCO(),
+                                        dto.getCognitiveLevel()
+                                )
                         )
                 );
     }
