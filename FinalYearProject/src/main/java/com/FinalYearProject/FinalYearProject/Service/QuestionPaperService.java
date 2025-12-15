@@ -200,6 +200,106 @@ public class QuestionPaperService {
     }
 
     @Transactional
+    public QuestionPaper approveQuestionPaperById(Long id){
+        String userEmail=UserUtil.getUserAuthentication().getUsername();
+        User user=userService.findByEmail(userEmail);
+        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        else {
+           QuestionPaper questionPaper=questionPaperRepository
+                   .findById(id)
+                   .orElseThrow(
+                           ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
+                   );
+           if (questionPaper.getApproved().equals(Boolean.TRUE)){
+               return questionPaper;
+           }
+           else {
+               questionPaper.setApproved(Boolean.TRUE);
+               questionPaper.setApprovedBy(user);
+               questionPaperRepository.save(questionPaper);
+               return questionPaper;
+           }
+        }
+    }
+
+    @Transactional
+    public QuestionPaper notApproveQuestionPaperById(Long id){
+        String userEmail=UserUtil.getUserAuthentication().getUsername();
+        User user=userService.findByEmail(userEmail);
+        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        else {
+            QuestionPaper questionPaper=questionPaperRepository
+                    .findById(id)
+                    .orElseThrow(
+                            ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
+                    );
+            if (questionPaper.getApproved().equals(Boolean.FALSE)){
+                return questionPaper;
+            }
+            else {
+                questionPaper.setApproved(Boolean.FALSE);
+                questionPaper.setApprovedBy(user);
+                questionPaperRepository.save(questionPaper);
+                return questionPaper;
+            }
+        }
+    }
+
+    @Transactional
+    public QuestionPaper approvedQuestionPaperByTile(String examTitle){
+        String userEmail=UserUtil.getUserAuthentication().getUsername();
+        User user=userService.findByEmail(userEmail);
+        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        else {
+            QuestionPaper questionPaper = questionPaperRepository
+                    .findByExamTitle(examTitle)
+                    .orElseThrow(
+                            ()-> new QuestionPaperNotFoundException("question paper with title :"+examTitle+" does not exist ")
+                    );
+            if (questionPaper.getApproved().equals(Boolean.TRUE)){
+                return questionPaper;
+            }
+            else {
+                questionPaper.setApproved(Boolean.TRUE);
+                questionPaper.setApprovedBy(user);
+                questionPaperRepository.save(questionPaper);
+                return questionPaper;
+            }
+        }
+    }
+
+    @Transactional
+    public QuestionPaper notApprovedQuestionPaperByTile(String examTitle){
+        String userEmail=UserUtil.getUserAuthentication().getUsername();
+        User user=userService.findByEmail(userEmail);
+        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        }
+        else {
+            QuestionPaper questionPaper = questionPaperRepository
+                    .findByExamTitle(examTitle)
+                    .orElseThrow(
+                            ()-> new QuestionPaperNotFoundException("question paper with title :"+examTitle+" does not exist ")
+                    );
+            if (questionPaper.getApproved().equals(Boolean.FALSE)){
+                return questionPaper;
+            }
+            else {
+                questionPaper.setApproved(Boolean.FALSE);
+                questionPaper.setApprovedBy(user);
+                questionPaperRepository.save(questionPaper);
+                return questionPaper;
+            }
+        }
+    }
+
+    @Transactional
     public QuestionPaper addQuestionPaper(QuestionPaper questionPaper) throws BadRequestException{
         String email = UserUtil.getUserAuthentication().getUsername();
         User user = userService.findByEmail(email);
