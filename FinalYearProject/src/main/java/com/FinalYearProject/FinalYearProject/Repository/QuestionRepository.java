@@ -39,7 +39,7 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
 
     @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO IN :mappedCOs")
     List<Question> findValidQuestionsWithSubjectCode(String subjectCode,String[] mappedCOs);
-    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO IN : mappedCOs")
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO IN :mappedCOs")
     List<Question> findValidQuestionWithSubjectName(String subjectName,String[] mappedCOs);
 
     @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
