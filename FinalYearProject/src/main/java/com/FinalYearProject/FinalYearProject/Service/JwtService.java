@@ -90,7 +90,7 @@ public class JwtService  {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-    private String extractUserRole(String token){
+    public String extractUserRole(String token){
         return extractClaim(token,claims -> claims.get("role", String.class));
     }
     public void isTokenExpiredOrThrow(String token){
