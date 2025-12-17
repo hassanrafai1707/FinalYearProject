@@ -410,6 +410,64 @@ public class SupervisorRestController {
         return new PagedModel<>(questionPaperService.findNotApproved(pageNo, size));
     }
 
+    @PatchMapping("/approveQuestionPaperById")
+    public ResponseEntity<?> approveQuestionPaperById(
+            @RequestBody Map<String,Long> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "approved Question paper",questionPaperService.
+                                approveQuestionPaperById(
+                                        request.get("id")
+                                )
+                )
+        );
+    }
+
+    @PatchMapping("/notApproveQuestionPaperById")
+    public ResponseEntity<?> notApproveQuestionPaperById(
+            @RequestBody Map<String,Long> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "not approved Question paper",questionPaperService
+                                .notApproveQuestionPaperById(
+                                request.get("id")
+                        )
+                )
+        );
+    }
+
+    @PatchMapping("/approvedQuestionPaperByTile")
+    public ResponseEntity<?> approvedQuestionPaperByTile(
+            @RequestBody Map<String,String> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "approved Question paper",questionPaperService
+                                .approvedQuestionPaperByTile(
+                                        request.get("examTitle")
+                                )
+                )
+        );
+    }
+
+    @PatchMapping("/notApprovedQuestionPaperByTile")
+    public ResponseEntity<?> notApprovedQuestionPaperByTile(
+            @RequestBody Map<String,String> request
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","Successful",
+                        "not approved Question paper",questionPaperService
+                                .notApprovedQuestionPaperByTile(request.get("examTitle"))
+                )
+        );
+    }
+
     @PatchMapping("/updateUserEmail")
     public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
     ){
