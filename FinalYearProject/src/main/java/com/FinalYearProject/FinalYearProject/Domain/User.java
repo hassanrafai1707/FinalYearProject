@@ -7,6 +7,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+/**
+ * User Domain Entity for System Authentication and Authorization
+ * PURPOSE: Core user entity for authentication, authorization, and user management across the exam system. Implements Spring Security UserDetails contract.
+ * DATABASE DESIGN: JPA entity with sequence-based ID generation. Indexes on id and email for optimal lookup performance. Unique constraints on email and password fields.
+ * AUTHENTICATION FIELDS: email (username equivalent), password (BCrypt hashed), role (authority/ROLE_*). Follows Spring Security field naming conventions.
+ * ACCOUNT STATUS MANAGEMENT: is_enable (account active/inactive), locked (temporary lockout), expired (credentials expired). Supports comprehensive account lifecycle management.
+ * ROLE-BASED ACCESS CONTROL: role field determines authorization level (ROLE_STUDENT, ROLE_TEACHER, ROLE_SUPERVISOR, ROLE_ADMIN). Used by SecurityConfig for endpoint protection.
+ * SECURITY FEATURES: Password stored as unique hash. Account lockout capability. Account expiration support. Email verification required via is_enable flag.
+ * AUDIT TRAIL: System-generated ID provides immutable reference. Email uniqueness prevents duplicate accounts. Timestamps implied through entity lifecycle.
+ * INTEGRATION POINTS: Referenced by Question (createdBy), QuestionPaper (generatedBy, approvedBy). Maintains data integrity through JPA relationships.
+ * PERFORMANCE: Indexed email enables fast login lookups. Builder pattern (@SuperBuilder) supports flexible object creation. Sequence generation ensures database-efficient ID assignment.
+ * ACCOUNT LIFECYCLE: New users start with is_enable=false (pending verification). Verified users have is_enable=true. locked=true for security lockouts. expired=true for forced password resets.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder

@@ -19,7 +19,37 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-//this class is used to Configure custom security
+/**
+ * Spring Security Configuration for JWT-based Authentication
+ * PURPOSE:
+ * Main security configuration class that sets up JWT authentication, role-based authorization,
+ * and stateless session management for a REST API.
+ * SECURITY ARCHITECTURE:
+ * 1. STATELESS SESSIONS: Uses JWT tokens instead of server-side sessions (SessionCreationPolicy.STATELESS)
+ * 2. CSRF DISABLED: Not needed for stateless REST APIs (no browser session cookies)
+ * 3. JWT FILTER: Custom JwtFilter processes tokens before Spring's default auth filter
+ * 4. ROLE-BASED ACCESS: URL patterns protected by specific authorities (ROLE_ADMIN, ROLE_STUDENT, etc.)
+ * KEY COMPONENTS:
+ * - AuthenticationProvider: Uses DaoAuthenticationProvider with BCrypt password encoding
+ * - PasswordEncoder: BCrypt with strength 12 (high security, slower hashing)
+ * - AuthenticationManager: Bean for programmatic authentication
+ * - SecurityFilterChain: Main security configuration with URL authorization rules
+ * URL AUTHORIZATION RULES:
+ * - /admin/** → Requires ROLE_ADMIN authority
+ * - /student/** → Requires ROLE_STUDENT or ROLE_ADMIN
+ * - /teacher/** → Requires ROLE_TEACHER or ROLE_ADMIN
+ * - /supervisor → Requires ROLE_SUPERVISOR or ROLE_ADMIN
+ * - Public paths: login, auth, static resources (CSS, JS, images) → Permit all
+ * - All other requests → Require authentication
+ * FILTER CHAIN ORDER:
+ * 1. JwtFilter (custom) - processes JWT tokens
+ * 2. UsernamePasswordAuthenticationFilter (Spring default) - processes form login
+ * SECURITY NOTES:
+ * - Uses app.version property for versioned API endpoints
+ * - BCrypt strength 12 provides strong password hashing (recommended for production)
+ * - Stateless design enables horizontal scaling (no session affinity needed)
+ * - JWT filter validates tokens before Spring's default authentication
+ */
 @EnableMethodSecurity
 @Configuration
 @EnableWebSecurity

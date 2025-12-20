@@ -18,6 +18,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Supervisor REST Controller for Question Paper Review and Approval
+ * PURPOSE: Provides comprehensive question paper management and approval system for supervisors. Requires ROLE_SUPERVISOR or ROLE_ADMIN authority. Combines question retrieval, question paper review, and approval workflows.
+ * QUESTION PAPER MANAGEMENT OPERATIONS:
+ * 1. QUESTION PAPER RETRIEVAL: getAllQuestionsPaper returns all question papers. getAllQuestionsPaperPaged provides paginated results. getQuestionPaperById retrieves single paper.
+ * 2. FILTERING BY ATTRIBUTES: findByExamTitle filters by exam title. findByGeneratedByUsingEmail/Id finds papers created by specific users (with pagination). findByApprovedByUsingEmail/Id finds papers approved by specific supervisors (with pagination).
+ * 3. APPROVAL STATUS FILTERS: findApproved returns only approved papers. findNotApproved returns pending/rejected papers. Both support pagination.
+ * 4. APPROVAL WORKFLOWS: approveQuestionPaperById/ByTile approves papers for use. notApproveQuestionPaperById/ByTile rejects or returns papers for revision.
+ * QUESTION BANK ACCESS (SIMILAR TO STUDENT): getAllQuestion, getQuestionById, findBySubjectCode, findBySubjectName with all filtering variants (MappedCO, CognitiveLevel). Includes pagination support.
+ * CREATOR TRACKING: findByCreatedByUsingEmail/Id retrieves questions created by specific teachers for quality review.
+ * SUPERVISOR SELF-SERVICE: updateUserEmail and updateUserPassword for account management. test endpoint for connectivity verification.
+ * SECURITY CONTEXT: Requires supervisor or admin role. Supervisors can approve/reject papers created by teachers. Access to full question bank for review purposes. Can view approval history by supervisor.
+ * WORKFLOW MANAGEMENT: Tracks paper status (approved/not approved). Maintains audit trail of who approved each paper. Enables quality control process before exam deployment.
+ * RESPONSE FORMAT: Consistent JSON structure: {"status": "Successful", "dataKey": data}. Paginated endpoints return PagedModel with page metadata.
+ * AUDIT TRAIL FEATURES: Tracks generatedBy (creator) and approvedBy (supervisor). Timestamps for creation and approval. Status history for papers.
+ */
 @RequestMapping("${app.version}/supervisor")
 @RestController
 public class SupervisorRestController {

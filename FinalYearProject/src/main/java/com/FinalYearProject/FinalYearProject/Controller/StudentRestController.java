@@ -16,6 +16,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Student REST Controller for Question Retrieval and Self-Service Operations
+ * PURPOSE: Provides question bank access and self-service account management for students. Requires ROLE_STUDENT or ROLE_ADMIN authority. All endpoints are version-prefixed with student path.
+ * QUESTION RETRIEVAL OPERATIONS:
+ * 1. GET ALL QUESTIONS: getAllQuestion returns all questions. getAllQuestionPaged returns paginated questions with default page size 100.
+ * 2. GET BY ID: getQuestionById retrieves single question by database ID.
+ * 3. FILTER BY SUBJECT CODE: findBySubjectCode returns questions for specific subject code. Supports pagination via findBySubjectCodePagged.
+ * 4. FILTER BY SUBJECT CODE & MAPPED CO: findBySubjectCode-MappedCO returns questions filtered by subject code and course outcome. Supports pagination via findBySubjectCode-MappedCOPaged.
+ * 5. FILTER BY SUBJECT CODE, MAPPED CO & COGNITIVE LEVEL: findBySubjectCode-MappedCO-CognitiveLevel returns questions filtered by subject code, course outcome, and cognitive level (Bloom's taxonomy).
+ * 6. FILTER BY SUBJECT NAME: findBySubjectName returns questions for specific subject name. Supports pagination via findBySubjectNamePaged.
+ * 7. FILTER BY SUBJECT NAME & MAPPED CO: findBySubjectName-MappedCO returns questions filtered by subject name and course outcome. Supports pagination via findBySubjectName-MappedCOPaged.
+ * 8. FILTER BY SUBJECT NAME, MAPPED CO & COGNITIVE LEVEL: findBySubjectName-MappedCO-CognitiveLevel returns questions filtered by subject name, course outcome, and cognitive level.
+ * STUDENT SELF-SERVICE OPERATIONS:
+ * 1. ACCOUNT UPDATE: updateUserEmail allows students to change their email. updateUserPassword allows password changes.
+ * 2. TEST ENDPOINT: test provides simple connectivity verification.
+ * RESPONSE FORMAT: Consistent JSON structure: {"status": "Successful", "dataKey": data}. Paginated endpoints return PagedModel with pagination metadata.
+ * SECURITY CONTEXT: Requires student or admin role. JWT token validation via SecurityFilterChain. Students can only modify their own account (handled in UserService).
+ * PERFORMANCE FEATURES: Pagination support for all list endpoints (default 100 items per page). Efficient database queries with proper indexing. Consider caching for frequently accessed question banks.
+ * EDUCATIONAL CONTEXT: Questions organized by Bloom's taxonomy cognitive levels (Remember, Understand, Apply, Analyze, Evaluate, Create). Mapped to course outcomes for curriculum alignment. Supports outcome-based education assessment.
+ */
 @RequestMapping("${app.version}/student")
 @RestController
 public class StudentRestController {

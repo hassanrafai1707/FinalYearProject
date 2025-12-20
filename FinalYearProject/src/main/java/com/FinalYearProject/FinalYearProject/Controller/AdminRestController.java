@@ -11,6 +11,52 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
+/**
+ * Admin REST Controller for User Management Operations
+ * PURPOSE:
+ * Provides comprehensive user administration endpoints for system administrators.
+ * All endpoints are prefixed with versioned admin path (${app.version}/admin).
+ * SECURITY CONTEXT:
+ * - Requires ROLE_ADMIN authority (configured in SecurityConfig)
+ * - All operations require admin authentication via JWT token
+ * - Sensitive operations (deletes, role changes) require additional admin password verification
+ * USER MANAGEMENT OPERATIONS:
+ * 1. USER RETRIEVAL:
+ *    - findUserById: Get user by database ID
+ *    - findByEmail: Get user by email address
+ *    - listOfUserByRole: Get all users with specific role
+ *    - getAllUsers: Get all users in system
+ *    - getAllUsersPaged: Get paginated list of users
+ * 2. USER DELETION:
+ *    - deleteUserByEmail: Delete single user by email (requires admin password)
+ *    - deleteUserById: Delete single user by ID (requires admin password)
+ *    - deleteUsersInBatchByID: Bulk delete by IDs (requires admin password)
+ *    - deleteUsersInBatchByEmail: Bulk delete by emails (requires admin password)
+ * 3. USER SUSPENSION/MANAGEMENT:
+ *    - suspendUserById/ByEmail: Suspend user account (prevent login)
+ *    - unsuspendUserById/ByEmail: Reactivate suspended account
+ * 4. USER UPDATE OPERATIONS:
+ *    - updateUserPasswordByEmail/ById: Reset user password (requires admin password)
+ *    - updateUserRoleByEmail/ById: Change user role/authority (requires admin password)
+ *    - updateUserEmail: Change user's email address
+ *    - updateUserPassword: Change user's password
+ * 5. UTILITY ENDPOINTS:
+ *    - logout: Logout endpoint (handled by stateless JWT - typically invalidates token)
+ *    - test: Simple endpoint for connectivity testing
+ * REQUEST/RESPONSE PATTERN:
+ * - Uses DTOs (Data Transfer Objects) for structured request data
+ * - Returns consistent JSON response format: {"status": "...", "data": ...}
+ * - Error handling via global exception handler (not shown in this controller)
+ * SECURITY NOTES:
+ * - Admin password verification for destructive operations adds extra security layer
+ * - JWT token validation happens before reaching these endpoints
+ * - No session management (stateless) - logout typically handled via token blacklisting
+ * PERFORMANCE CONSIDERATIONS:
+ * - getAllUsersPaged supports pagination for large user databases
+ * - Batch operations minimize database round-trips
+ * - Consider adding caching for frequently accessed user data
+ */
 @RequestMapping("${app.version}/admin")
 @RestController
 public class AdminRestController {

@@ -17,7 +17,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * GlobalExceptionHandler - Centralized Exception Handling Controller Advice
+ * PURPOSE: Global exception handler that intercepts and processes all exceptions across the application, providing consistent error responses and centralized error logging.
+ * ARCHITECTURE: Uses @RestControllerAdvice to apply exception handling globally. @Slf4j for structured logging. Individual @ExceptionHandler methods for specific exception types.
+ * ERROR CATEGORIZATION: Groups exceptions by domain - User errors (4xx), Question errors (4xx), QuestionPaper errors (4xx), and generic Exception (500) as catch-all.
+ * HTTP STATUS MAPPING: Maps business exceptions to appropriate HTTP status codes: NOT_FOUND (404), CONFLICT (409), UNAUTHORIZED (401), FORBIDDEN (403), BAD_REQUEST (400), NOT_ACCEPTABLE (406), LOCKED (423).
+ * LOGGING STRATEGY: Logs all exceptions with error level for monitoring and debugging. Includes stack trace for internal errors but sanitizes in production.
+ * RESPONSE CONSISTENCY: Uses ErrorResponse DTO for standardized error format across all endpoints. Includes message, status, timestamp, and request path.
+ * SECURITY CONSIDERATIONS: Avoids exposing internal details in error messages. Generic messages for security exceptions (WrongPasswordException gets "Invalid credentials").
+ * BUILD RESPONSE METHOD: Centralized response building ensures consistent error construction. Reduces code duplication across exception handlers.
+ * EXCEPTION HIERARCHY: Handles both custom business exceptions and generic Exception as fallback. Should be extended for new exception types.
+ * MONITORING INTEGRATION: Exception logging enables integration with monitoring systems (ELK, Splunk, etc.). Timestamps support correlation with application logs.
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler  {

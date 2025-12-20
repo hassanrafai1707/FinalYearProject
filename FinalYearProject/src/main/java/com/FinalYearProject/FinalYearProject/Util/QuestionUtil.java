@@ -4,6 +4,20 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * QuestionUtil - Utility Class for Question Content Processing and Validation
+ * PURPOSE: Provides utility methods for question content hashing and validation to ensure question quality and enable duplicate detection.
+ * CONTENT FINGERPRINTING: sha256 method generates SHA-256 hash of question body text. Creates unique identifier for duplicate detection and content integrity.
+ * DUPLICATE PREVENTION: Hash serves as question title/fingerprint in Question entity. Enables efficient duplicate question detection during creation.
+ * CONTENT VALIDATION: checkIfQuestionBodyIsAcceptable validates question body text quality. Checks if spaces exceed 25% of text length (crude quality metric).
+ * QUALITY CONTROL: Prevents low-quality questions with excessive whitespace or minimal content. Basic spam/precision check before question acceptance.
+ * HASHING IMPLEMENTATION: Uses Java's MessageDigest for SHA-256. Converts byte array to hexadecimal string representation.
+ * SECURITY CONSIDERATIONS: SHA-256 provides cryptographic strength suitable for content fingerprinting. Collision-resistant for practical purposes.
+ * PERFORMANCE: Single-pass hash computation. Efficient for typical question lengths (50-500 characters).
+ * INTEGRATION: Used by QuestionService for duplicate detection (question title generation) and content validation during question creation.
+ * EXTENSION POINTS: Could add more sophisticated validation (minimum word count, profanity filtering, grammar checking, keyword extraction).
+ * DEBUGGING: Consider logging hash values for troubleshooting duplicate detection issues in development.
+ */
 public class QuestionUtil {
 
     private QuestionUtil(){}

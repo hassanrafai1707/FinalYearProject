@@ -20,7 +20,48 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 
-//this class is used to configure the Jwt json web token used for authorization
+/**
+
+ JWT Authentication Filter for Spring Security
+
+ PURPOSE:
+
+ Intercepts HTTP requests to validate JWT tokens and establish authentication context.
+
+ Extends OncePerRequestFilter to ensure single execution per request.
+
+ WORKFLOW:
+
+ PUBLIC PATH CHECK: Skips authentication for login, register, static resources, etc.
+
+ TOKEN EXTRACTION: Extracts "Bearer <token>" from Authorization header.
+
+ TOKEN VALIDATION: Checks token expiration and signature validity.
+
+ USER LOADING: Loads UserDetails if token is valid.
+
+ AUTH SETUP: Creates UsernamePasswordAuthenticationToken and sets it in SecurityContext.
+
+ KEY BEHAVIOR:
+
+ Returns 401 UNAUTHORIZED for expired/invalid tokens
+
+ Sets authentication in SecurityContextHolder for valid tokens
+
+ Continues filter chain for public paths or after authentication setup
+
+ Uses ApplicationContext.getBean() for fresh UserDetailsService instance
+
+ SECURITY NOTES:
+
+ Never validates tokens for public endpoints (performance/security)
+
+ Validates both token expiration and signature
+
+ Sets WebAuthenticationDetails with request info (IP, session)
+
+ Follows Bearer token standard (RFC 6750)
+ */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     @Autowired

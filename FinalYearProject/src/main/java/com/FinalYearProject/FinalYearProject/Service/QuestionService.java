@@ -22,6 +22,20 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
+/**
+ * QuestionService - Business Logic Service for Question Bank Management
+ * PURPOSE: Core service for question bank operations including CRUD, advanced filtering, intelligent paper generation, and business rule enforcement.
+ * QUESTION BANK MANAGEMENT: Comprehensive CRUD operations for questions with validation. Supports creation by teachers, retrieval by all roles, deletion with ownership checks.
+ * INTELLIGENT PAPER GENERATION: generateBySubjectCodeQuestion and generateBySubjectNameQuestion implement algorithm for balanced exam paper creation based on cognitive levels, marks distribution, and course outcomes.
+ * FILTERING CAPABILITIES: Advanced filtering by subject code/name, mapped course outcomes, cognitive levels (A/R/U), and combinations. Supports both list and paginated results.
+ * COGNITIVE LEVEL BALANCING: Paper generation algorithm balances questions across Bloom's taxonomy levels (Apply, Remember, Understand) while respecting mark distribution constraints.
+ * VALIDATION & INTEGRITY: Question body validation, duplicate detection via SHA256 fingerprinting, mark validation (2 or 4), and teacher authorization checks.
+ * OWNERSHIP & AUTHORIZATION: UserUtil.getUserAuthentication() ensures teachers only manage their own questions. Role-based checks for all operations.
+ * PERFORMANCE OPTIMIZATIONS: Pagination support for all list methods. Shuffling algorithm for random question selection. Sorted output by marks for organized papers.
+ * TRANSACTION MANAGEMENT: @Transactional on write operations (addQuestion) ensures data consistency. Critical for question creation and status updates.
+ * ERROR HANDLING: Comprehensive exception handling - QuestionNotFoundException, DuplicateQuestionException, UnacceptableQuestion, UserNotAuthorizesException with meaningful messages.
+ * INTEGRATION: Works with QuestionRepository for data access, UserService for user validation, and QuestionUtil for fingerprint generation and validation.
+ */
 public class QuestionService {
 
     @Autowired

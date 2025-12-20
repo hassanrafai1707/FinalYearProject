@@ -25,6 +25,20 @@ import java.util.Map;
 
 @Service
 @AllArgsConstructor
+/**
+ * UserService - Core Business Logic Service for User Management and Authentication
+ * PURPOSE: Comprehensive service handling all user-related operations including registration, authentication, account management, admin functions, and email verification workflows.
+ * USER LIFECYCLE MANAGEMENT: Complete CRUD operations for users with role-based authorization. Supports creation, retrieval, updates, deletion, suspension, and role changes.
+ * AUTHENTICATION & AUTHORIZATION: verifyLoginByEmail handles password authentication with Spring Security AuthenticationManager. JWT token generation upon successful login.
+ * EMAIL VERIFICATION WORKFLOW: Registration creates user with disabled account. Sends verification email with token and OTP via Redis cache. verifyTokenAndOTP validates and activates account.
+ * ADMIN OPERATIONS: Extensive admin functionality requiring admin password re-authentication for sensitive operations (delete, suspend, role changes, password resets). Implements defense-in-depth security.
+ * SECURITY IMPLEMENTATION: BCrypt password hashing with strength 12. Account lockout and expiration flags. Admin password verification beyond JWT role validation.
+ * REDIS INTEGRATION: Stores email verification data (Conformation objects) with 10-minute TTL. Supports OTP regeneration and verification.
+ * TRANSACTION MANAGEMENT: @Transactional on write operations ensures data consistency. Propagation.REQUIRED for verification workflow.
+ * BATCH OPERATIONS: deleteUserInBatchById/Email for efficient bulk user management. Pagination support for user listings.
+ * ERROR HANDLING: Comprehensive exception hierarchy - UserNotFoundException, UserNotAuthorizesException, WrongPasswordException, DuplicateEmailException, UserLockedException.
+ * INTEGRATION: Works with UserRepository (data), JwtService (tokens), ConformationService (emails), RedisService (cache), BCryptPasswordEncoder (security), AuthenticationManager (auth).
+ */
 public class UserService {
     @Autowired
     private  UserRepository userRepository;

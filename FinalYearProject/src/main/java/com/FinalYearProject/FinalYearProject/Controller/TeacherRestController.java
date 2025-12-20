@@ -17,6 +17,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Teacher REST Controller for Question Management and Paper Generation
+ * PURPOSE: Provides comprehensive question creation, management, and exam paper generation for teachers. Requires ROLE_TEACHER or ROLE_ADMIN authority. Combines CRUD operations for questions with intelligent paper generation algorithms.
+ * QUESTION MANAGEMENT OPERATIONS:
+ * 1. QUESTION CRUD: addQuestion creates new questions. deleteQuestionById deletes by ID. deleteQuestionByQuestionBody deletes by content text. getYourQuestion retrieves teacher's own questions (with pagination support).
+ * 2. QUESTION RETRIEVAL: getAllQuestion returns all questions in bank. getQuestionById gets single question. findBySubjectCode/SubjectName with filtering variants (MappedCO, CognitiveLevel) similar to student endpoints.
+ * 3. INTELLIGENT PAPER GENERATION: generateBySubjectCodeQuestionPaper creates balanced papers based on subject code, course outcomes, cognitive levels (A/R/U), and mark distribution. generateBySubjectNameAndQuestionPaper does same using subject name.
+ * 4. PAPER APPROVAL WORKFLOW: approveGeneratedQuestionPaper submits generated papers for supervisor approval (saves to QuestionPaper entity).
+ * PAPER GENERATION ALGORITHM FEATURES: Balances questions across cognitive levels (A=Apply, R=Remember, U=Understand). Distributes marks between 2-mark and 4-mark questions. Maps to specified course outcomes (MappedCOs). Ensures curriculum coverage and difficulty distribution.
+ * SECURITY CONTEXT: Teachers can only delete their own questions. Paper generation uses full question bank but tracks creator. Submitted papers await supervisor approval before becoming official.
+ * SELF-SERVICE OPERATIONS: updateUserEmail and updateUserPassword for account management. test endpoint for connectivity verification.
+ * RESPONSE FORMAT: Consistent JSON structure: {"status": "Successful", "dataKey": data}. Generated papers return list of Question objects with balanced attributes.
+ * EDUCATIONAL ALIGNMENT: Supports outcome-based education with course outcome mapping. Implements Bloom's taxonomy cognitive levels. Enforces mark distribution guidelines. Maintains question quality through creator tracking.
+ */
 @RequestMapping("${app.version}/teacher")
 @RestController
 public class TeacherRestController {

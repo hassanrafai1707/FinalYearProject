@@ -8,6 +8,30 @@ import lombok.Setter;
 
 import java.util.Set;
 
+/**
+ * Question Domain Entity for Exam Question Bank Management
+ * PURPOSE: Represents individual exam questions in the question bank with comprehensive metadata for curriculum alignment, cognitive level classification, and question paper generation.
+ * DATABASE DESIGN: Uses @Entity for JPA persistence. @Table with optimized indexes for common query patterns. @SequenceGenerator for database-managed ID generation.
+ * COMPREHENSIVE INDEXING STRATEGY:
+ * - Simple indexes: id (primary), subject_name, subject_code, question_title, user_id (created_by)
+ * - Compound indexes: subject_code+mapped_co, subject_code+mapped_co+cognitive_level, subject_name+mapped_co, subject_name+mapped_co+cognitive_level
+ * - Enables efficient filtering for question paper generation algorithms
+ * CURRICULUM ALIGNMENT FIELDS:
+ * - subjectName & subjectCode: Course/subject identification
+ * - mappedCO: Course Outcome mapping for outcome-based education
+ * - cognitiveLevel: Bloom's taxonomy level (Remember, Understand, Apply, Analyze, Evaluate, Create)
+ * QUESTION CONTENT FIELDS:
+ * - questionBody: TEXT column for long question content
+ * - questionTitle: Unique fingerprint/identifier for each question
+ * - questionMarks: Marks allocated to this question
+ * - isInUse: Flag indicating if question is currently in active papers
+ * RELATIONSHIPS:
+ * - ManyToOne to User (createdBy): Tracks question creator/author
+ * - ManyToMany to QuestionPaper (questionPapers): Tracks which papers include this question (inverse side)
+ * SECURITY & AUDIT: createdBy field provides audit trail of question authorship. isInUse prevents deletion of questions currently in active exams.
+ * PERFORMANCE OPTIMIZATIONS: FetchType.LAZY for questionPapers relationship. Database-level indexing for all filter combinations used in paper generation.
+ * USAGE IN PAPER GENERATION: Indexed fields enable efficient querying for balanced paper generation algorithms that consider subject, outcomes, cognitive levels, and marks distribution.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter

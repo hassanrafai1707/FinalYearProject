@@ -24,6 +24,20 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+/**
+ * QuestionPaperService - Business Logic Service for Exam Paper Management
+ * PURPOSE: Core service for exam paper operations including creation, retrieval, approval workflows, and integrity validation. Manages complete paper lifecycle.
+ * PAPER LIFECYCLE MANAGEMENT: Handles paper creation by teachers, approval by supervisors, and retrieval by all roles. Maintains approval status and audit trail.
+ * APPROVAL WORKFLOW: approveQuestionPaperById/ByTile and notApproveQuestionPaperById/ByTile methods implement supervisor approval/rejection with authorization checks.
+ * INTEGRITY VALIDATION: Uses SHA256 fingerprinting (QuestionPaperUtil) to detect duplicate papers. Validates all referenced questions exist before paper creation.
+ * AUTHORIZATION ENFORCEMENT: Role-based checks for all operations - teachers create papers, supervisors approve, all roles can view based on permissions.
+ * PAGINATION SUPPORT: All list methods support pagination via Pageable. Returns Page objects for efficient large dataset handling.
+ * TRANSACTION MANAGEMENT: @Transactional on write operations ensures data consistency. Critical for paper creation and approval updates.
+ * USER CONTEXT: Uses UserUtil.getUserAuthentication() to identify current user for ownership and authorization checks. Maintains generatedBy and approvedBy audit trail.
+ * ERROR HANDLING: Comprehensive exception handling - QuestionPaperNotFoundException for missing papers, UserNotAuthorizesException for permission violations, DuplicateQuestionPaperException for duplicates.
+ * FINGERPRINT GENERATION: Creates content-based fingerprint from sorted question IDs. Enables duplicate detection even with different paper titles.
+ * INTEGRATION: Works with QuestionService for question validation, UserService for user lookups, and QuestionPaperRepository for data persistence.
+ */
 //TODO check if user is super visor
 public class QuestionPaperService {
     @Autowired
