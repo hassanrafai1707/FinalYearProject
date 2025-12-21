@@ -5,6 +5,7 @@ Here's the completed API endpoint table with all details filled in:
 |  1 | **POST**    | `${app.version}/auth/login`                              | `AuthRestController.processLoginByEmail()` | Email/password authentication | `{"email": "hassanrafai29@gmail.com","password": "123456789"}` |
 |  2 | **POST**    | `${app.version}/auth/register`                           | `AuthRestController.processRegister()`     | User registration | `{"name": "HASSAN","email": "hassanrafai29@gmail.com","password": "123456789","role": "ROLE_TEACHER"}` |
 |  3 | **POST**    | `${app.version}/auth/confirm`                            | `AuthRestController.conformation()`        | Email verification with token & OTP | `{"otp":"8908"}` (with query params: `?token=...&email=...`) |
+
 |  4 | **GET**     | `${app.version}/admin/findUserById`                      | `AdminRestController.findUserById()`       | Get user by ID | `{"id":"4"}` |
 |  5 | **GET**     | `${app.version}/admin/findByEmail`                       | `AdminRestController.findByEmail()`        | Get user by email | `{"email": "hassanrafai29@gmail.com"}` |
 |  6 | **GET**     | `${app.version}/admin/listOfUserByRole`                  | `AdminRestController.listOfUserByRole()`   | Get users by role | `{"role":"ROLE_STUDENT"}` |
@@ -27,6 +28,7 @@ Here's the completed API endpoint table with all details filled in:
 | 22 | **PATCH**   | `${app.version}/admin/updateUserPassword`                | `AdminRestController.updateUserPasswordById()` | Update user password | `{"password":"123456789"}` |
 | 23 | **POST**    | `${app.version}/admin/logout`                            | `AdminRestController.logoutProcesser()`    | Logout endpoint | No request body |
 | 24 | **GET**     | `${app.version}/admin/test`                              | `AdminRestController.test()`               | Test endpoint | No request body |
+
 | 25 | **GET**     | `${app.version}/student/getAllQuestion`                  | `StudentRestController.getAllQuestion()`   | Get all questions | No request body |
 | 26 | **GET**     | `${app.version}/student/getAllQuestionPaged`             | `StudentRestController.getAllQuestionsPaged()` | Paginated questions | Query params: `?pageNo=1&size=50` |
 | 27 | **GET**     | `${app.version}/student/getQuestionById`                 | `StudentRestController.getQuestionById()`  | Get question by ID | `{"id":"1"}` |
@@ -43,6 +45,7 @@ Here's the completed API endpoint table with all details filled in:
 | 38 | **PATCH**   | `${app.version}/student/updateUserEmail`                 | `StudentRestController.updateUserEmailById()` | Update student email | `{"email":"newemail@example.com"}` |
 | 39 | **PATCH**   | `${app.version}/student/updateUserPassword`              | `StudentRestController.updateUserPasswordById()` | Update student password | `{"oldPassword":"old123","newPassword":"new123"}` |
 | 40 | **GET**     | `${app.version}/student/test`                            | `StudentRestController.test()`             | Test endpoint | No request body |
+
 | 41 | **GET**     | `${app.version}/supervisor/getAllQuestion`               | `SupervisorRestController.getAllQuestion()` | Get all questions | No request body |
 | 42 | **GET**     | `${app.version}/supervisor/getAllQuestionPaged`          | `SupervisorRestController.getAllQuestionsPaged()` | Paginated questions | Query params: `?pageNo=1&size=50` |
 | 43 | **GET**     | `${app.version}/supervisor/getQuestionById`              | `SupervisorRestController.getQuestionById()` | Get question by ID | `{"id":"1"}` |
@@ -81,6 +84,7 @@ Here's the completed API endpoint table with all details filled in:
 | 76 | **PATCH**   | `${app.version}/supervisor/updateUserEmail`              | `SupervisorRestController.updateUserEmailById()` | Update supervisor email | `{"email":"newsemail@example.com"}` |
 | 77 | **PATCH**   | `${app.version}/supervisor/updateUserPassword`           | `SupervisorRestController.updateUserPasswordById()` | Update supervisor password | `{"oldPassword":"old123","newPassword":"new123"}` |
 | 78 | **GET**     | `${app.version}/supervisor/test`                         | `SupervisorRestController.test()`          | Test endpoint | No request body |
+
 | 79 | **GET**     | `${app.version}/teacher/getAllQuestion`                  | `TeacherRestController.getAllQuestion()`   | Get all questions | No request body |
 | 80 | **GET**     | `${app.version}/teacher/getAllQuestionPaged`             | `TeacherRestController.getAllQuestionsPaged()` | Paginated questions | Query params: `?pageNo=1&size=50` |
 | 81 | **GET**     | `${app.version}/teacher/getQuestionById`                 | `TeacherRestController.getQuestionById()`  | Get question by ID | `{"id":"1"}` |
