@@ -8,6 +8,7 @@ Here's the completed API endpoint table with all details filled in:
 |  4 | **GET**     | `${app.version}/admin/findUserById`                      | `AdminRestController.findUserById()`       | Get user by ID | `{"id":"4"}` |
 |  5 | **GET**     | `${app.version}/admin/findByEmail`                       | `AdminRestController.findByEmail()`        | Get user by email | `{"email": "hassanrafai29@gmail.com"}` |
 |  6 | **GET**     | `${app.version}/admin/listOfUserByRole`                  | `AdminRestController.listOfUserByRole()`   | Get users by role | `{"role":"ROLE_STUDENT"}` |
+|  6 | **GET**     | `${app.version}/admin/listOfUserByRolePaged`             | `AdminRestController.listOfUserByRolePaged()`| Get users by role |Paginated users (pageNo, size) | Query params: `?pageNo=1&size=50`|`{"role":"ROLE_STUDENT"}` |
 |  7 | **GET**     | `${app.version}/admin/getAllUsers`                       | `AdminRestController.getAllUsers()`        | Get all users | No request body |
 |  8 | **GET**     | `${app.version}/admin/getAllUsersPaged`                  | `AdminRestController.getAllUsersPaged()`   | Paginated users (pageNo, size) | Query params: `?pageNo=1&size=50` |
 |  9 | **DELETE**  | `${app.version}/admin/deleteUserByEmail`                 | `AdminRestController.deleteUserByEmail()`  | Delete user by email + admin password | `{"email": "hassanrafai29@gmail.com","adminPassword":"123456789"}` |

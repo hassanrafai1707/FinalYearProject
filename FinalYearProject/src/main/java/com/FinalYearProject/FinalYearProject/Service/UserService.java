@@ -457,6 +457,10 @@ public class UserService {
     public List<User> listOfUserByRole(String role){
         return userRepository.findByRole(role);
     }
+    public Page<User> listOfUserByRole(String role ,int pageNo, int size){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        return userRepository.findByRole(role,pageable);
+    }
 
     public Boolean existsByEmail(String email){
         if (userRepository.existsByEmail(email)){

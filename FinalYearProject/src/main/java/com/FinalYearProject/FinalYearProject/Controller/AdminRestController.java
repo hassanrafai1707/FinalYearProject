@@ -98,7 +98,16 @@ public class AdminRestController {
                 )
         );
     }
-//todo add pag for the above method
+
+    @GetMapping("/listOfUserByRolePaged")
+    public PagedModel<User> listOfUserByRolePaged(
+            @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestBody Map<String,String> request
+    ){
+        return new PagedModel<>(userService.listOfUserByRole(request.get("role"),pageNo,size));
+    }
+
     @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUsers(){
         List<User> AllUsers=userService.findAllUsers();
