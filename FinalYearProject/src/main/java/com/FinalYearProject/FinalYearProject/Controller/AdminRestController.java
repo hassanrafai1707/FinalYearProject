@@ -98,7 +98,7 @@ public class AdminRestController {
                 )
         );
     }
-
+//todo add pag for the above method
     @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUsers(){
         List<User> AllUsers=userService.findAllUsers();

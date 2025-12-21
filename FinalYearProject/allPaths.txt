@@ -1,107 +1,109 @@
-|  # | HTTP Method | Endpoint Path                                            | Backend Controller Method                 | Notes |
-| -: | ----------- | -------------------------------------------------------- | ----------------------------------------- | ----- |
-|  1 | **POST**    | `${app.version}/auth/login`                              | `AuthRestController.processLoginByEmail()` | Email/password authentication |
-|  2 | **POST**    | `${app.version}/auth/register`                           | `AuthRestController.processRegister()`     | User registration |
-|  3 | **POST**    | `${app.version}/auth/confirm`                            | `AuthRestController.conformation()`        | Email verification with token & OTP |
-|  4 | **GET**     | `${app.version}/admin/findUserById`                      | `AdminRestController.findUserById()`       | Get user by ID |
-|  5 | **GET**     | `${app.version}/admin/findByEmail`                       | `AdminRestController.findByEmail()`        | Get user by email |
-|  6 | **GET**     | `${app.version}/admin/listOfUserByRole`                  | `AdminRestController.listOfUserByRole()`   | Get users by role |
-|  7 | **GET**     | `${app.version}/admin/getAllUsers`                       | `AdminRestController.getAllUsers()`        | Get all users |
-|  8 | **GET**     | `${app.version}/admin/getAllUsersPaged`                  | `AdminRestController.getAllUsersPaged()`   | Paginated users (pageNo, size) |
-|  9 | **DELETE**  | `${app.version}/admin/deleteUserByEmail`                 | `AdminRestController.deleteUserByEmail()`  | Delete user by email + admin password |
-| 10 | **DELETE**  | `${app.version}/admin/deleteUserById`                    | `AdminRestController.deleteById()`         | Delete user by ID + admin password |
-| 11 | **DELETE**  | `${app.version}/admin/deleteUsersInBatchByID`            | `AdminRestController.deleteUsersInBatchByID()` | Batch delete by IDs |
-| 12 | **DELETE**  | `${app.version}/admin/deleteUsersInBatchByEmail`         | `AdminRestController.deleteUsersInBatchByEmail()` | Batch delete by emails |
-| 13 | **PATCH**   | `${app.version}/admin/suspendUserById`                   | `AdminRestController.suspendUserById()`    | Suspend user by ID |
-| 14 | **PATCH**   | `${app.version}/admin/unsuspendUserById`                 | `AdminRestController.unsuspendUserById()`  | Unsuspend user by ID |
-| 15 | **PATCH**   | `${app.version}/admin/suspendUserByEmail`                | `AdminRestController.suspendUserByEmail()` | Suspend user by email |
-| 16 | **PATCH**   | `${app.version}/admin/unsuspendUserByEmail`              | `AdminRestController.unsuspendUserByEmail()` | Unsuspend user by email |
-| 17 | **PATCH**   | `${app.version}/admin/updateUserPasswordByEmail`         | `AdminRestController.updatePasswordByEmail()` | Update password by email |
-| 18 | **PATCH**   | `${app.version}/admin/updateUserPasswordById`            | `AdminRestController.updateUserPasswordById()` | Update password by ID |
-| 19 | **PATCH**   | `${app.version}/admin/updateUserRoleById`                | `AdminRestController.updateUserRoleById()` | Update role by ID |
-| 20 | **PATCH**   | `${app.version}/admin/updateUserRoleByEmail`             | `AdminRestController.updateUserRoleByEmail()` | Update role by email |
-| 21 | **PATCH**   | `${app.version}/admin/updateUserEmail`                   | `AdminRestController.updateUserEmailById()` | Update user email |
-| 22 | **PATCH**   | `${app.version}/admin/updateUserPassword`                | `AdminRestController.updateUserPasswordById()` | Update user password |
-| 23 | **POST**    | `${app.version}/admin/logout`                            | `AdminRestController.logoutProcesser()`    | Logout endpoint |
-| 24 | **GET**     | `${app.version}/admin/test`                              | `AdminRestController.test()`               | Test endpoint |
-| 25 | **GET**     | `${app.version}/student/getAllQuestion`                  | `StudentRestController.getAllQuestion()`   | Get all questions |
-| 26 | **GET**     | `${app.version}/student/getAllQuestionPaged`             | `StudentRestController.getAllQuestionsPaged()` | Paginated questions |
-| 27 | **GET**     | `${app.version}/student/getQuestionById`                 | `StudentRestController.getQuestionById()`  | Get question by ID |
-| 28 | **GET**     | `${app.version}/student/findBySubjectCode`               | `StudentRestController.findBySubjectCode()` | Questions by subject code |
-| 29 | **GET**     | `${app.version}/student/findBySubjectCodePagged`         | `StudentRestController.findBySubjectCode()` | Paginated by subject code |
-| 30 | **GET**     | `${app.version}/student/findBySubjectCode-MappedCO`      | `StudentRestController.findBySubjectCodeMappedCO()` | Filter by subject code & CO |
-| 31 | **GET**     | `${app.version}/student/findBySubjectCode-MappedCOPaged` | `StudentRestController.findBySubjectCodeMappedCO()` | Paginated filter by subject code & CO |
-| 32 | **GET**     | `${app.version}/student/findBySubjectCode-MappedCO-CognitiveLevel` | `StudentRestController.findByCognitiveLevel()` | Filter by subject code, CO & cognitive level |
-| 33 | **GET**     | `${app.version}/student/findBySubjectName`               | `StudentRestController.findBySubjectName()` | Questions by subject name |
-| 34 | **GET**     | `${app.version}/student/findBySubjectNamePaged`          | `StudentRestController.findBySubjectName()` | Paginated by subject name |
-| 35 | **GET**     | `${app.version}/student/findBySubjectName-MappedCO`      | `StudentRestController.findBySubjectNameMappedCO()` | Filter by subject name & CO |
-| 36 | **GET**     | `${app.version}/student/findBySubjectName-MappedCOPaged` | `StudentRestController.findBySubjectNameMappedCO()` | Paginated filter by subject name & CO |
-| 37 | **GET**     | `${app.version}/student/findBySubjectName-MappedCO-CognitiveLevel` | `StudentRestController.findBySubjectNameMappedCOCognitiveLevel()` | Filter by subject name, CO & cognitive level |
-| 38 | **PATCH**   | `${app.version}/student/updateUserEmail`                 | `StudentRestController.updateUserEmailById()` | Update student email |
-| 39 | **PATCH**   | `${app.version}/student/updateUserPassword`              | `StudentRestController.updateUserPasswordById()` | Update student password |
-| 40 | **GET**     | `${app.version}/student/test`                            | `StudentRestController.test()`             | Test endpoint |
-| 41 | **GET**     | `${app.version}/supervisor/getAllQuestion`               | `SupervisorRestController.getAllQuestion()` | Get all questions |
-| 42 | **GET**     | `${app.version}/supervisor/getAllQuestionPaged`          | `SupervisorRestController.getAllQuestionsPaged()` | Paginated questions |
-| 43 | **GET**     | `${app.version}/supervisor/getQuestionById`              | `SupervisorRestController.getQuestionById()` | Get question by ID |
-| 44 | **GET**     | `${app.version}/supervisor/findBySubjectCode`            | `SupervisorRestController.findBySubjectCode()` | Questions by subject code |
-| 45 | **GET**     | `${app.version}/supervisor/findBySubjectCodePagged`      | `SupervisorRestController.findBySubjectCode()` | Paginated by subject code |
-| 46 | **GET**     | `${app.version}/supervisor/findBySubjectCode-MappedCO`   | `SupervisorRestController.findBySubjectCodeMappedCO()` | Filter by subject code & CO |
-| 47 | **GET**     | `${app.version}/supervisor/findBySubjectCode-MappedCOPaged` | `SupervisorRestController.findBySubjectCodeMappedCO()` | Paginated filter by subject code & CO |
-| 48 | **GET**     | `${app.version}/supervisor/findBySubjectCode-MappedCO-CognitiveLevel` | `SupervisorRestController.findByCognitiveLevel()` | Filter by subject code, CO & cognitive level |
-| 49 | **GET**     | `${app.version}/supervisor/findBySubjectName`            | `SupervisorRestController.findBySubjectName()` | Questions by subject name |
-| 50 | **GET**     | `${app.version}/supervisor/findBySubjectNamePaged`       | `SupervisorRestController.findBySubjectName()` | Paginated by subject name |
-| 51 | **GET**     | `${app.version}/supervisor/findBySubjectName-MappedCO`   | `SupervisorRestController.findBySubjectNameMappedCO()` | Filter by subject name & CO |
-| 52 | **GET**     | `${app.version}/supervisor/findBySubjectName-MappedCOPaged` | `SupervisorRestController.findBySubjectNameMappedCO()` | Paginated filter by subject name & CO |
-| 53 | **GET**     | `${app.version}/supervisor/findBySubjectName-MappedCO-CognitiveLevel` | `SupervisorRestController.findBySubjectNameMappedCOCognitiveLevel()` | Filter by subject name, CO & cognitive level |
-| 54 | **GET**     | `${app.version}/supervisor/findByCreatedByUsingEmail`    | `SupervisorRestController.findByCreatedByUsingEmail()` | Questions created by user (email) |
-| 55 | **GET**     | `${app.version}/supervisor/findByCreatedByUsingId`       | `SupervisorRestController.findByCreatedByUsingId()` | Questions created by user (ID) |
-| 56 | **GET**     | `${app.version}/supervisor/getAllQuestionsPaper`         | `SupervisorRestController.getAllQuestionPapers()` | Get all question papers |
-| 57 | **GET**     | `${app.version}/supervisor/getAllQuestionsPaperPaged`    | `SupervisorRestController.getAllQuestionsPaper()` | Paginated question papers |
-| 58 | **GET**     | `${app.version}/supervisor/findQuestionPaperById`        | `SupervisorRestController.getAllQuestionPapers()` | Get question paper by ID |
-| 59 | **GET**     | `${app.version}/supervisor/findByExamTitle`              | `SupervisorRestController.findByExamTitle()` | Find paper by exam title |
-| 60 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingEmail`  | `SupervisorRestController.findByGeneratedByUsingEmail()` | Papers generated by user (email) |
-| 61 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingEmailPaged` | `SupervisorRestController.findByGeneratedByUsingEmail()` | Paginated papers by generator email |
-| 62 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingId`     | `SupervisorRestController.findByGeneratedByUsingId()` | Papers generated by user (ID) |
-| 63 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingIdPaged` | `SupervisorRestController.findByGeneratedByUsingId()` | Paginated papers by generator ID |
-| 64 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingEmail`   | `SupervisorRestController.findByApprovedByUsingEmail()` | Papers approved by supervisor (email) |
-| 65 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingEmailPaged` | `SupervisorRestController.findByApprovedByUsingEmail()` | Paginated papers by approver email |
-| 66 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingId`      | `SupervisorRestController.findByApprovedByUsingId()` | Papers approved by supervisor (ID) |
-| 67 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingIdPaged` | `SupervisorRestController.findByApprovedByUsingId()` | Paginated papers by approver ID |
-| 68 | **GET**     | `${app.version}/supervisor/findApproved`                 | `SupervisorRestController.findApproved()` | Get approved papers |
-| 69 | **GET**     | `${app.version}/supervisor/findApprovedPaged`            | `SupervisorRestController.findApproved()` | Paginated approved papers |
-| 70 | **GET**     | `${app.version}/supervisor/findNotApproved`              | `SupervisorRestController.findNotApproved()` | Get pending/rejected papers |
-| 71 | **GET**     | `${app.version}/supervisor/findNotApprovedPaged`         | `SupervisorRestController.findNotApproved()` | Paginated pending papers |
-| 72 | **PATCH**   | `${app.version}/supervisor/approveQuestionPaperById`     | `SupervisorRestController.approveQuestionPaperById()` | Approve paper by ID |
-| 73 | **PATCH**   | `${app.version}/supervisor/notApproveQuestionPaperById`  | `SupervisorRestController.notApproveQuestionPaperById()` | Reject paper by ID |
-| 74 | **PATCH**   | `${app.version}/supervisor/approvedQuestionPaperByTile`  | `SupervisorRestController.approvedQuestionPaperByTile()` | Approve paper by title |
-| 75 | **PATCH**   | `${app.version}/supervisor/notApprovedQuestionPaperByTile` | `SupervisorRestController.notApprovedQuestionPaperByTile()` | Reject paper by title |
-| 76 | **PATCH**   | `${app.version}/supervisor/updateUserEmail`              | `SupervisorRestController.updateUserEmailById()` | Update supervisor email |
-| 77 | **PATCH**   | `${app.version}/supervisor/updateUserPassword`           | `SupervisorRestController.updateUserPasswordById()` | Update supervisor password |
-| 78 | **GET**     | `${app.version}/supervisor/test`                         | `SupervisorRestController.test()`          | Test endpoint |
-| 79 | **GET**     | `${app.version}/teacher/getAllQuestion`                  | `TeacherRestController.getAllQuestion()`   | Get all questions |
-| 80 | **GET**     | `${app.version}/teacher/getAllQuestionPaged`             | `TeacherRestController.getAllQuestionsPaged()` | Paginated questions |
-| 81 | **GET**     | `${app.version}/teacher/getQuestionById`                 | `TeacherRestController.getQuestionById()`  | Get question by ID |
-| 82 | **GET**     | `${app.version}/teacher/findBySubjectCode`               | `TeacherRestController.findBySubjectCode()` | Questions by subject code |
-| 83 | **GET**     | `${app.version}/teacher/findBySubjectCodePagged`         | `TeacherRestController.findBySubjectCode()` | Paginated by subject code |
-| 84 | **GET**     | `${app.version}/teacher/findBySubjectCode-MappedCO`      | `TeacherRestController.findBySubjectCodeMappedCO()` | Filter by subject code & CO |
-| 85 | **GET**     | `${app.version}/teacher/findBySubjectCode-MappedCOPaged` | `TeacherRestController.findBySubjectCodeMappedCO()` | Paginated filter by subject code & CO |
-| 86 | **GET**     | `${app.version}/teacher/findBySubjectCode-MappedCO-CognitiveLevel` | `TeacherRestController.findByCognitiveLevel()` | Filter by subject code, CO & cognitive level |
-| 87 | **GET**     | `${app.version}/teacher/findBySubjectName`               | `TeacherRestController.findBySubjectName()` | Questions by subject name |
-| 88 | **GET**     | `${app.version}/teacher/findBySubjectNamePaged`          | `TeacherRestController.findBySubjectName()` | Paginated by subject name |
-| 89 | **GET**     | `${app.version}/teacher/findBySubjectName-MappedCO`      | `TeacherRestController.findBySubjectNameMappedCO()` | Filter by subject name & CO |
-| 90 | **GET**     | `${app.version}/teacher/findBySubjectName-MappedCOPaged` | `TeacherRestController.findBySubjectNameMappedCO()` | Paginated filter by subject name & CO |
-| 91 | **GET**     | `${app.version}/teacher/findBySubjectName-MappedCO-CognitiveLevel` | `TeacherRestController.findBySubjectNameMappedCOCognitiveLevel()` | Filter by subject name, CO & cognitive level |
-| 92 | **POST**    | `${app.version}/teacher/addQuestion`                     | `TeacherRestController.addQuestion()`      | Create new question |
-| 93 | **GET**     | `${app.version}/teacher/generateBySubjectCodeQuestionPaper` | `TeacherRestController.generateBySubjectCodeQuestionPaper()` | Generate paper by subject code |
-| 94 | **GET**     | `${app.version}/teacher/generateBySubjectNameAndQuestionPaper` | `TeacherRestController.generateBySubjectAndQuestionPaper()` | Generate paper by subject name |
-| 95 | **GET**     | `${app.version}/teacher/getYourQuestion`                 | `TeacherRestController.getYourQuestion()`  | Get teacher's own questions |
-| 96 | **GET**     | `${app.version}/teacher/getYourQuestionPaged`            | `TeacherRestController.getYourQuestion()`  | Paginated teacher's questions |
-| 97 | **POST**    | `${app.version}/teacher/approveGeneratedQuestionPaper`   | `TeacherRestController.approveGeneratedQuestionPaper()` | Submit paper for approval |
-| 98 | **PATCH**   | `${app.version}/teacher/updateUserEmail`                 | `TeacherRestController.updateUserEmailById()` | Update teacher email |
-| 99 | **PATCH**   | `${app.version}/teacher/updateUserPassword`              | `TeacherRestController.updateUserPasswordById()` | Update teacher password |
-|100 | **DELETE**  | `${app.version}/teacher/deleteQuestionById`              | `TeacherRestController.deleteQuestionById()` | Delete question by ID |
-|101 | **DELETE**  | `${app.version}/teacher/deleteQestionByQuestionBody`     | `TeacherRestController.deleteQuestionByQuestionBody()` | Delete question by body text |
-|102 | **GET**     | `${app.version}/teacher/test`                            | `TeacherRestController.test()`             | Test endpoint |
+Here's the completed API endpoint table with all details filled in:
+
+|  # | HTTP Method | Endpoint Path                                            | Backend Controller Method                 | Notes | Request Body / Parameters |
+| -: | ----------- | -------------------------------------------------------- | ----------------------------------------- | ----- | ------------------------- |
+|  1 | **POST**    | `${app.version}/auth/login`                              | `AuthRestController.processLoginByEmail()` | Email/password authentication | `{"email": "hassanrafai29@gmail.com","password": "123456789"}` |
+|  2 | **POST**    | `${app.version}/auth/register`                           | `AuthRestController.processRegister()`     | User registration | `{"name": "HASSAN","email": "hassanrafai29@gmail.com","password": "123456789","role": "ROLE_TEACHER"}` |
+|  3 | **POST**    | `${app.version}/auth/confirm`                            | `AuthRestController.conformation()`        | Email verification with token & OTP | `{"otp":"8908"}` (with query params: `?token=...&email=...`) |
+|  4 | **GET**     | `${app.version}/admin/findUserById`                      | `AdminRestController.findUserById()`       | Get user by ID | `{"id":"4"}` |
+|  5 | **GET**     | `${app.version}/admin/findByEmail`                       | `AdminRestController.findByEmail()`        | Get user by email | `{"email": "hassanrafai29@gmail.com"}` |
+|  6 | **GET**     | `${app.version}/admin/listOfUserByRole`                  | `AdminRestController.listOfUserByRole()`   | Get users by role | `{"role":"ROLE_STUDENT"}` |
+|  7 | **GET**     | `${app.version}/admin/getAllUsers`                       | `AdminRestController.getAllUsers()`        | Get all users | No request body |
+|  8 | **GET**     | `${app.version}/admin/getAllUsersPaged`                  | `AdminRestController.getAllUsersPaged()`   | Paginated users (pageNo, size) | Query params: `?pageNo=1&size=50` |
+|  9 | **DELETE**  | `${app.version}/admin/deleteUserByEmail`                 | `AdminRestController.deleteUserByEmail()`  | Delete user by email + admin password | `{"email": "hassanrafai29@gmail.com","adminPassword":"123456789"}` |
+| 10 | **DELETE**  | `${app.version}/admin/deleteUserById`                    | `AdminRestController.deleteById()`         | Delete user by ID + admin password | `{"id": "4","adminPassword":"123456789"}` |
+| 11 | **DELETE**  | `${app.version}/admin/deleteUsersInBatchByID`            | `AdminRestController.deleteUsersInBatchByID()` | Batch delete by IDs | `{"ids":["4","5"],"adminPassword":"123456789"}` |
+| 12 | **DELETE**  | `${app.version}/admin/deleteUsersInBatchByEmail`         | `AdminRestController.deleteUsersInBatchByEmail()` | Batch delete by emails | `{"emails":["hassanrafai29@gmail.com","hassanrafai1707@gmail.com"],"adminPassword":"123456789"}` |
+| 13 | **PATCH**   | `${app.version}/admin/suspendUserById`                   | `AdminRestController.suspendUserById()`    | Suspend user by ID | `{"id": "4","adminPassword":"123456789"}` |
+| 14 | **PATCH**   | `${app.version}/admin/unsuspendUserById`                 | `AdminRestController.unsuspendUserById()`  | Unsuspend user by ID | `{"id": "4","adminPassword":"123456789"}` |
+| 15 | **PATCH**   | `${app.version}/admin/suspendUserByEmail`                | `AdminRestController.suspendUserByEmail()` | Suspend user by email | `{"email":"hassanrfai29@gmail.com","adminPassword":"123456789"}` |
+| 16 | **PATCH**   | `${app.version}/admin/unsuspendUserByEmail`              | `AdminRestController.unsuspendUserByEmail()` | Unsuspend user by email | `{"email":"hassanrfai29@gmail.com","adminPassword":"123456789"}` |
+| 17 | **PATCH**   | `${app.version}/admin/updateUserPasswordByEmail`         | `AdminRestController.updatePasswordByEmail()` | Update password by email | `{"email":"hassanrfai29@gmail.com","password":"123456789","adminPassword":"123456789"}` |
+| 18 | **PATCH**   | `${app.version}/admin/updateUserPasswordById`            | `AdminRestController.updateUserPasswordById()` | Update password by ID | `{"id": "4","password":"123456789","adminPassword":"123456789"}` |
+| 19 | **PATCH**   | `${app.version}/admin/updateUserRoleById`                | `AdminRestController.updateUserRoleById()` | Update role by ID | `{"id":"4","role":"ROLE_STUDENT","password":"123456789"}` |
+| 20 | **PATCH**   | `${app.version}/admin/updateUserRoleByEmail`             | `AdminRestController.updateUserRoleByEmail()` | Update role by email | `{"email":"hassanrfai29@gmail.com","role":"ROLE_STUDENT","password":"123456789"}` |
+| 21 | **PATCH**   | `${app.version}/admin/updateUserEmail`                   | `AdminRestController.updateUserEmailById()` | Update user email | `{"email":"hassanrfai29@gmail.com"}` |
+| 22 | **PATCH**   | `${app.version}/admin/updateUserPassword`                | `AdminRestController.updateUserPasswordById()` | Update user password | `{"password":"123456789"}` |
+| 23 | **POST**    | `${app.version}/admin/logout`                            | `AdminRestController.logoutProcesser()`    | Logout endpoint | No request body |
+| 24 | **GET**     | `${app.version}/admin/test`                              | `AdminRestController.test()`               | Test endpoint | No request body |
+| 25 | **GET**     | `${app.version}/student/getAllQuestion`                  | `StudentRestController.getAllQuestion()`   | Get all questions | No request body |
+| 26 | **GET**     | `${app.version}/student/getAllQuestionPaged`             | `StudentRestController.getAllQuestionsPaged()` | Paginated questions | Query params: `?pageNo=1&size=50` |
+| 27 | **GET**     | `${app.version}/student/getQuestionById`                 | `StudentRestController.getQuestionById()`  | Get question by ID | `{"id":"1"}` |
+| 28 | **GET**     | `${app.version}/student/findBySubjectCode`               | `StudentRestController.findBySubjectCode()` | Questions by subject code | `{"subjectCode":"CS101"}` |
+| 29 | **GET**     | `${app.version}/student/findBySubjectCodePagged`         | `StudentRestController.findBySubjectCode()` | Paginated by subject code | `{"subjectCode":"CS101"}` + Query params: `?pageNo=1&size=20` |
+| 30 | **GET**     | `${app.version}/student/findBySubjectCode-MappedCO`      | `StudentRestController.findBySubjectCodeMappedCO()` | Filter by subject code & CO | `{"subjectCode":"CS101","mappedCO":"CO1"}` |
+| 31 | **GET**     | `${app.version}/student/findBySubjectCode-MappedCOPaged` | `StudentRestController.findBySubjectCodeMappedCO()` | Paginated filter by subject code & CO | `{"subjectCode":"CS101","mappedCO":"CO1"}` + Query params |
+| 32 | **GET**     | `${app.version}/student/findBySubjectCode-MappedCO-CognitiveLevel` | `StudentRestController.findByCognitiveLevel()` | Filter by subject code, CO & cognitive level | `{"subjectCode":"CS101","mappedCO":"CO1","cognitiveLevel":"ANALYSIS"}` |
+| 33 | **GET**     | `${app.version}/student/findBySubjectName`               | `StudentRestController.findBySubjectName()` | Questions by subject name | `{"subjectName":"Database Systems"}` |
+| 34 | **GET**     | `${app.version}/student/findBySubjectNamePaged`          | `StudentRestController.findBySubjectName()` | Paginated by subject name | `{"subjectName":"Database Systems"}` + Query params |
+| 35 | **GET**     | `${app.version}/student/findBySubjectName-MappedCO`      | `StudentRestController.findBySubjectNameMappedCO()` | Filter by subject name & CO | `{"subjectName":"Database Systems","mappedCO":"CO1"}` |
+| 36 | **GET**     | `${app.version}/student/findBySubjectName-MappedCOPaged` | `StudentRestController.findBySubjectNameMappedCO()` | Paginated filter by subject name & CO | `{"subjectName":"Database Systems","mappedCO":"CO1"}` + Query params |
+| 37 | **GET**     | `${app.version}/student/findBySubjectName-MappedCO-CognitiveLevel` | `StudentRestController.findBySubjectNameMappedCOCognitiveLevel()` | Filter by subject name, CO & cognitive level | `{"subjectName":"Database Systems","mappedCO":"CO1","cognitiveLevel":"ANALYSIS"}` |
+| 38 | **PATCH**   | `${app.version}/student/updateUserEmail`                 | `StudentRestController.updateUserEmailById()` | Update student email | `{"email":"newemail@example.com"}` |
+| 39 | **PATCH**   | `${app.version}/student/updateUserPassword`              | `StudentRestController.updateUserPasswordById()` | Update student password | `{"oldPassword":"old123","newPassword":"new123"}` |
+| 40 | **GET**     | `${app.version}/student/test`                            | `StudentRestController.test()`             | Test endpoint | No request body |
+| 41 | **GET**     | `${app.version}/supervisor/getAllQuestion`               | `SupervisorRestController.getAllQuestion()` | Get all questions | No request body |
+| 42 | **GET**     | `${app.version}/supervisor/getAllQuestionPaged`          | `SupervisorRestController.getAllQuestionsPaged()` | Paginated questions | Query params: `?pageNo=1&size=50` |
+| 43 | **GET**     | `${app.version}/supervisor/getQuestionById`              | `SupervisorRestController.getQuestionById()` | Get question by ID | `{"id":"1"}` |
+| 44 | **GET**     | `${app.version}/supervisor/findBySubjectCode`            | `SupervisorRestController.findBySubjectCode()` | Questions by subject code | `{"subjectCode":"CS101"}` |
+| 45 | **GET**     | `${app.version}/supervisor/findBySubjectCodePagged`      | `SupervisorRestController.findBySubjectCode()` | Paginated by subject code | `{"subjectCode":"CS101"}` + Query params |
+| 46 | **GET**     | `${app.version}/supervisor/findBySubjectCode-MappedCO`   | `SupervisorRestController.findBySubjectCodeMappedCO()` | Filter by subject code & CO | `{"subjectCode":"CS101","mappedCO":"CO1"}` |
+| 47 | **GET**     | `${app.version}/supervisor/findBySubjectCode-MappedCOPaged` | `SupervisorRestController.findBySubjectCodeMappedCO()` | Paginated filter by subject code & CO | `{"subjectCode":"CS101","mappedCO":"CO1"}` + Query params |
+| 48 | **GET**     | `${app.version}/supervisor/findBySubjectCode-MappedCO-CognitiveLevel` | `SupervisorRestController.findByCognitiveLevel()` | Filter by subject code, CO & cognitive level | `{"subjectCode":"CS101","mappedCO":"CO1","cognitiveLevel":"ANALYSIS"}` |
+| 49 | **GET**     | `${app.version}/supervisor/findBySubjectName`            | `SupervisorRestController.findBySubjectName()` | Questions by subject name | `{"subjectName":"Database Systems"}` |
+| 50 | **GET**     | `${app.version}/supervisor/findBySubjectNamePaged`       | `SupervisorRestController.findBySubjectName()` | Paginated by subject name | `{"subjectName":"Database Systems"}` + Query params |
+| 51 | **GET**     | `${app.version}/supervisor/findBySubjectName-MappedCO`   | `SupervisorRestController.findBySubjectNameMappedCO()` | Filter by subject name & CO | `{"subjectName":"Database Systems","mappedCO":"CO1"}` |
+| 52 | **GET**     | `${app.version}/supervisor/findBySubjectName-MappedCOPaged` | `SupervisorRestController.findBySubjectNameMappedCO()` | Paginated filter by subject name & CO | `{"subjectName":"Database Systems","mappedCO":"CO1"}` + Query params |
+| 53 | **GET**     | `${app.version}/supervisor/findBySubjectName-MappedCO-CognitiveLevel` | `SupervisorRestController.findBySubjectNameMappedCOCognitiveLevel()` | Filter by subject name, CO & cognitive level | `{"subjectName":"Database Systems","mappedCO":"CO1","cognitiveLevel":"ANALYSIS"}` |
+| 54 | **GET**     | `${app.version}/supervisor/findByCreatedByUsingEmail`    | `SupervisorRestController.findByCreatedByUsingEmail()` | Questions created by user (email) | `{"email":"teacher@example.com"}` |
+| 55 | **GET**     | `${app.version}/supervisor/findByCreatedByUsingId`       | `SupervisorRestController.findByCreatedByUsingId()` | Questions created by user (ID) | `{"id":"5"}` |
+| 56 | **GET**     | `${app.version}/supervisor/getAllQuestionsPaper`         | `SupervisorRestController.getAllQuestionPapers()` | Get all question papers | No request body |
+| 57 | **GET**     | `${app.version}/supervisor/getAllQuestionsPaperPaged`    | `SupervisorRestController.getAllQuestionsPaper()` | Paginated question papers | Query params: `?pageNo=1&size=20` |
+| 58 | **GET**     | `${app.version}/supervisor/findQuestionPaperById`        | `SupervisorRestController.getAllQuestionPapers()` | Get question paper by ID | `{"id":"10"}` |
+| 59 | **GET**     | `${app.version}/supervisor/findByExamTitle`              | `SupervisorRestController.findByExamTitle()` | Find paper by exam title | `{"examTitle":"Midterm Exam 2024"}` |
+| 60 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingEmail`  | `SupervisorRestController.findByGeneratedByUsingEmail()` | Papers generated by user (email) | `{"email":"teacher@example.com"}` |
+| 61 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingEmailPaged` | `SupervisorRestController.findByGeneratedByUsingEmail()` | Paginated papers by generator email | `{"email":"teacher@example.com"}` + Query params |
+| 62 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingId`     | `SupervisorRestController.findByGeneratedByUsingId()` | Papers generated by user (ID) | `{"id":"5"}` |
+| 63 | **GET**     | `${app.version}/supervisor/findByGeneratedByUsingIdPaged` | `SupervisorRestController.findByGeneratedByUsingId()` | Paginated papers by generator ID | `{"id":"5"}` + Query params |
+| 64 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingEmail`   | `SupervisorRestController.findByApprovedByUsingEmail()` | Papers approved by supervisor (email) | `{"email":"supervisor@example.com"}` |
+| 65 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingEmailPaged` | `SupervisorRestController.findByApprovedByUsingEmail()` | Paginated papers by approver email | `{"email":"supervisor@example.com"}` + Query params |
+| 66 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingId`      | `SupervisorRestController.findByApprovedByUsingId()` | Papers approved by supervisor (ID) | `{"id":"3"}` |
+| 67 | **GET**     | `${app.version}/supervisor/findByApprovedByUsingIdPaged` | `SupervisorRestController.findByApprovedByUsingId()` | Paginated papers by approver ID | `{"id":"3"}` + Query params |
+| 68 | **GET**     | `${app.version}/supervisor/findApproved`                 | `SupervisorRestController.findApproved()` | Get approved papers | No request body |
+| 69 | **GET**     | `${app.version}/supervisor/findApprovedPaged`            | `SupervisorRestController.findApproved()` | Paginated approved papers | Query params: `?pageNo=1&size=20` |
+| 70 | **GET**     | `${app.version}/supervisor/findNotApproved`              | `SupervisorRestController.findNotApproved()` | Get pending/rejected papers | No request body |
+| 71 | **GET**     | `${app.version}/supervisor/findNotApprovedPaged`         | `SupervisorRestController.findNotApproved()` | Paginated pending papers | Query params: `?pageNo=1&size=20` |
+| 72 | **PATCH**   | `${app.version}/supervisor/approveQuestionPaperById`     | `SupervisorRestController.approveQuestionPaperById()` | Approve paper by ID | `{"id":"10","comment":"Approved"}` |
+| 73 | **PATCH**   | `${app.version}/supervisor/notApproveQuestionPaperById`  | `SupervisorRestController.notApproveQuestionPaperById()` | Reject paper by ID | `{"id":"10","comment":"Needs revision"}` |
+| 74 | **PATCH**   | `${app.version}/supervisor/approvedQuestionPaperByTile`  | `SupervisorRestController.approvedQuestionPaperByTile()` | Approve paper by title | `{"examTitle":"Midterm Exam 2024","comment":"Approved"}` |
+| 75 | **PATCH**   | `${app.version}/supervisor/notApprovedQuestionPaperByTile` | `SupervisorRestController.notApprovedQuestionPaperByTile()` | Reject paper by title | `{"examTitle":"Midterm Exam 2024","comment":"Needs revision"}` |
+| 76 | **PATCH**   | `${app.version}/supervisor/updateUserEmail`              | `SupervisorRestController.updateUserEmailById()` | Update supervisor email | `{"email":"newsemail@example.com"}` |
+| 77 | **PATCH**   | `${app.version}/supervisor/updateUserPassword`           | `SupervisorRestController.updateUserPasswordById()` | Update supervisor password | `{"oldPassword":"old123","newPassword":"new123"}` |
+| 78 | **GET**     | `${app.version}/supervisor/test`                         | `SupervisorRestController.test()`          | Test endpoint | No request body |
+| 79 | **GET**     | `${app.version}/teacher/getAllQuestion`                  | `TeacherRestController.getAllQuestion()`   | Get all questions | No request body |
+| 80 | **GET**     | `${app.version}/teacher/getAllQuestionPaged`             | `TeacherRestController.getAllQuestionsPaged()` | Paginated questions | Query params: `?pageNo=1&size=50` |
+| 81 | **GET**     | `${app.version}/teacher/getQuestionById`                 | `TeacherRestController.getQuestionById()`  | Get question by ID | `{"id":"1"}` |
+| 82 | **GET**     | `${app.version}/teacher/findBySubjectCode`               | `TeacherRestController.findBySubjectCode()` | Questions by subject code | `{"subjectCode":"CS101"}` |
+| 83 | **GET**     | `${app.version}/teacher/findBySubjectCodePagged`         | `TeacherRestController.findBySubjectCode()` | Paginated by subject code | `{"subjectCode":"CS101"}` + Query params |
+| 84 | **GET**     | `${app.version}/teacher/findBySubjectCode-MappedCO`      | `TeacherRestController.findBySubjectCodeMappedCO()` | Filter by subject code & CO | `{"subjectCode":"CS101","mappedCO":"CO1"}` |
+| 85 | **GET**     | `${app.version}/teacher/findBySubjectCode-MappedCOPaged` | `TeacherRestController.findBySubjectCodeMappedCO()` | Paginated filter by subject code & CO | `{"subjectCode":"CS101","mappedCO":"CO1"}` + Query params |
+| 86 | **GET**     | `${app.version}/teacher/findBySubjectCode-MappedCO-CognitiveLevel` | `TeacherRestController.findByCognitiveLevel()` | Filter by subject code, CO & cognitive level | `{"subjectCode":"CS101","mappedCO":"CO1","cognitiveLevel":"ANALYSIS"}` |
+| 87 | **GET**     | `${app.version}/teacher/findBySubjectName`               | `TeacherRestController.findBySubjectName()` | Questions by subject name | `{"subjectName":"Database Systems"}` |
+| 88 | **GET**     | `${app.version}/teacher/findBySubjectNamePaged`          | `TeacherRestController.findBySubjectName()` | Paginated by subject name | `{"subjectName":"Database Systems"}` + Query params |
+| 89 | **GET**     | `${app.version}/teacher/findBySubjectName-MappedCO`      | `TeacherRestController.findBySubjectNameMappedCO()` | Filter by subject name & CO | `{"subjectName":"Database Systems","mappedCO":"CO1"}` |
+| 90 | **GET**     | `${app.version}/teacher/findBySubjectName-MappedCOPaged` | `TeacherRestController.findBySubjectNameMappedCO()` | Paginated filter by subject name & CO | `{"subjectName":"Database Systems","mappedCO":"CO1"}` + Query params |
+| 91 | **GET**     | `${app.version}/teacher/findBySubjectName-MappedCO-CognitiveLevel` | `TeacherRestController.findBySubjectNameMappedCOCognitiveLevel()` | Filter by subject name, CO & cognitive level | `{"subjectName":"Database Systems","mappedCO":"CO1","cognitiveLevel":"ANALYSIS"}` |
+| 92 | **POST**    | `${app.version}/teacher/addQuestion`                     | `TeacherRestController.addQuestion()`      | Create new question | `{"subjectCode":"CS101","subjectName":"Database Systems","questionBody":"What is normalization?","mappedCO":"CO1","cognitiveLevel":"ANALYSIS","marks":5}` |
+| 93 | **GET**     | `${app.version}/teacher/generateBySubjectCodeQuestionPaper` | `TeacherRestController.generateBySubjectCodeQuestionPaper()` | Generate paper by subject code | `{"subjectCode":"CS101","totalMarks":100,"difficultyDistribution":{"EASY":30,"MEDIUM":50,"HARD":20}}` |
+| 94 | **GET**     | `${app.version}/teacher/generateBySubjectNameAndQuestionPaper` | `TeacherRestController.generateBySubjectAndQuestionPaper()` | Generate paper by subject name | `{"subjectName":"Database Systems","totalMarks":100,"difficultyDistribution":{"EASY":30,"MEDIUM":50,"HARD":20}}` |
+| 95 | **GET**     | `${app.version}/teacher/getYourQuestion`                 | `TeacherRestController.getYourQuestion()`  | Get teacher's own questions | No request body |
+| 96 | **GET**     | `${app.version}/teacher/getYourQuestionPaged`            | `TeacherRestController.getYourQuestion()`  | Paginated teacher's questions | Query params: `?pageNo=1&size=20` |
+| 97 | **POST**    | `${app.version}/teacher/approveGeneratedQuestionPaper`   | `TeacherRestController.approveGeneratedQuestionPaper()` | Submit paper for approval | `{"examTitle":"Midterm Exam 2024","questionPaperId":"15","comment":"Ready for approval"}` |
+| 98 | **PATCH**   | `${app.version}/teacher/updateUserEmail`                 | `TeacherRestController.updateUserEmailById()` | Update teacher email | `{"email":"newteacher@example.com"}` |
+| 99 | **PATCH**   | `${app.version}/teacher/updateUserPassword`              | `TeacherRestController.updateUserPasswordById()` | Update teacher password | `{"oldPassword":"old123","newPassword":"new123"}` |
+|100 | **DELETE**  | `${app.version}/teacher/deleteQuestionById`              | `TeacherRestController.deleteQuestionById()` | Delete question by ID | `{"id":"25"}` |
+|101 | **DELETE**  | `${app.version}/teacher/deleteQestionByQuestionBody`     | `TeacherRestController.deleteQuestionByQuestionBody()` | Delete question by body text | `{"questionBody":"What is normalization?"}` |
+|102 | **GET**     | `${app.version}/teacher/test`                            | `TeacherRestController.test()`             | Test endpoint | No request body |
 
 **Total: 102 endpoints**
 
@@ -114,3 +116,8 @@
 6. Question paper approval workflow is in Supervisor controller
 7. All roles have self-service email/password update endpoints
 8. Student and Supervisor have overlapping question retrieval endpoints
+9. Authentication uses email/password with OTP verification
+10. Role-based access control: ADMIN, TEACHER, SUPERVISOR, STUDENT
+11. Question management includes filtering by subject code/name, CO mapping, and cognitive levels
+12. Pagination support for most list endpoints
+13. Batch operations available for admin users
