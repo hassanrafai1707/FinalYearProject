@@ -334,7 +334,7 @@ public class TeacherRestController {
                 );
     }
 
-    @DeleteMapping("/deleteQestionByQuestionBody")
+    @DeleteMapping("/deleteQuestionByQuestionBody")
     public ResponseEntity<?> deleteQuestionByQuestionBody(@RequestBody Map<String,String> request){
         questionService.deleteQuestionByQuestionBody(request.get("questionBody"));
         return ResponseEntity.ok(
