@@ -8,6 +8,7 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.Q
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -107,5 +108,11 @@ public class GlobalExceptionHandler  {
     @ExceptionHandler(QuestionPaperNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleQuestionPaperNotFoundException(DuplicateQuestionException e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.NOT_FOUND, request);
+    }
+
+    //internal exceptions
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> handleBadRequestException(BadRequestException e , HttpServletRequest request){
+        return buildResponse(e,HttpStatus.BAD_REQUEST,request);
     }
 }
