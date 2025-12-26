@@ -1,25 +1,37 @@
-class Auth {
-  // Save only token & role (no full user object)
-  static setToken(token, role) {
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-  }
+const Auth = {
 
-  static getToken() {
-    return localStorage.getItem("token");
-  }
+  setToken: (token) => {
+    console.log("Saving JWT token:", token); // ✅ LOG HERE
+    localStorage.setItem("jwt_token", token);
+  },
 
-  static getRole() {
-    return localStorage.getItem("role");
-  }
+  getToken: () => {
+    return localStorage.getItem("jwt_token");
+  },
 
-  static isAuthenticated() {
-    return !!this.getToken();
-  }
-
-  static logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
+  logout: () => {
+    localStorage.removeItem("jwt_token");
     window.location.href = "/login";
+  },
+
+  isAuthenticated: () => {
+    const token = Auth.getToken();
+    if (!token) return false;
+
+    const payload = Auth.parseJwt(token);
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp > now;
+  },
+
+  getRole: () => {
+    const token = Auth.getToken();
+    if (!token) return null;
+    return Auth.parseJwt(token).role;
+  },
+
+  parseJwt: (token) => {
+    const base64Payload = token.split('.')[1];
+    const payload = atob(base64Payload);
+    return JSON.parse(payload);
   }
-}
+};
