@@ -72,16 +72,23 @@ public class SecurityConfig {
                         auth ->
                                 auth
                                         //TODO remove ROLE_ADMIN from where it does not belong
-                                        .requestMatchers(appVersion+"/admin/**").hasAnyAuthority("ROLE_ADMIN")
+                                        .requestMatchers(appVersion+"/admin/**").hasAuthority("ROLE_ADMIN")
                                         .requestMatchers(appVersion+"/student/**").hasAnyAuthority("ROLE_STUDENT","ROLE_ADMIN")
-                                        .requestMatchers(appVersion+"/teacher**").hasAnyAuthority("ROLE_TEACHER","ROLE_ADMIN")
-                                        .requestMatchers(appVersion+"/supervisor").hasAnyAuthority("ROLE_SUPERVISOR","ROLE_ADMIN")
+                                        .requestMatchers(appVersion+"/teacher/**").hasAnyAuthority("ROLE_TEACHER","ROLE_ADMIN")
+                                        .requestMatchers(appVersion+"/supervisor/**").hasAnyAuthority("ROLE_SUPERVISOR","ROLE_ADMIN")
+                                        .requestMatchers("/student-dashboard","/student-dashboard/**").hasAnyAuthority("ROLE_STUDENT","ROLE_ADMIN")
+                                        .requestMatchers("/teacher-dashboard","/teacher-dashboard?**").hasAnyAuthority("ROLE_TEACHER","ROLE_ADMIN")
+                                        .requestMatchers("/supervisor-dashboard","/supervisor-dashboard/**").hasAnyAuthority("ROLE_SUPERVISOR","ROLE_ADMIN")
                                         .requestMatchers(
                                                 // All of the below paths are permitted with put being authorised
                                                 appVersion+"/login",
                                                 appVersion+"/auth/**",
                                                 "/login",
                                                 "/register",
+//                                                "/admin-dashboard",
+//                                                "/teacher-dashboard",
+//                                                "/supervisor-dashboard",
+//                                                "/student-dashboard",
                                                 "/css/**",
                                                 "/js/**",
                                                 "/images/**",

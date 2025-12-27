@@ -179,10 +179,7 @@ function createPagination(
 
 // Generic logout function
 function logout() {
-  if (confirm("Are you sure you want to logout?")) {
-    alert("Logged out successfully!");
-    // In real app: window.location.href = '/login';
-  }
+    AuthAPI.logout();
 }
 
 // ====================

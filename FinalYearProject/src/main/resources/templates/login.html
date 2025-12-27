@@ -29,7 +29,7 @@
 </div>
 
 <script src="/js/api.js"></script>
-<script src="/js/auth.js"></script>
+<!--<script src="/js/auth.js"></script>-->
 
 <script>
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -50,24 +50,24 @@
       const response = await AuthAPI.login(email, password);
 
       // Save JWT
-      Auth.setToken(response.token);
+      AuthAPI.setToken(response.token);
 
       // Extract role from JWT
-      const role = Auth.getRole();
+      const role = AuthAPI.getRole();
 
       // Redirect by role
       switch (role) {
         case "ROLE_ADMIN":
-          window.location.href = "/admin-dashboard";
+          await AdminAPI.redirectToPage();
           break;
         case "ROLE_TEACHER":
-          window.location.href = "/teacher-dashboard";
+          await TeacherAPI.redirectToPage();
           break;
         case "ROLE_STUDENT":
-          window.location.href = "/student-dashboard";
+          await StudentAPI.redirectToPage();
           break;
         case "ROLE_SUPERVISOR":
-          window.location.href = "/supervisor-dashboard";
+          await SupervisorAPI.redirectToPage();
           break;
         default:
           window.location.href = "/";
