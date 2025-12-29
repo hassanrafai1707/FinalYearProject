@@ -3,7 +3,6 @@ package com.FinalYearProject.FinalYearProject.Controller;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -371,16 +370,6 @@ public class AdminRestController {
                 Map.of(
                         "status","successful",
                         "data",userService.updateUserPassword(password)
-                )
-        );
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logoutProcesser (HttpServletRequest token){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "message","user logout successfully"
                 )
         );
     }
