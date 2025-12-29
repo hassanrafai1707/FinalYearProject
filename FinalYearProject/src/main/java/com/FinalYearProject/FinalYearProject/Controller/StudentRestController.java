@@ -8,12 +8,12 @@ import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -40,10 +40,17 @@ import java.util.Map;
 @RequestMapping("${app.version}/student")
 @RestController
 public class StudentRestController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private QuestionService questionService;
+    private final UserService userService;
+    private final QuestionService questionService;
+
+    public StudentRestController(UserService userService,QuestionService questionService){
+        this.userService=userService;
+        this.questionService=questionService;
+    }
+
+    private LocalDateTime getTimeNow(){
+        return LocalDateTime.now();
+    }
 
     @GetMapping("/getAllQuestion")
     public ResponseEntity<?> getAllQuestion(){
@@ -51,18 +58,25 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status","Successful",
-                                "all Question", questionList
+                                "status","successful",
+                                "data", questionList,
+                                "time",getTimeNow()
                         )
                 );
     }
 
     @GetMapping("/getAllQuestionPaged")
-    public PagedModel<Question>  getAllQuestionsPaged(
+    public ResponseEntity<?>  getAllQuestionsPaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
     ){
-        return new PagedModel<>(questionService.getAllQuestionsPaged(pageNo,size));
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data",questionService.getAllQuestionsPaged(pageNo, size),
+                        "time",getTimeNow()
+                        )
+        );
     }
 
     @GetMapping("/getQuestionById")
@@ -70,8 +84,9 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status","Successful",
-                                "question with giver id",questionService.getQuestionById(request.get("id"))
+                                "status","successful",
+                                "data",questionService.getQuestionById(request.get("id")),
+                                "time",getTimeNow()
                         )
                 );
     }
@@ -83,20 +98,33 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status","Successful",
-                                "list of all questions with CO" ,questions
+                                "status","successful",
+                                "data",questions,
+                                "time",getTimeNow()
                         )
                 );
     }
 
     @GetMapping("/findBySubjectCodePagged")
-    public PagedModel<Question> findBySubjectCode(
+    public ResponseEntity<?> findBySubjectCode(
             @RequestParam(value = "pageNo" ,defaultValue = "0") int page,
             @RequestParam(value = "size" , defaultValue = "100") int size,
             @RequestBody Map<String,String> request
     ){
         String subjectCode =request.get("subjectCode");
-        return new PagedModel<>(questionService.findBySubjectCode(subjectCode,page,size));
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data",new PagedModel<>(
+                                questionService.findBySubjectCode(
+                                        subjectCode,
+                                        page,
+                                        size
+                                )
+                        ),
+                        "time",getTimeNow()
+                )
+        );
     }
 
     @GetMapping("/findBySubjectCode-MappedCO")
@@ -105,24 +133,31 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name and mapped CO" ,question
+                                "status","successful",
+                                "data",question,
+                                "time",getTimeNow()
                         )
                 );
     }
 
     @GetMapping("/findBySubjectCode-MappedCOPaged")
-    public PagedModel<Question> findBySubjectCodeMappedCO(
+    public ResponseEntity<?> findBySubjectCodeMappedCO(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestBody DtoForSubjectCodeAndMappedCO dto
     ){
-        return new PagedModel<>(
-                questionService.findBySubjectCodeMappedCO(
-                        dto.getSubjectCode(),
-                        dto.getMappedCO(),
-                        pageNo,
-                        size
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data",new PagedModel<>(
+                                questionService.findBySubjectCodeMappedCO(
+                                        dto.getSubjectCode(),
+                                        dto.getMappedCO(),
+                                        pageNo,
+                                        size
+                                )
+                        ),
+                        "time",getTimeNow()
                 )
         );
     }
@@ -137,8 +172,9 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status","Successful",
-                                "list of all questions with subject code and mapped CO and cognitive level",questions
+                                "status","successful",
+                                "data",questions,
+                                "time",getTimeNow()
                         )
                 );
     }
@@ -150,24 +186,31 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name" ,questions
+                                "status","successful",
+                                "data",questions,
+                                "time",getTimeNow()
                         )
                 );
     }
 
     @GetMapping("/findBySubjectNamePaged")
-    public PagedModel<Question> findBySubjectName(
+    public ResponseEntity findBySubjectName(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestBody Map<String,String> request
     ){
         String subjectName=request.get("subjectName");
-        return new PagedModel<>(
-                questionService.findBySubjectName(
-                        subjectName,
-                        pageNo,
-                        size
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data",new PagedModel<>(
+                                questionService.findBySubjectName(
+                                        subjectName,
+                                        pageNo,
+                                        size
+                                )
+                        ),
+                        "time",getTimeNow()
                 )
         );
     }
@@ -177,28 +220,34 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name and mapped CO",
-                                questionService.findBySubjectNameMappedCO(
+                                "status","successful",
+                                "data", questionService.findBySubjectNameMappedCO(
                                         dto.getSubjectName(),
                                         dto.getMappedCO()
-                                )
+                                ),
+                                "time",getTimeNow()
                         )
                 );
     }
 
     @GetMapping("/findBySubjectName-MappedCOPaged")
-    public PagedModel<Question> findBySubjectNameMappedCO(
+    public ResponseEntity<?> findBySubjectNameMappedCO(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
             @RequestBody DtoForSubjectNameAndMappedCO dto
     ){
-        return new PagedModel<>(
-                questionService.findBySubjectNameMappedCO(
-                        dto.getSubjectName(),
-                        dto.getMappedCO(),
-                        pageNo,
-                        size
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data",new PagedModel<>(
+                                questionService.findBySubjectNameMappedCO(
+                                        dto.getSubjectName(),
+                                        dto.getMappedCO(),
+                                        pageNo,
+                                        size
+                                )
+                        ),
+                        "time",getTimeNow()
                 )
         );
     }
@@ -208,13 +257,13 @@ public class StudentRestController {
         return ResponseEntity
                 .ok(
                         Map.of(
-                                "status" ,"Successful",
-                                "list of all questions with subject name and mapped CO and cognitive level",
-                                questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                "status","successful",
+                                "data", questionService.findBySubjectNameMappedCOCognitiveLevel(
                                         dto.getSubjectName(),
                                         dto.getMappedCO(),
                                         dto.getCognitiveLevel()
-                                )
+                                ),
+                                "time",getTimeNow()
                         )
                 );
     }
@@ -226,8 +275,9 @@ public class StudentRestController {
         User upDatedUser= userService.updateUserEmail(email);
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
-                        "updatedUser",upDatedUser
+                        "status","successful",
+                        "data",upDatedUser,
+                        "time",getTimeNow()
                 )
         );
     }
@@ -238,8 +288,9 @@ public class StudentRestController {
         User updatedUser = userService.updateUserPassword(password);
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
-                        "updatedUser",updatedUser
+                        "status","successful",
+                        "data",updatedUser,
+                        "time",getTimeNow()
                 )
         );
     }
