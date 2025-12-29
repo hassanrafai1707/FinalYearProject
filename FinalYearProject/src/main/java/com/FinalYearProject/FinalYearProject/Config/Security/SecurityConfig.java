@@ -77,7 +77,7 @@ public class SecurityConfig {
                                         .requestMatchers(appVersion+"/teacher/**").hasAnyAuthority("ROLE_TEACHER","ROLE_ADMIN")
                                         .requestMatchers(appVersion+"/supervisor/**").hasAnyAuthority("ROLE_SUPERVISOR","ROLE_ADMIN")
                                         .requestMatchers(
-                                                // All of the below paths are permitted with put being authorised
+                                                // All the below paths are permitted with put being authorised
                                                 appVersion+"/login",
                                                 appVersion+"/auth/**",
                                                 "/login",

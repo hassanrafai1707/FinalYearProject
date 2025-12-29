@@ -328,7 +328,7 @@ const AdminAPI = {
     try {
         let response=await AdminAPI.test();
         console.log(response)
-      if (response==='OK') {
+      if (response.status===200) {
         // user is admin → now navigate
           return await fetch(`/admin-dashboard`, {
               method: "GET",

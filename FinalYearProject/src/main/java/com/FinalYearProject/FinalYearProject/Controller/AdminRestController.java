@@ -1,16 +1,13 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
-import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PagedModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,76 +58,120 @@ import java.util.Map;
 @RequestMapping("${app.version}/admin")
 @RestController
 public class AdminRestController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @GetMapping("/findUserById")
-    public ResponseEntity<?> findUserById(@RequestBody Map<String ,Long> request){
-        Long Id= request.get("id");
-        User existingUser = userService.findUserById(Id);
+    AdminRestController(UserService userService){
+        this.userService=userService;
+    }
+
+    @GetMapping("/user/id/{id}")
+    public ResponseEntity<?> findUserById(@PathVariable("id") Long id){
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful" ,
-                        "user",existingUser
+                        "data",userService.findUserById(id)
                 )
         );
     }
 
-    @GetMapping("/findByEmail")
-    public ResponseEntity<?> findByEmail(@RequestBody Map<String , String> requst) {
-        String Email = requst.get("email");
-        User existingUser = userService.findByEmail(Email);
+    @GetMapping("/user/email/{email}")
+    public ResponseEntity<?> findByEmail(@PathVariable("email") String email) {
         return ResponseEntity.ok(
                 Map.of(
                         "status", "successful",
-                        "user", existingUser
+                        "data", userService.findByEmail(email)
                 )
         );
     }
 
-    @GetMapping("/listOfUserByRole")
-    public ResponseEntity<?> listOfUserByRole(@RequestBody Map<String ,String > request){
-        String Role=request.get("role");
-        List<User> userByRole =userService.listOfUserByRole(Role);
+    @GetMapping("/users/role/{role}")
+    public ResponseEntity<?> listOfUserByRole(@PathVariable("role") String role){
+        if (
+                !(
+                        role.equals("ROLE_ADMIN")
+                        ||role.equals("ROLE_TEACHER")
+                        ||role.equals("ROLE_STUDENT")
+                        ||role.equals("ROLE_SUPERVISOR")
+                )
+        ){
+            throw new RoleNotValidException("User role must be ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT, or ROLE_SUPERVISOR");
+        }
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "listOfUsersWithTheGivenRole",userByRole
+                        "data",userService.listOfUserByRole(role)
                 )
         );
     }
 
-    @GetMapping("/listOfUserByRolePaged")
-    public PagedModel<User> listOfUserByRolePaged(
+    @GetMapping("/users/role/{role}/paged")
+    public ResponseEntity<?> listOfUserByRolePaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size", defaultValue = "100") int size,
-            @RequestBody Map<String,String> request
+            @PathVariable("role") String role
     ){
-        return new PagedModel<>(userService.listOfUserByRole(request.get("role"),pageNo,size));
-    }
-
-    @GetMapping("/getAllUsers")
-    public ResponseEntity<?> getAllUsers(){
-        List<User> AllUsers=userService.findAllUsers();
+        if (
+                !(
+                role.equals("ROLE_ADMIN")
+                ||role.equals("ROLE_TEACHER")
+                ||role.equals("ROLE_STUDENT")
+                ||role.equals("ROLE_SUPERVISOR")
+                )
+        ){
+            throw new RoleNotValidException(
+                    "User role must be ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT, or ROLE_SUPERVISOR"
+            );
+        }
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "allUsers", AllUsers
+                        "data", new PagedModel<>(
+                                userService.listOfUserByRole(
+                                        role,
+                                        pageNo,
+                                        size
+                                )
+                        )
                 )
         );
     }
 
-    @GetMapping("/getAllUsersPaged")
-    public PagedModel<User> getAllUsersPaged(
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers(){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data", userService.findAllUsers()
+                )
+        );
+    }
+
+    @GetMapping("/users/paged")
+    public ResponseEntity<?> getAllUsersPaged(
             @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size
     ){
-        return new PagedModel<>(userService.findAllUsersPage(pageNo, size));
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data",new PagedModel<>(
+                                userService.findAllUsersPage(
+                                        pageNo,
+                                        size
+                                )
+                        )
+                )
+        );
     }
 
-    @DeleteMapping("/deleteUserByEmail")
-     public ResponseEntity<?> deleteUserByEmail(@RequestBody DtoForEmailAndAdminPasswordInRequest dto){
-        userService.deleteUserByEmail(dto.getEmail(),dto.getAdminPassword());
+    @DeleteMapping("/user/email")
+     public ResponseEntity<?> deleteUserByEmail(
+             @RequestBody DtoForEmailAndAdminPasswordInRequest dto
+    ){
+        userService.deleteUserByEmail(
+                dto.getEmail(),
+                dto.getAdminPassword()
+        );
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
@@ -139,20 +180,30 @@ public class AdminRestController {
         );
     }
 
-    @DeleteMapping("/deleteUserById")
-    public ResponseEntity<?> deleteById( @RequestBody DtoForIdAndAdminPasswordInRequest dto){
-        userService.deleteUserById(dto.getId(),dto.getAdminPassword());
+    @DeleteMapping("/user/id")
+    public ResponseEntity<?> deleteById(
+            @RequestBody DtoForIdAndAdminPasswordInRequest dto
+    ){
+        userService.deleteUserById(
+                dto.getId(),
+                dto.getAdminPassword()
+        );
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
+                        "status","successful",
                         "message","users with id deleted successfully"
                 )
         );
     }
 
-    @DeleteMapping("/deleteUsersInBatchByID")
-    public ResponseEntity<?> deleteUsersInBatchByID(@RequestBody DtoForIdsAndPasswordInRequest dto){
-        userService.deleteUserInBatchById(dto.getIds(),dto.getAdminPassword());
+    @DeleteMapping("/users/ids")
+    public ResponseEntity<?> deleteUsersInBatchByID(
+            @RequestBody DtoForIdsAndPasswordInRequest dto
+    ){
+        userService.deleteUserInBatchById(
+                dto.getIds(),
+                dto.getAdminPassword()
+        );
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
@@ -161,8 +212,10 @@ public class AdminRestController {
         );
     }
 
-    @DeleteMapping("/deleteUsersInBatchByEmail")
-    public ResponseEntity<?> deleteUsersInBatchByEmail(@RequestBody DtoForEmailsAndPasswordInRequest dto){
+    @DeleteMapping("/users/emails")
+    public ResponseEntity<?> deleteUsersInBatchByEmail(
+            @RequestBody DtoForEmailsAndPasswordInRequest dto
+    ){
         userService.deleteUserInBatchEmail(dto.getEmails(),dto.getAdminPassword());
         return ResponseEntity.ok(
                 Map.of(
@@ -172,88 +225,109 @@ public class AdminRestController {
         );
     }
 
-    @PatchMapping("/suspendUserById")
-    public ResponseEntity<?> suspendUserById(@RequestBody DtoForIdAndAdminPasswordInRequest dto){
-        User user = userService.suspendUserById(dto.getId(),dto.getAdminPassword());
+    @PatchMapping("/suspend/user/id")
+    public ResponseEntity<?> suspendUserById(
+            @RequestBody DtoForIdAndAdminPasswordInRequest dto
+    ){
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
-                        "updated user", user
+                        "status","successful",
+                        "data", userService.suspendUserById
+                                (
+                                        dto.getId(),
+                                        dto.getAdminPassword()
+                                )
                 )
         );
     }
 
-    @PatchMapping("/unsuspendUserById")
-    public ResponseEntity<?> unsuspendUserById(@RequestBody DtoForIdAndAdminPasswordInRequest dto){
-        User user =userService.unsuspendUserById(dto.getId(),dto.getAdminPassword());
+    @PatchMapping("/unsuspend/user/id")
+    public ResponseEntity<?> unsuspendUserById(
+            @RequestBody DtoForIdAndAdminPasswordInRequest dto
+    ){
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
-                        "message", user
-                )
-        );
-    }
-
-    @PatchMapping("/suspendUserByEmail")
-    public ResponseEntity<?> suspendUserByEmail(@RequestBody DtoForEmailAndAdminPasswordInRequest dto){
-        User user= userService.suspendUserByEmail(dto.getEmail(),dto.getAdminPassword());
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "message", user
-                )
-        );
-    }
-
-    @PatchMapping("/unsuspendUserByEmail")
-    public ResponseEntity<?> unsuspendUserByEmail(@RequestBody DtoForEmailAndAdminPasswordInRequest dto){
-        User user =userService.unsuspendUserByEmail(dto.getEmail(),dto.getAdminPassword());
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "message", user
-                )
-        );
-    }
-
-    @PatchMapping("/updateUserPasswordByEmail")
-    public ResponseEntity<?> updatePasswordByEmail(@RequestBody DtoForEmailAnd2PasswordsInRequest dto){
-        User user=userService.updateUserPasswordByEmail(
-                dto.getEmail(),
-                dto.getPassword(),
-                dto.getAdminPassword()
-        );
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "states","successful",
-                                "updated user",user
+                        "status","successful",
+                        "data", userService.unsuspendUserById(
+                                dto.getId(),
+                                dto.getAdminPassword()
                         )
-                );
-    }
-
-    @PatchMapping("/updateUserPasswordById")
-    public ResponseEntity<?> updateUserPasswordById(@RequestBody DtoForUserIdAndPasswordInRequest dto){
-        User user=userService.updateUserPasswordById(
-                dto.getId(),
-                dto.getPassword(),
-                dto.getAdminPassword()
-        );
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "updated user",user
                 )
         );
     }
 
-    @PatchMapping("/updateUserRoleById")
-    public ResponseEntity<?> updateUserRoleById(@RequestBody DtoForRoleAndIdAndPassworedInRequest dto){
+    @PatchMapping("/suspend/user/email")
+    public ResponseEntity<?> suspendUserByEmail(
+            @RequestBody DtoForEmailAndAdminPasswordInRequest dto
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data", userService.suspendUserByEmail(
+                                dto.getEmail(),
+                                dto.getAdminPassword()
+                        )
+                )
+        );
+    }
+
+    @PatchMapping("/unsuspend/user/email")
+    public ResponseEntity<?> unsuspendUserByEmail(
+            @RequestBody DtoForEmailAndAdminPasswordInRequest dto
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data", userService.unsuspendUserByEmail(
+                                dto.getEmail(),
+                                dto.getAdminPassword()
+                        )
+                )
+        );
+    }
+
+    @PatchMapping("/update/user/password/email")
+    public ResponseEntity<?> updatePasswordByEmail(
+            @RequestBody DtoForEmailAnd2PasswordsInRequest dto
+    ){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "updated user", userService.updateUserRoleById(
+                                "data",userService.updateUserPasswordByEmail(
+                                        dto.getEmail(),
+                                        dto.getPassword(),
+                                        dto.getAdminPassword()
+                                )
+                        )
+                );
+    }
+
+    @PatchMapping("/update/user/password/id")
+    public ResponseEntity<?> updateUserPasswordById(
+            @RequestBody DtoForUserIdAndPasswordInRequest dto
+    ){
+        return ResponseEntity.ok(
+                Map.of(
+                        "status","successful",
+                        "data",userService.updateUserPasswordById(
+                                dto.getId(),
+                                dto.getPassword(),
+                                dto.getAdminPassword()
+                        )
+                )
+        );
+    }
+
+    @PatchMapping("/update/user/role/id")
+    public ResponseEntity<?> updateUserRoleById(
+            @RequestBody DtoForRoleAndIdAndPassworedInRequest dto
+    ){
+        return ResponseEntity
+                .ok(
+                        Map.of(
+                                "status","successful",
+                                "data", userService.updateUserRoleById(
                                         dto.getRole(),
                                         dto.getId(),
                                         dto.getPassword()
@@ -262,13 +336,15 @@ public class AdminRestController {
                 );
     }
 
-    @PatchMapping("/updateUserRoleByEmail")
-    public ResponseEntity<?> updateUserRoleByEmail(@RequestBody DtoForRoleAndEmailAndPasswordInRequest dto){
+    @PatchMapping("/update/user/role/email")
+    public ResponseEntity<?> updateUserRoleByEmail(
+            @RequestBody DtoForRoleAndEmailAndPasswordInRequest dto
+    ){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "updated user",userService.updateUserRoleByEmail(
+                                "data",userService.updateUserRoleByEmail(
                                         dto.getEmail(),
                                         dto.getRole(),
                                         dto.getPassword()
@@ -277,35 +353,33 @@ public class AdminRestController {
                 );
     }
 
-    @PatchMapping("/updateUserEmail")
-    public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
-                                                            ){
-        String email= request.get("email");
-        User upDatedUser= userService.updateUserEmail(email);
+    @PatchMapping("/update/my/email")
+    public ResponseEntity<?>updateUserEmail(@RequestBody Map<String,String> request){
+        String email= request.get("newEmail");
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
-                        "updatedUser",upDatedUser
+                        "status","successful",
+                        "data",userService.updateUserEmail(email)
                 )
         );
     }
 
-    @PatchMapping("/updateUserPassword")
-    public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
+    @PatchMapping("/update/my/password")
+    public ResponseEntity<?> updateUserPassword(@RequestBody Map<String,String> request){
         String password= request.get("password");
-        User updatedUser = userService.updateUserPassword(password);
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
-                        "updatedUser",updatedUser
+                        "status","successful",
+                        "data",userService.updateUserPassword(password)
                 )
         );
     }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logoutProcesser (HttpServletRequest token){
         return ResponseEntity.ok(
                 Map.of(
-                        "states","successful",
+                        "status","successful",
                         "message","user logout successfully"
                 )
         );
@@ -313,6 +387,8 @@ public class AdminRestController {
 
     @GetMapping("/test")
     public ResponseEntity<?> test(){
-        return ResponseEntity.ok(HttpStatus.OK);
+        return ResponseEntity.ok(
+                Map.of("status", "successful")
+        );
     }
 }
