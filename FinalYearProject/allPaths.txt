@@ -26,7 +26,7 @@ Here's the corrected API endpoint table with the proper request body formats for
 | 21 | PATCH       | `${app.version}/admin/update/user/role/email`               | Update role by email                 | `{"email": "...", "role": "...", "password": "..."}`                                      |
 | 22 | PATCH       | `${app.version}/admin/update/my/email`                      | Update admin's own email             | `{"newEmail": "..."}`                                                                     |
 | 23 | PATCH       | `${app.version}/admin/update/my/password`                   | Update admin's own password          | `{"password": "..."}`                                                                     |
-| 25 | GET         | `${app.version}/api/v1/admin/test`                                 | Test endpoint                        | No parameters                                                                             |
+| 25 | GET         | `${app.version}/api/v1/admin/test`                          | Test endpoint                        | No parameters                                                                             |
 
 | 26 | **GET**     | `${app.version}/student/getAllQuestion`                  | `StudentRestController.getAllQuestion()`   | Get all questions | No request body |
 | 27 | **GET**     | `${app.version}/student/getAllQuestionPaged`             | `StudentRestController.getAllQuestionsPaged()` | Get paginated questions | Query params: `?pageNo=1&size=50` |

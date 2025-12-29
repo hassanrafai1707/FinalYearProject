@@ -7,6 +7,7 @@ import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -15,44 +16,67 @@ import java.util.Map;
  * Provides comprehensive user administration endpoints for system administrators.
  * All endpoints are prefixed with versioned admin path (${app.version}/admin).
  * SECURITY CONTEXT:
- * - Requires ROLE_ADMIN authority (configured in SecurityConfig)
- * - All operations require admin authentication via JWT token
- * - Sensitive operations (deletes, role changes) require additional admin password verification
+ * - Requires ROLE_ADMIN authority (enforced via SecurityConfig)
+ * - All endpoints require JWT authentication with admin privileges
+ * - Destructive operations (deletions, role changes) require additional admin password verification
+ * - Stateless architecture using JWT tokens (no session management)
  * USER MANAGEMENT OPERATIONS:
  * 1. USER RETRIEVAL:
- *    - findUserById: Get user by database ID
- *    - findByEmail: Get user by email address
- *    - listOfUserByRole: Get all users with specific role
- *    - getAllUsers: Get all users in system
- *    - getAllUsersPaged: Get paginated list of users
- * 2. USER DELETION:
+ *    - findUserById: Retrieve user by database ID
+ *    - findByEmail: Retrieve user by email address
+ *    - listOfUserByRole: Retrieve all users with specific role (with and without pagination)
+ *    - getAllUsers: Retrieve all users in system
+ *    - getAllUsersPaged: Retrieve paginated list of users
+ * 2. USER DELETION OPERATIONS:
  *    - deleteUserByEmail: Delete single user by email (requires admin password)
  *    - deleteUserById: Delete single user by ID (requires admin password)
- *    - deleteUsersInBatchByID: Bulk delete by IDs (requires admin password)
- *    - deleteUsersInBatchByEmail: Bulk delete by emails (requires admin password)
- * 3. USER SUSPENSION/MANAGEMENT:
- *    - suspendUserById/ByEmail: Suspend user account (prevent login)
+ *    - deleteUsersInBatchByID: Bulk delete by list of IDs (requires admin password)
+ *    - deleteUsersInBatchByEmail: Bulk delete by list of emails (requires admin password)
+ * 3. USER SUSPENSION MANAGEMENT:
+ *    - suspendUserById/ByEmail: Suspend user account (prevents login)
  *    - unsuspendUserById/ByEmail: Reactivate suspended account
  * 4. USER UPDATE OPERATIONS:
  *    - updateUserPasswordByEmail/ById: Reset user password (requires admin password)
  *    - updateUserRoleByEmail/ById: Change user role/authority (requires admin password)
- *    - updateUserEmail: Change user's email address
- *    - updateUserPassword: Change user's password
+ *    - updateUserEmail: Change authenticated admin's own email address
+ *    - updateUserPassword: Change authenticated admin's own password
  * 5. UTILITY ENDPOINTS:
- *    - logout: Logout endpoint (handled by stateless JWT - typically invalidates token)
- *    - test: Simple endpoint for connectivity testing
+ *    - logout: Logout endpoint (JWT stateless - typically handled via token blacklisting)
+ *    - test: Connectivity testing endpoint
  * REQUEST/RESPONSE PATTERN:
- * - Uses DTOs (Data Transfer Objects) for structured request data
- * - Returns consistent JSON response format: {"status": "...", "data": ...}
- * - Error handling via global exception handler (not shown in this controller)
+ * - All endpoints accept and return JSON
+ * - Uses Data Transfer Objects (DTOs) for structured request validation
+ * - Consistent JSON response format: {"status": "successful/error", "data": {...}, "message": "..."}
+ * - Validation errors handled via global exception handler
+ * - Custom exceptions (e.g., RoleNotValidException) for business rule violations
+ * PAGINATION:
+ * - Supports pagination for large datasets via pageNo and size parameters
+ * - Default page size: 100 records
+ * - Returns PagedModel for standardized pagination metadata
+ * ROLE VALIDATION:
+ * - Valid roles: ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT, ROLE_SUPERVISOR
+ * - Role validation performed at controller level for /users/role endpoints
+ * - Invalid roles throw RoleNotValidException
  * SECURITY NOTES:
- * - Admin password verification for destructive operations adds extra security layer
- * - JWT token validation happens before reaching these endpoints
- * - No session management (stateless) - logout typically handled via token blacklisting
+ * - Admin password verification adds defense-in-depth for critical operations
+ * - JWT token validation occurs before controller method invocation
+ * - No session management - logout typically implemented via token blacklisting
+ * - Role-based access control enforced at method/endpoint level
  * PERFORMANCE CONSIDERATIONS:
- * - getAllUsersPaged supports pagination for large user databases
- * - Batch operations minimize database round-trips
- * - Consider adding caching for frequently accessed user data
+ * - Pagination endpoints prevent memory issues with large user databases
+ * - Batch operations reduce database round-trips for bulk actions
+ * - Consider implementing caching for frequently accessed user data
+ * - Database indexes recommended on email, id, and role fields
+ * ERROR HANDLING:
+ * - Standardized error responses via global exception handler
+ * - Business logic exceptions provide clear user messages
+ * - Input validation performed via DTO constraints
+ * - HTTP status codes: 200 (success), 400 (bad request), 401 (unauthorized), 403 (forbidden), 404 (not found)
+ * MAINTENANCE NOTES:
+ * - DTO naming follows pattern: DtoFor[ParameterTypes]InRequest
+ * - Service layer handles business logic and data access
+ * - Controller focuses on HTTP handling and response formatting
+ * - Consistent naming convention: [action]UserBy[Identifier]
  */
 @RequestMapping("${app.version}/admin")
 @RestController
@@ -63,12 +87,17 @@ public class AdminRestController {
         this.userService=userService;
     }
 
+    private LocalDateTime getNowTime(){
+        return LocalDateTime.now();
+    }
+
     @GetMapping("/user/id/{id}")
     public ResponseEntity<?> findUserById(@PathVariable("id") Long id){
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful" ,
-                        "data",userService.findUserById(id)
+                        "data",userService.findUserById(id),
+                        "time",getNowTime()
                 )
         );
     }
@@ -78,7 +107,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status", "successful",
-                        "data", userService.findByEmail(email)
+                        "data", userService.findByEmail(email),
+                        "time",getNowTime()
                 )
         );
     }
@@ -98,7 +128,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data",userService.listOfUserByRole(role)
+                        "data",userService.listOfUserByRole(role),
+                        "time",getNowTime()
                 )
         );
     }
@@ -130,7 +161,8 @@ public class AdminRestController {
                                         pageNo,
                                         size
                                 )
-                        )
+                        ),
+                        "time",getNowTime()
                 )
         );
     }
@@ -140,7 +172,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data", userService.findAllUsers()
+                        "data", userService.findAllUsers(),
+                        "time",getNowTime()
                 )
         );
     }
@@ -158,7 +191,8 @@ public class AdminRestController {
                                         pageNo,
                                         size
                                 )
-                        )
+                        ),
+                        "time",getNowTime()
                 )
         );
     }
@@ -174,7 +208,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "message","users with email deleted successfully"
+                        "message","users with email deleted successfully",
+                        "time",getNowTime()
                 )
         );
     }
@@ -190,7 +225,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "message","users with id deleted successfully"
+                        "message","users with id deleted successfully",
+                        "time",getNowTime()
                 )
         );
     }
@@ -206,7 +242,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "message","all users with ids deleted successfully"
+                        "message","all users with ids deleted successfully",
+                        "time",getNowTime()
                 )
         );
     }
@@ -219,7 +256,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "message","all users deleted successfully with emails"
+                        "message","all users deleted successfully with emails",
+                        "time",getNowTime()
                 )
         );
     }
@@ -231,11 +269,11 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data", userService.suspendUserById
-                                (
+                        "data", userService.suspendUserById(
                                         dto.getId(),
                                         dto.getAdminPassword()
-                                )
+                        ),
+                        "time",getNowTime()
                 )
         );
     }
@@ -250,7 +288,8 @@ public class AdminRestController {
                         "data", userService.unsuspendUserById(
                                 dto.getId(),
                                 dto.getAdminPassword()
-                        )
+                        ),
+                        "time",getNowTime()
                 )
         );
     }
@@ -265,7 +304,8 @@ public class AdminRestController {
                         "data", userService.suspendUserByEmail(
                                 dto.getEmail(),
                                 dto.getAdminPassword()
-                        )
+                        ),
+                        "time",getNowTime()
                 )
         );
     }
@@ -280,7 +320,8 @@ public class AdminRestController {
                         "data", userService.unsuspendUserByEmail(
                                 dto.getEmail(),
                                 dto.getAdminPassword()
-                        )
+                        ),
+                        "time",getNowTime()
                 )
         );
     }
@@ -297,7 +338,9 @@ public class AdminRestController {
                                         dto.getEmail(),
                                         dto.getPassword(),
                                         dto.getAdminPassword()
-                                )
+                                ),
+                                "time",getNowTime()
+
                         )
                 );
     }
@@ -313,7 +356,8 @@ public class AdminRestController {
                                 dto.getId(),
                                 dto.getPassword(),
                                 dto.getAdminPassword()
-                        )
+                        ),
+                        "time",getNowTime()
                 )
         );
     }
@@ -330,7 +374,8 @@ public class AdminRestController {
                                         dto.getRole(),
                                         dto.getId(),
                                         dto.getPassword()
-                                )
+                                ),
+                                "time",getNowTime()
                         )
                 );
     }
@@ -347,7 +392,8 @@ public class AdminRestController {
                                         dto.getEmail(),
                                         dto.getRole(),
                                         dto.getPassword()
-                                )
+                                ),
+                                "time",getNowTime()
                         )
                 );
     }
@@ -358,7 +404,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data",userService.updateUserEmail(email)
+                        "data",userService.updateUserEmail(email),
+                        "time",getNowTime()
                 )
         );
     }
@@ -369,7 +416,8 @@ public class AdminRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data",userService.updateUserPassword(password)
+                        "data",userService.updateUserPassword(password),
+                        "time",getNowTime()
                 )
         );
     }
