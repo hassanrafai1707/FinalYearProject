@@ -213,7 +213,7 @@ public class QuestionService {
             }
         }
     }
-
+//todo use this method in supervise
     public Page<Question> findByCreatedByUsingId(Long Id,int pageNo,int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         User tempUser=userService.findUserById(Id);
@@ -252,7 +252,7 @@ public class QuestionService {
            return findByCreatedByUsingEmail(email,pageNo,size);
         }
     }
-
+//todo use this metho
     public Question findQuestionByQuestionBody(String questionBody){
         return questionRepository.
                 findByQuestionTitle(
