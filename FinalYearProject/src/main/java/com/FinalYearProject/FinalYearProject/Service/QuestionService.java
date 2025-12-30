@@ -1,5 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.QuestionDTO;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
@@ -51,6 +52,24 @@ public class QuestionService {
         else {
             throw new QuestionNotFoundException("no Question in DataBase");
         }
+    }
+
+    public List<QuestionDTO> getAllQuestionWithDTO(){
+        List<Question> questions=questionRepository.findAll();
+        List<QuestionDTO> questionDTOS=new ArrayList<>();
+        for (Question question:questions){
+            QuestionDTO temp=new QuestionDTO(
+                    question.getId(),
+                    question.getSubjectName(),
+                    question.getQuestionMarks(),
+                    question.getMappedCO(),
+                    question.getSubjectCode(),
+                    question.getCognitiveLevel(),
+                    question.getQuestionBody()
+            );
+            questionDTOS.add(temp);
+        }
+        return questionDTOS;
     }
 
     public Page<Question> getAllQuestionsPaged(int pageNo,int size){

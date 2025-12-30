@@ -1,5 +1,6 @@
 package com.FinalYearProject.FinalYearProject.DTO.QuestionDto;
 
+import com.FinalYearProject.FinalYearProject.Domain.Question;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,17 @@ public class QuestionDTO {
 
         private String questionBody;
 
-        public Long getId() {
+    public QuestionDTO(Question question) {
+        this.Id=question.getId();
+        this.cognitiveLevel=question.getCognitiveLevel();
+        this.questionBody=question.getQuestionBody();
+        this.questionMarks=question.getQuestionMarks();
+        this.subjectName=question.getSubjectName();
+        this.mappedCO=question.getMappedCO();
+        this.subjectCode=question.getSubjectCode();
+    }
+
+    public Long getId() {
             return Id;
         }
 

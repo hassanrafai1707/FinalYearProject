@@ -1,177 +1,207 @@
-//package com.FinalYearProject.FinalYearProject.TestService;
-//
-//import com.FinalYearProject.FinalYearProject.Domain.Question;
-//import com.FinalYearProject.FinalYearProject.Domain.User;
-//import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
-//import com.FinalYearProject.FinalYearProject.Service.QuestionService;
-//import com.FinalYearProject.FinalYearProject.Service.UserService;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.*;
-//import java.util.*;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.*;
-//
-//class QuestionServiceTest {
-//
-//    @Mock
-//    private QuestionRepository questionRepository;
-//
-//    @Mock
-//    private UserService userService;
-//
-//    @InjectMocks
-//    private QuestionService questionService;
-//
-//    @BeforeEach
-//    void setup() {
-//        MockitoAnnotations.openMocks(this);
-//    }
-//
-//    // ============= TEST : getQuestionById ==================
+package com.FinalYearProject.FinalYearProject.TestService;
+
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.QuestionDTO;
+import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
+import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
+import com.FinalYearProject.FinalYearProject.Service.QuestionService;
+import com.FinalYearProject.FinalYearProject.Service.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class QuestionServiceTest {
+
+    @Mock
+    private QuestionRepository questionRepository;
+
+    @Mock
+    private UserService userService;
+
+    @InjectMocks
+    private QuestionService questionService;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    // ================= getQuestionById =================
+    @Test
+    void testGetQuestionByIdSuccess() {
+        Question q = new Question();
+        q.setId(1L);
+
+        when(questionRepository.findById(1L)).thenReturn(Optional.of(q));
+
+        Question result = questionService.getQuestionById(1L);
+
+        assertEquals(1L, result.getId());
+    }
+
+    @Test
+    void testGetQuestionByIdNotFound() {
+        when(questionRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(QuestionNotFoundException.class,
+                () -> questionService.getQuestionById(1L));
+    }
+
+    // ================= findBySubjectName =================
+    @Test
+    void testFindBySubjectNameSuccess() {
+        when(questionRepository.findBySubjectName("JAVA"))
+                .thenReturn(List.of(new Question()));
+
+        assertEquals(1, questionService.findBySubjectName("JAVA").size());
+    }
+
+    @Test
+    void testFindBySubjectNameNotFound() {
+        when(questionRepository.findBySubjectName("JAVA"))
+                .thenReturn(Collections.emptyList());
+
+        assertThrows(QuestionNotFoundException.class,
+                () -> questionService.findBySubjectName("JAVA"));
+    }
+
+    // ================= findBySubjectCode =================
+    @Test
+    void testFindBySubjectCodeSuccess() {
+        when(questionRepository.findBySubjectCode("3140706"))
+                .thenReturn(List.of(new Question()));
+
+        assertEquals(1, questionService.findBySubjectCode("3140706").size());
+    }
+
+    // ================= findByCreatedByUsingEmail =================
+    @Test
+    void testFindByCreatedByUsingEmailSuccess() {
+        User teacher = new User();
+        teacher.setRole("ROLE_TEACHER");
+
+        when(userService.findByEmail("abc@test.com")).thenReturn(teacher);
+        when(questionRepository.findByCreatedBy(teacher))
+                .thenReturn(List.of(new Question()));
+
+        assertEquals(1,
+                questionService.findByCreatedByUsingEmail("abc@test.com").size());
+    }
+
+    @Test
+    void testFindByCreatedByUsingEmailNoQuestions() {
+        User teacher = new User();
+        teacher.setRole("ROLE_TEACHER");
+
+        when(userService.findByEmail("abc@test.com")).thenReturn(teacher);
+        when(questionRepository.findByCreatedBy(teacher))
+                .thenReturn(Collections.emptyList());
+
+        assertThrows(QuestionNotFoundException.class,
+                () -> questionService.findByCreatedByUsingEmail("abc@test.com"));
+    }
+
+    // ================= addQuestion =================
 //    @Test
-//    void testGetQuestionByIdSuccess() {
+//    void testAddQuestionSuccess() {
+//        // mock security context
+//        Authentication auth = mock(Authentication.class);
+//        SecurityContext context = mock(SecurityContext.class);
+//
+//        when(auth.getName()).thenReturn("teacher@test.com");
+//        when(context.getAuthentication()).thenReturn(auth);
+//        SecurityContextHolder.setContext(context);
+//
+//        User teacher = new User();
+//        teacher.setRole("ROLE_TEACHER");
+//
+//        when(userService.findByEmail("teacher@test.com")).thenReturn(teacher);
+//        when(questionRepository.existsByQuestionTitle(anyString()))
+//                .thenReturn(false);
+//        when(questionRepository.save(any()))
+//                .thenAnswer(i -> i.getArgument(0));
+//
 //        Question q = new Question();
-//        q.setId(1L);
-//
-//        when(questionRepository.findById(1L)).thenReturn(Optional.of(q));
-//
-//        Question result = questionService.getQuestionById(1L);
-//
-//        assertEquals(1L, result.getId());
-//        verify(questionRepository, times(1)).findById(1L);
-//    }
-//
-//    @Test
-//    void testGetQuestionByIdNotFound() {
-//        when(questionRepository.findById(1L)).thenReturn(Optional.empty());
-//        assertThrows(RuntimeException.class, () -> questionService.getQuestionById(1L));
-//    }
-//
-//    // ============= TEST : getFindBySubjectNameMappedCOMappedCO ==================
-//    @Test
-//    void testFindByMappedCOSuccess() {
-//        List<Question> list = List.of(new Question());
-//        when(questionRepository.getFindBySubjectNameMappedCOMappedCO("CO1")).thenReturn(list);
-//
-//        assertEquals(1, questionService.getFindBySubjectNameMappedCOMappedCO("CO1").size());
-//    }
-//
-//    // ============= TEST : findBySubjectName ==================
-//    @Test
-//    void testFindBySubjectNameSuccess() {
-//        List<Question> list = List.of(new Question());
-//        when(questionRepository.findBySubjectName("JAVA")).thenReturn(list);
-//
-//        assertEquals(1, questionService.findBySubjectName("JAVA").size());
-//    }
-//
-//    // ============= TEST : findBySubjectCode ==================
-//    @Test
-//    void testFindBySubjectCodeSuccess() {
-//        List<Question> list = List.of(new Question());
-//        when(questionRepository.findBySubjectCode("3140706")).thenReturn(list);
-//
-//        assertEquals(1, questionService.findBySubjectCode("3140706").size());
-//    }
-//
-//    // ============= TEST : findBySubjectCodeMappedCOCognitiveLevel ==================
-//    @Test
-//    void testFindByCognitiveLevelSuccess() {
-//        List<Question> list = List.of(new Question());
-//        when(questionRepository.findBySubjectCodeMappedCOCognitiveLevel("L")).thenReturn(list);
-//
-//        assertEquals(1, questionService.findBySubjectCodeMappedCOCognitiveLevel("L").size());
-//    }
-//
-//    // ============= TEST : findByCreatedByUsingEmail ==================
-//    @Test
-//    void testFindByCreatedBySuccess() {
-//        User user = new User();
-//        user.setEmail("abc@test.com");
-//
-//        List<Question> list = List.of(new Question());
-//
-//        when(userService.existsByEmail("abc@test.com")).thenReturn(true);
-//        when(questionRepository.findByCreatedBy(user)).thenReturn(list);
-//
-//        assertEquals(1, questionService.findByCreatedByUsingEmail(user).size());
-//    }
-//
-//    @Test
-//    void testFindByCreatedByUserDoesNotExist() {
-//        User user = new User();
-//        user.setEmail("no@test.com");
-//
-//        when(userService.existsByEmail(anyString())).thenReturn(false);
-//
-//        assertThrows(RuntimeException.class,
-//                () -> questionService.findByCreatedByUsingEmail(user));
-//    }
-//
-//    // ============= TEST : addQuestion ==================
-//    @Test
-//    void testAddQuestion() {
-//        Question q = new Question();
-//        q.setInUse(true);
-//
-//        when(questionRepository.save(any())).thenAnswer(i -> i.getArguments()[0]);
+//        q.setQuestionBody("What is JVM?");
+//        q.setQuestionMarks(2);
 //
 //        Question result = questionService.addQuestion(q);
 //
-//        assertFalse(result.getInUse()); // must be false
+//        assertFalse(result.getInUse());
 //        verify(questionRepository).save(q);
 //    }
-//
-//    // ============= TEST : deleteQuestionById ==================
-//    @Test
-//    void testDeleteQuestionSuccess() {
-//        when(questionRepository.existsById(1L)).thenReturn(true);
-//
-//        questionService.deleteQuestionById(1L);
-//
-//        verify(questionRepository, times(1)).deleteById(1L);
-//    }
-//
-//    @Test
-//    void testDeleteQuestionNotFound() {
-//        when(questionRepository.existsById(1L)).thenReturn(false);
-//
-//        assertThrows(RuntimeException.class,
-//                () -> questionService.deleteQuestionById(1L));
-//    }
-//
-//    // ============= TEST : generateQuestion ==================
-//    @Test
-//    void testGenerateQuestionSuccess() {
-//        Question q1 = new Question();
-//        q1.setCognitiveLevel("L");
-//        q1.setMappedCO("CO1");
-//        q1.setQuestionMarks(2);
-//        q1.setInUse(false);
-//
-//        when(questionRepository.findAll()).thenReturn(List.of(q1));
-//
-//        List<Question> result = questionService.generateQuestion(
-//                new String[]{"CO1"},
-//                1, 0, 0,
-//                1, 0,
-//                2);
-//
-//        assertEquals(1, result.size());
-//    }
-//
-//    @Test
-//    void testGenerateQuestionEmptyResult() {
-//        when(questionRepository.findAll()).thenReturn(Collections.emptyList());
-//
-//        List<Question> result = questionService.generateQuestion(
-//                new String[]{"CO1"},
-//                1, 0, 0,
-//                1, 0,
-//                2);
-//
-//        assertTrue(result.isEmpty());
-//    }
-//}
+
+    // ================= deleteQuestionById =================
+    @Test
+    void testDeleteQuestionSuccess() {
+        when(questionRepository.existsById(1L)).thenReturn(true);
+
+        questionService.deleteQuestionById(1L);
+
+        verify(questionRepository).deleteById(1L);
+    }
+
+    @Test
+    void testDeleteQuestionNotFound() {
+        when(questionRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(QuestionNotFoundException.class,
+                () -> questionService.deleteQuestionById(1L));
+    }
+
+    // ================= generateBySubjectCodeQuestion =================
+    @Test
+    void testGenerateBySubjectCodeQuestionSuccess() {
+        Question q = new Question();
+        q.setCognitiveLevel("A");
+        q.setMappedCO("CO1");
+        q.setQuestionMarks(2);
+        q.setInUse(false);
+
+        when(questionRepository.findValidQuestionsWithSubjectCode(
+                eq("3140706"), any()))
+                .thenReturn(List.of(q));
+
+        List<Question> result =
+                questionService.generateBySubjectCodeQuestion(
+                        "3140706",
+                        new String[]{"CO1"},
+                        1, 0, 0,
+                        1, 0
+                );
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testGenerateBySubjectCodeQuestionEmpty() {
+        when(questionRepository.findValidQuestionsWithSubjectCode(
+                anyString(), any()))
+                .thenReturn(Collections.emptyList());
+
+        assertThrows(QuestionNotFoundException.class,
+                () -> questionService.generateBySubjectCodeQuestion(
+                        "3140706",
+                        new String[]{"CO1"},
+                        1, 0, 0,
+                        1, 0
+                ));
+    }
+
+    @Test
+    void testGetAllQuestionWithDTO(){
+        Question q = new Question();
+        q.setId(1L);
+
+        when(questionRepository.findAll()).thenReturn(List.of(q));
+        List<QuestionDTO> result=questionService.getAllQuestionWithDTO();
+        assertEquals(1,result.size());
+    }
+}
