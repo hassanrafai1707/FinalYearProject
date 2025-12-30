@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Question Paper System</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+
+<body>
+<div class="login-container">
+    <h1 class="login-title">Register - Question Paper System</h1>
+
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required />
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password:</label>
+            <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    required
+            />
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="">Select Role</option>
+                <option value="ROLE_ADMIN">Admin</option>
+                <option value="ROLE_TEACHER'">Teacher</option>
+                <option value="ROLE_STUDENT">Student</option>
+                <option value="ROLE_SUPERVISOR">Supervisor</option>
+            </select>
+        </div>
+
+        <button type="submit" id="registerBtn">Register</button>
+    </form>
+
+    <p style="text-align:center; margin-top: 10px;">
+        Already have an account? <a href="/login">Login</a>
+    </p>
+
+    <div id="message"></div>
+</div>
+
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/auth.js}"></script>
+<script>
+    document
+      .getElementById("registerForm")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const registerBtn = document.getElementById("registerBtn");
+        const messageDiv = document.getElementById("message");
+
+        registerBtn.disabled = true;
+        registerBtn.textContent = "Registering...";
+        messageDiv.innerHTML = "";
+
+        const formData = new FormData(e.target);
+        const password = formData.get("password");
+        const confirmPassword = formData.get("confirmPassword");
+
+        if (password !== confirmPassword) {
+          messageDiv.innerHTML =
+            '<div class="error">Passwords do not match</div>';
+          registerBtn.disabled = false;
+          registerBtn.textContent = "Register";
+          return;
+        }
+
+        const registerData = {
+          name: formData.get("name"),
+          email: formData.get("email"),
+          password: password,
+          role: formData.get("role"),
+        };
+
+        try {
+          const response = await AuthAPI.register(
+            registerData.name,
+            registerData.email,
+            registerData.password,
+            registerData.role
+          );
+
+          messageDiv.innerHTML =
+            '<div class="success">Registration successful! Please check your email to confirm your account.</div>';
+          e.target.reset();
+
+          // Optional: redirect to login after 3s
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
+        } catch (error) {
+          messageDiv.innerHTML = `<div class="error">${error.message}</div>`;
+        } finally {
+          registerBtn.disabled = false;
+          registerBtn.textContent = "Register";
+        }
+      });
+</script>
+</body>
+</html>

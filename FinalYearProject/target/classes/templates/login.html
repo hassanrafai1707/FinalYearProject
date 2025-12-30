@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Question Paper System</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}" />
+</head>
+
+<body>
+<div class="login-container">
+  <h1 class="login-title">Question Paper System</h1>
+
+  <form id="loginForm">
+    <div class="form-group">
+      <label>Email:</label>
+      <input type="email" name="email" required />
+    </div>
+
+    <div class="form-group">
+      <label>Password:</label>
+      <input type="password" name="password" required />
+    </div>
+
+    <button type="submit" id="loginBtn">Login</button>
+  </form>
+
+  <div id="message"></div>
+</div>
+
+<script src="/js/api.js"></script>
+<!--<script src="/js/auth.js"></script>-->
+
+<script>
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const btn = document.getElementById("loginBtn");
+    const msg = document.getElementById("message");
+
+    btn.disabled = true;
+    btn.textContent = "Logging in...";
+    msg.innerHTML = "";
+
+    const formData = new FormData(e.target);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      const response = await AuthAPI.login(email, password);
+
+      // Save JWT
+      AuthAPI.setToken(response.token);
+
+      // Extract role from JWT
+      const role = AuthAPI.getRole();
+
+      // Redirect by role
+      switch (role) {
+        case "ROLE_ADMIN":
+          await AdminAPI.redirectToPage();
+          break;
+        case "ROLE_TEACHER":
+          await TeacherAPI.redirectToPage();
+          break;
+        case "ROLE_STUDENT":
+          await StudentAPI.redirectToPage();
+          break;
+        case "ROLE_SUPERVISOR":
+          await SupervisorAPI.redirectToPage();
+          break;
+        default:
+          window.location.href = "/";
+      }
+
+    } catch (error) {
+      msg.innerHTML = `<div class="error">${error.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Login";
+    }
+  });
+
+  // Auto-redirect if already logged in
+<!--  if (Auth.isAuthenticated()) {-->
+<!--    const role = Auth.getRole();-->
+<!--    switch (role) {-->
+<!--      case "ROLE_ADMIN":-->
+<!--        window.location.href = "/admin-dashboard";-->
+<!--        break;-->
+<!--      case "ROLE_TEACHER":-->
+<!--        window.location.href = "/teacher-dashboard";-->
+<!--        break;-->
+<!--      case "ROLE_STUDENT":-->
+<!--        window.location.href = "/student-dashboard";-->
+<!--        break;-->
+<!--      case "ROLE_SUPERVISOR":-->
+<!--        window.location.href = "/supervisor-dashboard";-->
+<!--        break;-->
+<!--    }-->
+<!--  }-->
+</script>
+
+</body>
+</html>

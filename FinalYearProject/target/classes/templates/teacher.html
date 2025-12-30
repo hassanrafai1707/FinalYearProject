@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"><head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style1.css}">
+</head>
+<body>
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+    <i class="fas fa-moon"></i>
+</button>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>Teacher Panel</h2>
+            <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+        <ul>
+            <div class="menu-category">Question Management</div>
+            <li>
+                <a href="#" onclick="showSection('addQuestion')" class="active">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Question</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('myQuestions')">
+                    <i class="fas fa-list"></i>
+                    <span>My Questions</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('allQuestions')">
+                    <i class="fas fa-database"></i>
+                    <span>All Questions</span>
+                </a>
+            </li>
+
+            <div class="menu-category">Search & Filter</div>
+            <li>
+                <a href="#" onclick="showSection('byId')">
+                    <i class="fas fa-search"></i>
+                    <span>Question By ID</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('bySubjectCode')">
+                    <i class="fas fa-code"></i>
+                    <span>By Subject Code</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('bySubjectName')">
+                    <i class="fas fa-book"></i>
+                    <span>By Subject Name</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('withFilters')">
+                    <i class="fas fa-filter"></i>
+                    <span>Advanced Filters</span>
+                </a>
+            </li>
+
+            <div class="menu-category">Paper Generation</div>
+            <li>
+                <a href="#" onclick="showSection('generateByCode')">
+                    <i class="fas fa-cogs"></i>
+                    <span>Generate By Code</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('generateByName')">
+                    <i class="fas fa-cogs"></i>
+                    <span>Generate By Name</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('approvePaper')">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Approve Paper</span>
+                </a>
+            </li>
+
+            <div class="menu-category">Account Management</div>
+            <li>
+                <a href="#" onclick="showSection('updateEmail')">
+                    <i class="fas fa-envelope"></i>
+                    <span>Update Email</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('updatePassword')">
+                    <i class="fas fa-lock"></i>
+                    <span>Update Password</span>
+                </a>
+            </li>
+
+            <div class="menu-category">Danger Zone</div>
+            <li>
+                <a href="#" onclick="showSection('deleteById')">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete By ID</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('deleteByBody')">
+                    <i class="fas fa-trash-alt"></i>
+                    <span>Delete By Body</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#" onclick="logout()" style="color: #e74c3c">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <h1 id="pageTitle">Add Question</h1>
+
+        <!-- Add Question Section -->
+        <div id="addQuestion" class="section active">
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Add New Question</h2>
+                <form id="addQuestionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Subject Code *</label>
+                            <input
+                                    type="text"
+                                    id="subjectCode"
+                                    placeholder="e.g., CS101"
+                                    required
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label>Subject Name *</label>
+                            <input
+                                    type="text"
+                                    id="subjectName"
+                                    placeholder="e.g., Database Systems"
+                                    required
+                            />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Question Body *</label>
+                        <textarea
+                                id="questionBody"
+                                rows="3"
+                                placeholder="Enter your question here..."
+                                required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Mapped Course Outcome (CO) *</label>
+                            <input
+                                    type="text"
+                                    id="mappedCO"
+                                    placeholder="e.g., CO1, CO2, CO3"
+                                    required
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label>Marks *</label>
+                            <div class="marks-options">
+                                <div class="mark-option">
+                                    <input
+                                            type="radio"
+                                            id="marks2"
+                                            name="marks"
+                                            value="2"
+                                            required
+                                    />
+                                    <label for="marks2">2 Marks</label>
+                                </div>
+                                <div class="mark-option">
+                                    <input
+                                            type="radio"
+                                            id="marks4"
+                                            name="marks"
+                                            value="4"
+                                            checked
+                                    />
+                                    <label for="marks4">4 Marks</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cognitive Level *</label>
+                        <select id="cognitiveLevel" required>
+                            <option value="">Select Level</option>
+                            <option value="REMEMBER">Remember</option>
+                            <option value="UNDERSTAND">Understand</option>
+                            <option value="APPLY">Apply</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="success">
+                        <i class="fas fa-save"></i> Add Question
+                    </button>
+                </form>
+                <div id="addQuestionResult"></div>
+            </div>
+        </div>
+
+        <!-- My Questions Section -->
+        <div id="myQuestions" class="section">
+            <div class="card">
+                <h2><i class="fas fa-list"></i> My Questions</h2>
+                <div class="search-bar">
+                    <input
+                            type="text"
+                            placeholder="Search my questions..."
+                            id="searchMyQuestions"
+                    />
+                    <button onclick="searchMyQuestions()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div id="myQuestionsContainer">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Question</th>
+                            <th>Subject Name</th>
+                            <th>Subject Code</th>
+                            <th>CO</th>
+                            <th>Marks</th>
+                            <th>Cognitive Level</th>
+                        </tr>
+                        </thead>
+                        <tbody id="myQuestionsTable">
+                        <tr>
+                            <td colspan="7" style="text-align: center">
+                                No questions yet. Add your first question!
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="myQuestionsPagination"></div>
+            </div>
+        </div>
+
+        <!-- All Questions Section -->
+        <div id="allQuestions" class="section">
+            <div class="card">
+                <h2><i class="fas fa-database"></i> All Questions</h2>
+                <div class="search-bar">
+                    <input
+                            type="text"
+                            placeholder="Search all questions..."
+                            id="searchAllQuestions"
+                    />
+                    <button onclick="loadAllQuestions()">
+                        <i class="fas fa-search"></i> Load All
+                    </button>
+                </div>
+                <div id="allQuestionsContainer">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Question</th>
+                            <th>Subject Name</th>
+                            <th>Subject Code</th>
+                            <th>CO</th>
+                            <th>Marks</th>
+                            <th>Cognitive Level</th>
+                        </tr>
+                        </thead>
+                        <tbody id="allQuestionsTable">
+                        <tr>
+                            <td colspan="7" style="text-align: center">
+                                Click "Load All" to see questions
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="allQuestionsPagination"></div>
+            </div>
+        </div>
+
+        <!-- Question By ID -->
+        <div id="byId" class="section">
+            <div class="card">
+                <h2><i class="fas fa-search"></i> Find Question By ID</h2>
+                <div class="form-group">
+                    <label>Question ID</label>
+                    <input
+                            type="text"
+                            id="questionIdSearch"
+                            placeholder="Enter question ID"
+                    />
+                </div>
+                <button onclick="searchById()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <div id="questionByIdResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- By Subject Code -->
+        <div id="bySubjectCode" class="section">
+            <div class="card">
+                <h2><i class="fas fa-code"></i> Find By Subject Code</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Code *</label>
+                        <input
+                                type="text"
+                                id="searchSubjectCode"
+                                placeholder="e.g., CS101"
+                                required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Mapped CO (Optional)</label>
+                        <input
+                                type="text"
+                                id="searchSubjectCodeCO"
+                                placeholder="e.g., CO1"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cognitive Level (Optional)</label>
+                    <select id="searchSubjectCodeLevel">
+                        <option value="">Any Level</option>
+                        <option value="REMEMBER">Remember</option>
+                        <option value="UNDERSTAND">Understand</option>
+                        <option value="APPLY">Apply</option>
+                    </select>
+                </div>
+                <button onclick="searchBySubjectCode()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <div id="subjectCodeResults" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- By Subject Name -->
+        <div id="bySubjectName" class="section">
+            <div class="card">
+                <h2><i class="fas fa-book"></i> Find By Subject Name</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Name *</label>
+                        <input
+                                type="text"
+                                id="searchSubjectName"
+                                placeholder="e.g., Database Systems"
+                                required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Mapped CO (Optional)</label>
+                        <input
+                                type="text"
+                                id="searchSubjectNameCO"
+                                placeholder="e.g., CO1"
+                        />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cognitive Level (Optional)</label>
+                    <select id="searchSubjectNameLevel">
+                        <option value="">Any Level</option>
+                        <option value="REMEMBER">Remember</option>
+                        <option value="UNDERSTAND">Understand</option>
+                        <option value="APPLY">Apply</option>
+                    </select>
+                </div>
+                <button onclick="searchBySubjectName()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <div id="subjectNameResults" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Advanced Filters -->
+        <div id="withFilters" class="section">
+            <div class="card">
+                <h2><i class="fas fa-filter"></i> Advanced Search with Filters</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Code (Optional)</label>
+                        <input
+                                type="text"
+                                id="advSubjectCode"
+                                placeholder="e.g., CS101"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Subject Name (Optional)</label>
+                        <input
+                                type="text"
+                                id="advSubjectName"
+                                placeholder="e.g., Database Systems"
+                        />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mapped CO (Optional)</label>
+                        <input type="text" id="advCO" placeholder="e.g., CO1" />
+                    </div>
+                    <div class="form-group">
+                        <label>Marks</label>
+                        <select id="advMarks">
+                            <option value="">Any Marks</option>
+                            <option value="2">2 Marks</option>
+                            <option value="4">4 Marks</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Cognitive Levels (Select multiple)</label>
+                    <div class="cognitive-levels">
+                        <div
+                                class="cognitive-level"
+                                onclick="toggleCognitiveLevel(this)"
+                                data-value="REMEMBER"
+                        >
+                            Remember
+                        </div>
+                        <div
+                                class="cognitive-level"
+                                onclick="toggleCognitiveLevel(this)"
+                                data-value="UNDERSTAND"
+                        >
+                            Understand
+                        </div>
+                        <div
+                                class="cognitive-level"
+                                onclick="toggleCognitiveLevel(this)"
+                                data-value="APPLY"
+                        >
+                            Apply
+                        </div>
+                    </div>
+                </div>
+                <button onclick="advancedSearch()">
+                    <i class="fas fa-search"></i> Advanced Search
+                </button>
+                <div id="advancedResults" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Generate By Code -->
+        <div id="generateByCode" class="section">
+            <div class="card">
+                <h2><i class="fas fa-cogs"></i> Generate Paper By Subject Code</h2>
+                <div class="form-group">
+                    <label>Subject Code *</label>
+                    <input
+                            type="text"
+                            id="genSubjectCode"
+                            placeholder="e.g., CS101"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>Total Marks *</label>
+                    <input
+                            type="number"
+                            id="genTotalMarks"
+                            min="10"
+                            max="200"
+                            value="100"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>Difficulty Distribution *</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Easy (%)</label>
+                            <input
+                                    type="number"
+                                    id="genEasy"
+                                    min="0"
+                                    max="100"
+                                    value="30"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label>Medium (%)</label>
+                            <input
+                                    type="number"
+                                    id="genMedium"
+                                    min="0"
+                                    max="100"
+                                    value="50"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label>Hard (%)</label>
+                            <input
+                                    type="number"
+                                    id="genHard"
+                                    min="0"
+                                    max="100"
+                                    value="20"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <button onclick="generateByCode()" class="success">
+                    <i class="fas fa-cogs"></i> Generate Paper
+                </button>
+                <div id="generatedPaper" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Generate By Name -->
+        <div id="generateByName" class="section">
+            <div class="card">
+                <h2><i class="fas fa-cogs"></i> Generate Paper By Subject Name</h2>
+                <div class="form-group">
+                    <label>Subject Name *</label>
+                    <input
+                            type="text"
+                            id="genSubjectName"
+                            placeholder="e.g., Database Systems"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>Total Marks *</label>
+                    <input
+                            type="number"
+                            id="genByNameTotalMarks"
+                            min="10"
+                            max="200"
+                            value="100"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>Difficulty Distribution *</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Easy (%)</label>
+                            <input
+                                    type="number"
+                                    id="genByNameEasy"
+                                    min="0"
+                                    max="100"
+                                    value="30"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label>Medium (%)</label>
+                            <input
+                                    type="number"
+                                    id="genByNameMedium"
+                                    min="0"
+                                    max="100"
+                                    value="50"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label>Hard (%)</label>
+                            <input
+                                    type="number"
+                                    id="genByNameHard"
+                                    min="0"
+                                    max="100"
+                                    value="20"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <button onclick="generateByName()" class="success">
+                    <i class="fas fa-cogs"></i> Generate Paper
+                </button>
+                <div id="generatedPaperByName" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Approve Paper -->
+        <div id="approvePaper" class="section">
+            <div class="card">
+                <h2><i class="fas fa-check-circle"></i> Approve Generated Paper</h2>
+                <div class="form-group">
+                    <label>Exam Title *</label>
+                    <input
+                            type="text"
+                            id="examTitle"
+                            placeholder="e.g., Midterm Exam 2024"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>Question Paper ID *</label>
+                    <input
+                            type="text"
+                            id="questionPaperId"
+                            placeholder="Enter paper ID"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>Comments</label>
+                    <textarea
+                            id="approveComments"
+                            rows="3"
+                            placeholder="Any comments or notes..."
+                    ></textarea>
+                </div>
+                <button onclick="approvePaper()" class="success">
+                    <i class="fas fa-check"></i> Submit for Approval
+                </button>
+                <div id="approvePaperResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Update Email -->
+        <div id="updateEmail" class="section">
+            <div class="card">
+                <h2><i class="fas fa-envelope"></i> Update Email Address</h2>
+                <div class="form-group">
+                    <label>New Email Address *</label>
+                    <input
+                            type="email"
+                            id="newEmail"
+                            placeholder="newteacher@example.com"
+                            required
+                    />
+                </div>
+                <button onclick="updateEmail()">
+                    <i class="fas fa-save"></i> Update Email
+                </button>
+                <div id="updateEmailResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Update Password -->
+        <div id="updatePassword" class="section">
+            <div class="card">
+                <h2><i class="fas fa-lock"></i> Update Password</h2>
+                <div class="form-group">
+                    <label>Current Password *</label>
+                    <input
+                            type="password"
+                            id="currentPassword"
+                            placeholder="Enter current password"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>New Password *</label>
+                    <input
+                            type="password"
+                            id="newPassword"
+                            placeholder="Enter new password"
+                            required
+                    />
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password *</label>
+                    <input
+                            type="password"
+                            id="confirmPassword"
+                            placeholder="Confirm new password"
+                            required
+                    />
+                </div>
+                <button onclick="updatePassword()">
+                    <i class="fas fa-save"></i> Update Password
+                </button>
+                <div id="updatePasswordResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Delete By ID -->
+        <div id="deleteById" class="section">
+            <div class="card">
+                <h2><i class="fas fa-trash"></i> Delete Question By ID</h2>
+                <div class="form-group">
+                    <label>Question ID to Delete *</label>
+                    <input
+                            type="text"
+                            id="deleteId"
+                            placeholder="Enter question ID"
+                            required
+                    />
+                </div>
+                <button class="delete" onclick="deleteById()">
+                    <i class="fas fa-trash"></i> Delete Question
+                </button>
+                <div id="deleteByIdResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Delete By Body -->
+        <div id="deleteByBody" class="section">
+            <div class="card">
+                <h2><i class="fas fa-trash-alt"></i> Delete Question By Body</h2>
+                <div class="form-group">
+                    <label>Question Text to Delete *</label>
+                    <textarea
+                            id="deleteBody"
+                            rows="3"
+                            placeholder="Enter exact question text"
+                            required
+                    ></textarea>
+                </div>
+                <button class="delete" onclick="deleteByBody()">
+                    <i class="fas fa-trash"></i> Delete Question
+                </button>
+                <div id="deleteByBodyResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/common-dashboard.js"></script>
+</body>
+</html>
