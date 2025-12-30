@@ -5,7 +5,6 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
-import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
