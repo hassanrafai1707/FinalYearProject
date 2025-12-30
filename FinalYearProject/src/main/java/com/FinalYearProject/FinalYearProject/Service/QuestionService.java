@@ -5,6 +5,7 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
@@ -114,6 +115,14 @@ public class QuestionService {
     public Question getQuestionById(Long id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
+    }
+
+    public QuestionDTO getQuestionDtoById(Long id){
+        Question temp=questionRepository.findById(id)
+                .orElseThrow(
+                        ()->new QuestionNotFoundException("Question with id:"+id+"not found")
+                );
+        return QuestionDTO.questionToQuestionDTO(temp);
     }
 
     public List<Question> getQuestionByIds(List<Long> Ids){
