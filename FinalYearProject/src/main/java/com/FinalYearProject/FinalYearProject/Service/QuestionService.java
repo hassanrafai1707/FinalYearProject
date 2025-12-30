@@ -46,6 +46,21 @@ public class QuestionService {
     @Autowired
     private UserService userService;
 
+    private List<QuestionDTO> listOfQuestionToQuestionDto(List<Question> questions){
+        if (questions.isEmpty()){
+            throw new IllegalArgumentException("the question passed in this method can not be null");
+        }
+        List<QuestionDTO> temp=new ArrayList<>();
+       for (Question question:questions){
+           temp.add(
+                   QuestionDTO.questionToQuestionDTO(
+                           question
+                   )
+           );
+       }
+       return temp;
+    }
+
     public List<Question> getAllQuestion(){
         List<Question> tempQuestion=questionRepository.findAll();
         if (!(tempQuestion.isEmpty())){
@@ -100,12 +115,8 @@ public class QuestionService {
             throw new QuestionNotFoundException("no more Question in DataBase");
         }
         else {
-            List<QuestionDTO> questionDTOList=questions
-                    .stream()
-                    .map(QuestionDTO::questionToQuestionDTO)
-                    .toList();
             return new PageImpl<>(
-                    questionDTOList,
+                    listOfQuestionToQuestionDto(questions),
                     pageable,
                     temp.getTotalElements()
             );
