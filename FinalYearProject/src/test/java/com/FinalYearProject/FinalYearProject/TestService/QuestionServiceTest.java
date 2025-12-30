@@ -10,6 +10,10 @@ import com.FinalYearProject.FinalYearProject.Service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 
 import java.util.*;
@@ -203,5 +207,67 @@ class QuestionServiceTest {
         when(questionRepository.findAll()).thenReturn(List.of(q));
         List<QuestionDTO> result=questionService.getAllQuestionWithDTO();
         assertEquals(1,result.size());
+    }
+
+    @Test
+    void testGetAllQuestionsDTOPaged() {
+        int pageNo = 1;
+        int size = 100;
+
+        // ---- test data ----
+        Question q = new Question();
+        q.setId(1L);
+
+        Page<Question> page =
+                new PageImpl<>(
+                        List.of(q),
+                        PageRequest.of(pageNo, size),
+                        1
+                );
+
+        // ---- mock repository (IMPORTANT) ----
+        when(questionRepository.findAll(any(Pageable.class)))
+                .thenReturn(page);
+
+        // ---- execute ----
+        Page<QuestionDTO> result =
+                questionService.getAllQuestionsDTOPaged(pageNo, size);
+
+        // ---- assertions ----
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());   // content count
+        assertEquals(size, result.getSize());          // page size
+        assertEquals(pageNo, result.getNumber());      // page number
+    }
+
+    @Test
+    void testGetAllQuestionsDTOPagedImpl(){
+        int pageNo = 1;
+        int size = 100;
+
+        // ---- test data ----
+        Question q = new Question();
+        q.setId(1L);
+
+        Page<Question> page =
+                new PageImpl<>(
+                        List.of(q),
+                        PageRequest.of(pageNo, size),
+                        1
+                );
+
+        // ---- mock repository (IMPORTANT) ----
+        when(questionRepository.findAll(any(Pageable.class)))
+                .thenReturn(page);
+
+        // ---- execute ----
+        Page<QuestionDTO> result =
+                questionService.getAllQuestionsDTOPagedImpl(pageNo, size);
+
+        // ---- assertions ----
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());   // content count
+        assertEquals(size, result.getSize());          // page size
+        assertEquals(pageNo, result.getNumber());      // page number
     }
 }

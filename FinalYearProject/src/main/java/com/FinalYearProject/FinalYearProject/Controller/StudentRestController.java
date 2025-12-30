@@ -75,7 +75,7 @@ public class StudentRestController {
                         "status","successful",
                         "data",questionService.getAllQuestionsPaged(pageNo, size),
                         "time",getTimeNow()
-                        )
+                )
         );
     }
 

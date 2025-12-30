@@ -96,7 +96,7 @@ public class Question {
     @Column(nullable = false)
     private Boolean isInUse;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false,name = "User_Id")
     private User createdBy;
 

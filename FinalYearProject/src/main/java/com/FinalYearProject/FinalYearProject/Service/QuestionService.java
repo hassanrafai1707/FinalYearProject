@@ -13,6 +13,7 @@ import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,19 +56,13 @@ public class QuestionService {
     }
 
     public List<QuestionDTO> getAllQuestionWithDTO(){
-        List<Question> questions=questionRepository.findAll();
         List<QuestionDTO> questionDTOS=new ArrayList<>();
-        for (Question question:questions){
-            QuestionDTO temp=new QuestionDTO(
-                    question.getId(),
-                    question.getSubjectName(),
-                    question.getQuestionMarks(),
-                    question.getMappedCO(),
-                    question.getSubjectCode(),
-                    question.getCognitiveLevel(),
-                    question.getQuestionBody()
-            );
-            questionDTOS.add(temp);
+        for (Question question: questionRepository.findAll()){
+                questionDTOS.add(
+                        QuestionDTO.questionToQuestionDTO(
+                                question
+                        )
+                );
         }
         return questionDTOS;
     }
@@ -80,6 +75,39 @@ public class QuestionService {
         }
         else {
             throw new QuestionNotFoundException("no more Question in DataBase");
+        }
+    }
+
+    public Page<QuestionDTO> getAllQuestionsDTOPaged(int pageNo,int size){
+        Pageable pageable= PageRequest.of(pageNo, size);
+        Page<Question> questions=questionRepository.findAll(pageable);
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("no more Question in DataBase");
+        }
+        else {
+            return questions.map(
+                    QuestionDTO::questionToQuestionDTO
+            );
+        }
+    }
+
+    public PageImpl<QuestionDTO> getAllQuestionsDTOPagedImpl(int pageNo, int size){
+        Pageable pageable=PageRequest.of(pageNo, size);
+        Page<Question> temp=questionRepository.findAll(pageable);
+        List<Question> questions=temp.getContent();
+        if (temp.isEmpty()){
+            throw new QuestionNotFoundException("no more Question in DataBase");
+        }
+        else {
+            List<QuestionDTO> questionDTOList=questions
+                    .stream()
+                    .map(QuestionDTO::questionToQuestionDTO)
+                    .toList();
+            return new PageImpl<>(
+                    questionDTOList,
+                    pageable,
+                    temp.getTotalElements()
+            );
         }
     }
 
