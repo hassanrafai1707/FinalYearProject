@@ -18,7 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.ls.LSInput;
 
 
 import java.util.*;
@@ -357,6 +356,28 @@ public class QuestionService {
         else {
             throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+" and Mapped "+mappedCO);
         }
+    }
+
+    public PageImpl<QuestionDTO> findBySubjectNameMappedCODtoPaged(
+            String subjectName,
+            String mappedCO,
+            int pageNo,
+            int size
+    ){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> question =questionRepository.findBySubjectNameAndMappedCO(
+                subjectName,
+                mappedCO,
+                pageable
+        );
+        if (question.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+" and Mapped "+mappedCO);
+        }
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(question.getContent()),
+                pageable,
+                question.getTotalElements()
+        );
     }
 
     public List<Question> findBySubjectNameMappedCOCognitiveLevel(String subjectName,String mappedCO,String cognitiveLevel){
