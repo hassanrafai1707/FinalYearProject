@@ -108,13 +108,12 @@ public class QuestionService {
     public PageImpl<QuestionDTO> getAllQuestionsDTOPagedImpl(int pageNo, int size){
         Pageable pageable=PageRequest.of(pageNo, size);
         Page<Question> temp=questionRepository.findAll(pageable);
-        List<Question> questions=temp.getContent();//todo put temp.getcontendt in new pageimpl
         if (temp.isEmpty()){
             throw new QuestionNotFoundException("no more Question in DataBase");
         }
         else {
             return new PageImpl<>(
-                    listOfQuestionToQuestionDto(questions),
+                    listOfQuestionToQuestionDto(temp.getContent()),
                     pageable,
                     temp.getTotalElements()
             );
