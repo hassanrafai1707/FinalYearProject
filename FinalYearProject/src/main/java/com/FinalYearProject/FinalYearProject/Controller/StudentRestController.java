@@ -1,11 +1,9 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
-import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
