@@ -196,6 +196,19 @@ public class QuestionService {
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
     }
 
+    public List<QuestionDTO> findBySubjectCodeMappedCODto(String subjectCode,String mappedCO){
+        List<QuestionDTO> questionDTOList=listOfQuestionToQuestionDto(
+                questionRepository.findBySubjectCodeAndMappedCO(
+                        subjectCode,
+                        mappedCO
+                )
+        );
+        if (questionDTOList.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
+        }
+        return questionDTOList;
+    }
+
     public Page<Question> findBySubjectCodeMappedCO(String subjectCode,String mappedCO, int pageNo, int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCO(subjectCode,mappedCO,pageable);
