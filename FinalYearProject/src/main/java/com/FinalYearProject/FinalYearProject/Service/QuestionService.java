@@ -108,7 +108,7 @@ public class QuestionService {
     public PageImpl<QuestionDTO> getAllQuestionsDTOPagedImpl(int pageNo, int size){
         Pageable pageable=PageRequest.of(pageNo, size);
         Page<Question> temp=questionRepository.findAll(pageable);
-        List<Question> questions=temp.getContent();
+        List<Question> questions=temp.getContent();//todo put temp.getcontendt in new pageimpl
         if (temp.isEmpty()){
             throw new QuestionNotFoundException("no more Question in DataBase");
         }
@@ -173,6 +173,20 @@ public class QuestionService {
             return temp;
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
+    }
+
+    public PageImpl<QuestionDTO> findBySubjectCodeDtoPaged(
+            String subjectCode,
+            int pageNo,
+            int size
+    ){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> questions=questionRepository.findBySubjectCode(subjectCode,pageable);
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(questions.getContent()),
+                pageable,
+                questions.getTotalElements()
+        );
     }
 
     public List<Question> findBySubjectCodeMappedCO(String subjectCode , String mappedCO){
