@@ -106,7 +106,6 @@ public class StudentRestController {
             @RequestParam(value = "size" , defaultValue = "100") int size,
             @RequestBody Map<String,String> request
     ){
-        String subjectCode =request.get("subjectCode");
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
@@ -122,12 +121,14 @@ public class StudentRestController {
 
     @GetMapping("/findBySubjectCode-MappedCO")
     public ResponseEntity<?> findBySubjectCodeMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
-        List<Question> question=questionService.findBySubjectCodeMappedCO(dto.getSubjectCode(), dto.getMappedCO());
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "data",question,
+                                "data",questionService.findBySubjectCodeMappedCODto(
+                                        dto.getSubjectCode(),
+                                        dto.getMappedCO()
+                                ),
                                 "time",getTimeNow()
                         )
                 );
