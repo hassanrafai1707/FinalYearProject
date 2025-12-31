@@ -214,7 +214,7 @@ public class StudentRestController {
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "data", questionService.findBySubjectNameMappedCO(
+                                "data", questionService.findBySubjectNameMappedCODto(
                                         dto.getSubjectName(),
                                         dto.getMappedCO()
                                 ),
