@@ -50,14 +50,26 @@ public class QuestionService {
             throw new IllegalArgumentException("the question passed in this method can not be null");
         }
         List<QuestionDTO> temp=new ArrayList<>();
-       for (Question question:questions){
-           temp.add(
-                   QuestionDTO.questionToQuestionDTO(
-                           question
-                   )
-           );
-       }
-       return temp;
+        for (Question question:questions){
+            temp.add(
+                    questionToQuestionDto(
+                            question
+                    )
+            );
+        }
+        return temp;
+    }
+
+    private QuestionDTO questionToQuestionDto(Question question){
+        return new QuestionDTO(
+                question.getId(),
+                question.getSubjectName(),
+                question.getQuestionMarks(),
+                question.getMappedCO(),
+                question.getSubjectCode(),
+                question.getCognitiveLevel(),
+                question.getQuestionBody()
+        );
     }
 
     public List<Question> getAllQuestion(){
@@ -73,11 +85,11 @@ public class QuestionService {
     public List<QuestionDTO> getAllQuestionWithDTO(){
         List<QuestionDTO> questionDTOS=new ArrayList<>();
         for (Question question: questionRepository.findAll()){
-                questionDTOS.add(
-                        QuestionDTO.questionToQuestionDTO(
-                                question
-                        )
-                );
+            questionDTOS.add(
+                    questionToQuestionDto(
+                            question
+                    )
+            );
         }
         return questionDTOS;
     }
@@ -90,19 +102,6 @@ public class QuestionService {
         }
         else {
             throw new QuestionNotFoundException("no more Question in DataBase");
-        }
-    }
-
-    public Page<QuestionDTO> getAllQuestionsDTOPaged(int pageNo,int size){
-        Pageable pageable= PageRequest.of(pageNo, size);
-        Page<Question> questions=questionRepository.findAll(pageable);
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("no more Question in DataBase");
-        }
-        else {
-            return questions.map(
-                    QuestionDTO::questionToQuestionDTO
-            );
         }
     }
 
@@ -132,7 +131,7 @@ public class QuestionService {
                 .orElseThrow(
                         ()->new QuestionNotFoundException("Question with id:"+id+"not found")
                 );
-        return QuestionDTO.questionToQuestionDTO(temp);
+        return questionToQuestionDto(temp);
     }
 
     public List<Question> getQuestionByIds(List<Long> Ids){
@@ -157,6 +156,14 @@ public class QuestionService {
             return tempQuestion;
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
+    }
+
+    public List<QuestionDTO> findBySubjectCodeDto(String subjectCode){
+        List<Question> questions=questionRepository.findBySubjectCode(subjectCode);
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("no question with subjectCode:"+subjectCode+"found");
+        }
+        return listOfQuestionToQuestionDto(questions);
     }
 
     public Page<Question> findBySubjectCode(String subjectCode,int pageNo,int size){
@@ -287,7 +294,7 @@ public class QuestionService {
             }
         }
     }
-//todo use this method in supervise
+    //todo use this method in supervise
     public Page<Question> findByCreatedByUsingId(Long Id,int pageNo,int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         User tempUser=userService.findUserById(Id);
@@ -326,7 +333,7 @@ public class QuestionService {
            return findByCreatedByUsingEmail(email,pageNo,size);
         }
     }
-//todo use this metho
+    //todo use this metho
     public Question findQuestionByQuestionBody(String questionBody){
         return questionRepository.
                 findByQuestionTitle(

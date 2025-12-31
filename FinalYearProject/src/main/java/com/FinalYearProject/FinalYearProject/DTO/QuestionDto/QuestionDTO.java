@@ -25,18 +25,6 @@ public class QuestionDTO {
 
         private String questionBody;
 
-    public static QuestionDTO questionToQuestionDTO(Question question){
-        return new QuestionDTO(
-                question.getId(),
-                question.getSubjectName(),
-                question.getQuestionMarks(),
-                question.getMappedCO(),
-                question.getSubjectCode(),
-                question.getCognitiveLevel(),
-                question.getQuestionBody()
-        );
-    }
-
     public Long getId() {
             return Id;
         }

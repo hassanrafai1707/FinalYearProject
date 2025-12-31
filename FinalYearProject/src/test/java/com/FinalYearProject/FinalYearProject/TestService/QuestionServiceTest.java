@@ -281,8 +281,8 @@ class QuestionServiceTest {
                 .thenReturn(createQuestionPage(pageNo, size));
 
         // When: Call paged service
-        Page<QuestionDTO> result =
-                questionService.getAllQuestionsDTOPaged(pageNo, size);
+        Page<Question> result =
+                questionService.getAllQuestionsPaged(pageNo, size);
 
         // Then: Verify page metadata and content
         assertNotNull(result);
