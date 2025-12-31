@@ -250,6 +250,30 @@ public class QuestionService {
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
     }
 
+    public PageImpl<QuestionDTO> findBySubjectCodeMappedCOCognitiveLevelDto(
+            String subjectCode,
+            String mappedCO,
+            String cognitiveLevel,
+            int pageNo,
+            int size
+            ){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> temp=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(
+                subjectCode,
+                mappedCO,
+                cognitiveLevel,
+                pageable
+        );
+        if (temp.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
+        }
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(temp.getContent()),
+                pageable,
+                temp.getTotalElements()
+        );
+    }
+
     public List<Question> findBySubjectName(String subjectName){
         List<Question> tempQuestion=questionRepository.findBySubjectName(subjectName);
         if (!(tempQuestion.isEmpty())){
