@@ -70,7 +70,7 @@ public class StudentRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data",questionService.getAllQuestionsPaged(pageNo, size),
+                        "data",questionService.getAllQuestionsDTOPagedImpl(pageNo, size),
                         "time",getTimeNow()
                 )
         );
