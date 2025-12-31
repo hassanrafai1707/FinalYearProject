@@ -244,15 +244,21 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
-    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(@RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto){
+    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
+            @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size,
+            @RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto
+    ){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "data", questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                "data", questionService.findBySubjectNameMappedCOCognitiveLevelDtoPaged(
                                         dto.getSubjectName(),
                                         dto.getMappedCO(),
-                                        dto.getCognitiveLevel()
+                                        dto.getCognitiveLevel(),
+                                        pageNo,
+                                        size
                                 ),
                                 "time",getTimeNow()
                         )
