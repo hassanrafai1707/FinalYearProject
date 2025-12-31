@@ -190,21 +190,18 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectNamePaged")
-    public ResponseEntity findBySubjectName(
+    public ResponseEntity<?> findBySubjectName(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestBody Map<String,String> request
     ){
-        String subjectName=request.get("subjectName");
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data",new PagedModel<>(
-                                questionService.findBySubjectName(
-                                        subjectName,
-                                        pageNo,
-                                        size
-                                )
+                        "data",questionService.findBySubjectNameDtoPaged(
+                                request.get("subjectName"),
+                                pageNo,
+                                size
                         ),
                         "time",getTimeNow()
                 )
