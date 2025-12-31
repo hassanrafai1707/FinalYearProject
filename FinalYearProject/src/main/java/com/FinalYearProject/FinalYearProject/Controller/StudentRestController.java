@@ -179,13 +179,11 @@ public class StudentRestController {
 
     @GetMapping("/findBySubjectName")
     public ResponseEntity<?> findBySubjectName(@RequestBody Map<String,String> request){
-        String subjectName = request.get("subjectName");
-        List<Question> questions=questionService.findBySubjectName(subjectName);
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "data",questions,
+                                "data",questionService.findBySubjectNameDto(request.get("subjectName")),
                                 "time",getTimeNow()
                         )
                 );
