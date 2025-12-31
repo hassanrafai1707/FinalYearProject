@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignore the target folder in the current directory
+target/
+
+# Ignore the IDEA settings in the parent directory
+../.idea/
