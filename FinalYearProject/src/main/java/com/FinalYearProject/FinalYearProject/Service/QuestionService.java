@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.ls.LSInput;
 
 
 import java.util.*;
@@ -329,6 +330,22 @@ public class QuestionService {
             return tempQuestion;
         }
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped "+mappedCO);
+    }
+
+    public List<QuestionDTO> findBySubjectNameMappedCODto(
+            String subjectName,
+            String mappedCO
+    ){
+        List<QuestionDTO> questionDTOS=listOfQuestionToQuestionDto(
+                questionRepository.findBySubjectNameAndMappedCO(
+                        subjectName, mappedCO
+                )
+        );
+
+        if (questionDTOS.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped "+mappedCO);
+        }
+        return questionDTOS;
     }
 
     public Page<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO,int pageNo,int size){
