@@ -303,6 +303,26 @@ public class QuestionService {
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
 
+    public PageImpl<QuestionDTO>findBySubjectNameDtoPaged(
+            String subjectName,
+            int pageNo,
+            int size
+    ){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question>questions=questionRepository.findBySubjectName(
+                subjectName,
+                pageable
+        );
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
+        }
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(questions.getContent()),
+                pageable,
+                questions.getTotalElements()
+        );
+    }
+
     public List<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO){
         List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(subjectName,mappedCO);
         if (!(tempQuestion.isEmpty())){
