@@ -220,6 +220,28 @@ public class QuestionService {
         }
     }
 
+    public PageImpl<QuestionDTO>findBySubjectCodeMappedCODtoPage(
+            String subjectCode,
+            String mappedCO,
+            int pageNo,
+            int size
+    ){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> questions=questionRepository.findBySubjectCodeAndMappedCO(
+                subjectCode,
+                mappedCO,
+                pageable
+        );
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
+        }
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(questions.getContent()),
+                pageable,
+                questions.getTotalElements()
+        );
+    }
+
     public List<Question> findBySubjectCodeMappedCOCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel){
         List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
         if (!(tempQuestions.isEmpty())){
