@@ -232,13 +232,11 @@ public class StudentRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data",new PagedModel<>(
-                                questionService.findBySubjectNameMappedCO(
-                                        dto.getSubjectName(),
-                                        dto.getMappedCO(),
-                                        pageNo,
-                                        size
-                                )
+                        "data",questionService.findBySubjectNameMappedCODtoPaged(
+                                dto.getSubjectName(),
+                                dto.getMappedCO(),
+                                pageNo,
+                                size
                         ),
                         "time",getTimeNow()
                 )
