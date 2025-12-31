@@ -83,15 +83,11 @@ public class QuestionService {
     }
 
     public List<QuestionDTO> getAllQuestionWithDTO(){
-        List<QuestionDTO> questionDTOS=new ArrayList<>();
-        for (Question question: questionRepository.findAll()){
-            questionDTOS.add(
-                    questionToQuestionDto(
-                            question
-                    )
-            );
+        List<Question> questions=questionRepository.findAll();
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("no Question in DataBase");
         }
-        return questionDTOS;
+        return listOfQuestionToQuestionDto(questions);
     }
 
     public Page<Question> getAllQuestionsPaged(int pageNo,int size){
