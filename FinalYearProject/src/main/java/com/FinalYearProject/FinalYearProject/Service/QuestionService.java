@@ -403,7 +403,7 @@ public class QuestionService {
                 pageable
         );
         if (questions.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel)
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
         }
         return new PageImpl<>(
                 listOfQuestionToQuestionDto(questions.getContent()),
