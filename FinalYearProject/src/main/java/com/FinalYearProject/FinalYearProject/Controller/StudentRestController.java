@@ -1,9 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCO;
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectCodeAndMappedCOAndCognitiveLevel;
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCO;
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.DtoForSubjectNameAndMappedCOAndCognitiveLevel;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
@@ -54,7 +51,7 @@ public class StudentRestController {
 
     @GetMapping("/getAllQuestion")
     public ResponseEntity<?> getAllQuestion(){
-        List<Question> questionList=questionService.getAllQuestion();
+        List<QuestionDTO> questionList=questionService.getAllQuestionWithDTO();
         return ResponseEntity
                 .ok(
                         Map.of(
