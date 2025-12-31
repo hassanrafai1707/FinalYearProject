@@ -17,8 +17,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -340,5 +341,37 @@ class QuestionServiceTest {
 
         // Optional: Check if the error message contains the ID we asked for
         assertTrue(exception.getMessage().contains(nonExistentId.toString()));
+    }
+
+    @Test
+    void testGetQuestionDtoByIds() {
+        // Given
+        List<Long> ids = Arrays.asList(1L, 2L, 3L);
+
+        // Create actual question entities that the repository will return
+        Question q1 = createQuestion();
+        q1.setId(1L);
+        Question q2 = createQuestion();
+        q2.setId(2L);
+        Question q3 = createQuestion();
+        q3.setId(3L);
+
+        List<Question> questions = Arrays.asList(q1, q2, q3);
+
+        // Mock the repository call
+        when(questionRepository.findAllById(ids)).thenReturn(questions);
+
+        // When
+        List<QuestionDTO> result = questionService.getQuestionDtoByIds(ids);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(1L, result.get(0).getId());
+        assertEquals(2L, result.get(1).getId());
+        assertEquals(3L, result.get(2).getId());
+
+        // Verify repository was called correctly
+        verify(questionRepository).findAllById(ids);
     }
 }

@@ -143,6 +143,14 @@ public class QuestionService {
         return temp;
     }
 
+    public List<QuestionDTO> getQuestionDtoByIds(List<Long> ids){
+        List<Question> questions=questionRepository.findAllById(ids);
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("questions with the given ids not found");
+        }
+        return listOfQuestionToQuestionDto(questions);
+    }
+
     public List<Question> findBySubjectCode(String subjectCode){
         List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
         if (!(tempQuestion.isEmpty())){
