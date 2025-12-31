@@ -36,6 +36,7 @@ import java.util.Map;
  */
 @RequestMapping("${app.version}/student")
 @RestController
+//todo use proper naming standers to name endpoints
 public class StudentRestController {
     private final UserService userService;
     private final QuestionService questionService;
@@ -143,7 +144,7 @@ public class StudentRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data", questionService.findBySubjectNameMappedCODtoPaged(
+                        "data", questionService.findBySubjectCodeMappedCODtoPaged(
                               dto.getSubjectCode(),
                               dto.getMappedCO(),
                               pageNo,
@@ -155,17 +156,22 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
-    private ResponseEntity<?> findByCognitiveLevel(@RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto){
-        List<Question> questions=questionService.findBySubjectCodeMappedCOCognitiveLevel(
-                dto.getSubjectCode(),
-                dto.getMappedCO(),
-                dto.getCognitiveLevel()
-        );
+    private ResponseEntity<?> findByCognitiveLevel(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto
+    ){
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "data",questions,
+                                "data",questionService.findBySubjectCodeMappedCOCognitiveLevelDtoPaged(
+                                        dto.getSubjectCode(),
+                                        dto.getMappedCO(),
+                                        dto.getCognitiveLevel(),
+                                        pageNo,
+                                        size
+                                ),
                                 "time",getTimeNow()
                         )
                 );

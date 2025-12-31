@@ -216,7 +216,7 @@ public class QuestionService {
         }
     }
 
-    public PageImpl<QuestionDTO>findBySubjectCodeMappedCODtoPage(
+    public PageImpl<QuestionDTO>findBySubjectCodeMappedCODtoPaged(
             String subjectCode,
             String mappedCO,
             int pageNo,
@@ -246,7 +246,7 @@ public class QuestionService {
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
     }
 
-    public PageImpl<QuestionDTO> findBySubjectCodeMappedCOCognitiveLevelDto(
+    public PageImpl<QuestionDTO> findBySubjectCodeMappedCOCognitiveLevelDtoPaged(
             String subjectCode,
             String mappedCO,
             String cognitiveLevel,
