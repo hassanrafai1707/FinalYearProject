@@ -102,7 +102,7 @@ public class StudentRestController {
 
     @GetMapping("/findBySubjectCodePagged")
     public ResponseEntity<?> findBySubjectCode(
-            @RequestParam(value = "pageNo" ,defaultValue = "0") int page,
+            @RequestParam(value = "pageNo" ,defaultValue = "0") int pageNo,
             @RequestParam(value = "size" , defaultValue = "100") int size,
             @RequestBody Map<String,String> request
     ){
@@ -110,12 +110,10 @@ public class StudentRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
-                        "data",new PagedModel<>(
-                                questionService.findBySubjectCode(
-                                        subjectCode,
-                                        page,
-                                        size
-                                )
+                        "data",questionService.findBySubjectCodeDtoPaged(
+                                request.get("subjectCode"),
+                                pageNo,
+                                size
                         ),
                         "time",getTimeNow()
                 )
