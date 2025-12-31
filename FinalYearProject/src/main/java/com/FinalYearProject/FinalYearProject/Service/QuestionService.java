@@ -282,6 +282,18 @@ public class QuestionService {
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
 
+    public List<QuestionDTO> findBySubjectNameDto(String subjectName){
+        List<QuestionDTO> questionDTOS=listOfQuestionToQuestionDto(
+                questionRepository.findBySubjectName(
+                        subjectName
+                )
+        );
+        if (questionDTOS.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
+        }
+        return questionDTOS;
+    }
+
     public Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> temp=questionRepository.findBySubjectName(subjectName,pageable);
