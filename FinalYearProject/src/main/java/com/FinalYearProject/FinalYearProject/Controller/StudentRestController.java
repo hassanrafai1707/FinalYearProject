@@ -4,6 +4,8 @@ import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import lombok.SneakyThrows;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,7 +78,11 @@ public class StudentRestController {
     }
 
     @GetMapping("/getQuestionById")
+    @SneakyThrows
     public ResponseEntity<?> getQuestionById (@RequestBody Map<String,Long> request){
+        if (!request.containsKey("id")){
+            throw new BadRequestException("the request must contain 'id'");
+        }
         return ResponseEntity
                 .ok(
                         Map.of(
@@ -88,7 +94,11 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectCode")
-    public ResponseEntity<?> findBySubjectCode(@RequestBody Map<String,String> request){
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectCode(@RequestBody Map<String,String> request) {
+        if (!request.containsKey("subjectCode")){
+            throw new BadRequestException("the request must contain 'subjectCode'");
+        }
         return ResponseEntity
                 .ok(
                         Map.of(
@@ -100,11 +110,15 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectCodePagged")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectCode(
             @RequestParam(value = "pageNo" ,defaultValue = "0") int pageNo,
             @RequestParam(value = "size" , defaultValue = "100") int size,
             @RequestBody Map<String,String> request
     ){
+        if (!request.containsKey("subjectCode")){
+            throw new BadRequestException("the request must contain 'subjectCode'");
+        }
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
@@ -119,7 +133,14 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectCode-MappedCO")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectCodeMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
+        if (
+                dto.getSubjectCode().isEmpty()
+                ||dto.getMappedCO().isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
+        }
         return ResponseEntity
                 .ok(
                         Map.of(
@@ -134,11 +155,18 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectCode-MappedCOPaged")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectCodeMappedCO(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestBody DtoForSubjectCodeAndMappedCO dto
     ){
+        if (
+                dto.getSubjectCode().isEmpty()
+                ||dto.getMappedCO().isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
+        }
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
@@ -154,11 +182,19 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
+    @SneakyThrows
     private ResponseEntity<?> findByCognitiveLevel(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto
     ){
+        if (
+                dto.getSubjectCode().isEmpty()
+                ||dto.getMappedCO().isEmpty()
+                ||dto.getCognitiveLevel().isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO' and 'cognitiveLevel'");
+        }
         return ResponseEntity
                 .ok(
                         Map.of(
@@ -176,7 +212,11 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectName")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectName(@RequestBody Map<String,String> request){
+        if (!request.containsKey("subjectName")){
+            throw new BadRequestException("the request must contain 'subjectName'");
+        }
         return ResponseEntity
                 .ok(
                         Map.of(
@@ -188,11 +228,15 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectNamePaged")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectName(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestBody Map<String,String> request
     ){
+        if (!request.containsKey("subjectName")){
+            throw new BadRequestException("the request must contain 'subjectName'");
+        }
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
@@ -207,7 +251,14 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectName-MappedCO")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
+        if (
+                dto.getSubjectName().isEmpty()
+                ||dto.getMappedCO().isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
+        }
         return ResponseEntity
                 .ok(
                         Map.of(
@@ -222,11 +273,18 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectName-MappedCOPaged")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCO(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
             @RequestBody DtoForSubjectNameAndMappedCO dto
     ){
+        if (
+                dto.getSubjectName().isEmpty()
+                ||dto.getMappedCO().isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
+        }
         return ResponseEntity.ok(
                 Map.of(
                         "status","successful",
@@ -242,11 +300,19 @@ public class StudentRestController {
     }
 
     @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
+    @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
             @RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto
     ){
+        if (
+                dto.getSubjectName().isEmpty()
+                ||dto.getMappedCO().isEmpty()
+                ||dto.getCognitiveLevel().isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO' and 'cognitiveLevel'");
+        }
         return ResponseEntity
                 .ok(
                         Map.of(
