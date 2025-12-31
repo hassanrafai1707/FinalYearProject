@@ -42,6 +42,8 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     Page<Question> findBySubjectCodeAndMappedCO(String subjectCode, String mappedCO,Pageable pageable);
     @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel")
     List<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel")
+    Page<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel,Pageable pageable);
 
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO")
     List<Question> findBySubjectNameAndMappedCO(String subjectName ,String mappedCO);
@@ -49,6 +51,8 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     Page<Question> findBySubjectNameAndMappedCO(String subjectName ,String mappedCO, Pageable pageable);
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel")
     List<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(String subjectName ,String mappedCO ,String cognitiveLevel);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel")
+    List<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(String subjectName ,String mappedCO ,String cognitiveLevel,Pageable pageable);
 
     @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO IN :mappedCOs")
     List<Question> findValidQuestionsWithSubjectCode(String subjectCode,String[] mappedCOs);
