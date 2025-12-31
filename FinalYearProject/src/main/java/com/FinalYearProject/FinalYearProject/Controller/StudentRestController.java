@@ -82,7 +82,7 @@ public class StudentRestController {
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "data",questionService.getQuestionById(request.get("id")),
+                                "data",questionService.getQuestionDtoById(request.get("id")),
                                 "time",getTimeNow()
                         )
                 );
