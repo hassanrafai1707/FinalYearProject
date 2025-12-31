@@ -445,6 +445,28 @@ public class QuestionService {
         }
     }
 
+    public PageImpl<QuestionDTO> findByCreatedByUsingEmailDto(
+            String email,
+            int pageNo,
+            int size
+    ){
+        //todo check if user is ROLE_SUPERVISOR
+        Pageable pageable=PageRequest.of(pageNo,size);
+        User user=userService.findByEmail(email);
+        if (!(user.getRole().equalsIgnoreCase("ROLE_TEACHER"))){
+           throw new UserNotAuthorizesException("user with email: "+email+"is not authorized to make question");
+        }
+        Page<Question> questions=questionRepository.findByCreatedBy(user,pageable);
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("the user with email: "+email+" has not made any questions");
+        }
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(questions.getContent()),
+                pageable,
+                questions.getTotalElements()
+        );
+    }
+
     public List<Question> findByCreatedByUsingId(Long Id){
         User tempUser=userService.findUserById(Id);
         if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
