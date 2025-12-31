@@ -500,6 +500,28 @@ public class QuestionService {
         }
     }
 
+    public PageImpl<QuestionDTO> findByCreatedByUsingIdDto(
+            Long id,
+            int pageNo,
+            int size
+    ){
+        //todo check if user is ROLE_SUPERVISOR
+        User user=userService.findUserById(id);
+        if (!(user.getRole().equalsIgnoreCase("ROLE_TEACHER"))){
+            throw new UserNotAuthorizesException("User with the Id"+id+" has not created any Question");
+        }
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> questions=questionRepository.findByCreatedBy(user,pageable);
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("User with id:"+id+" has not created any question");
+        }
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(questions.getContent()),
+                pageable,
+                questions.getTotalElements()
+        );
+    }
+
     public List<Question> getAllQuestionsByCurrentUser(){
         String email=UserUtil.getUserAuthentication().getUsername();
         String role=UserUtil.getUserAuthentication().getAuthorities().toString();

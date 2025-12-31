@@ -105,7 +105,7 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 jwtService.isTokenExpiredOrThrow(token);
             } catch (Exception e) {
-                UserDetails userDetails = myUserDetailsServices.loadUserByUsername(username);
+                UserDetails userDetails = myUserDetailsServices.loadUserByUsername(username);//todo fix a bottleneck
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Token Expired — Please Login Again");
                 return;
