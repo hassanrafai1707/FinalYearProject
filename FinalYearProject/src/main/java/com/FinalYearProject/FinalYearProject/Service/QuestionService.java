@@ -137,8 +137,8 @@ public class QuestionService {
 
     public List<Question> getQuestionByIds(List<Long> Ids){
         List<Question> temp =questionRepository.findAllById(Ids);
-        for (Question question:temp){
-            System.out.println(question);
+        if (temp.isEmpty()){
+            throw new QuestionNotFoundException("question with the given ids not found");
         }
         return temp;
     }
