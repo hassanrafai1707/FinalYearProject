@@ -7,6 +7,7 @@ import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 /**
@@ -453,7 +455,8 @@ public class UserService {
             Conformation conformation=redisService.get(email,Conformation.class);
             if ( conformation !=null &&
                     otp == conformation.getOtp() &&
-                    userRepository.existsByEmail(conformation.getUser().getEmail())
+                    existsByEmail(conformation.getUser().getEmail())
+                    && token.equals(conformation.getToken())
             ) {
                 userRepository.updateIsEnableLockedExpiredToTrue(conformation.getUser().getEmail());
 
@@ -466,7 +469,7 @@ public class UserService {
             }
         }
         catch (Exception e){
-            System.err.println("Error in verify Token in UserServices "+e.getMessage());
+            log.error("Error in verify Token in UserServices "+e.getMessage());
             throw new RuntimeException(e);
         }
     }
