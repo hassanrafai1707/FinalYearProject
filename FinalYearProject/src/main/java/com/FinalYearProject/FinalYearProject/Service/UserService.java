@@ -2,6 +2,7 @@ package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.Conformation;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Domain.UserPrincipal;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -404,23 +406,18 @@ public class UserService {
         }
     }
     //  VERIFY LOGIN
-    public Map<String,Object> verifyLoginByEmail(String email, String password) {
+    public String verifyLoginByEmail(String email, String password) {
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
 
         if (authentication.isAuthenticated()) {
-            User foundUser = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            if (!foundUser.isIs_enable() || foundUser.isLocked() || foundUser.isExpired() ){
+            UserPrincipal foundUser=(UserPrincipal) authentication.getPrincipal();
+            if (!foundUser.isEnabled() || !foundUser.isAccountNonExpired() || !foundUser.isAccountNonExpired() ){
                 throw new UserLockedException("Login failed due to user is locked");
             }
             else {
-                String token= jwtService.jwtToken(email, foundUser.getRole());
-                return Map.of(
-                        "token", token,
-                        "user", foundUser
-                );
+                return jwtService.jwtToken(email, foundUser.getRole());
             }
         }
 

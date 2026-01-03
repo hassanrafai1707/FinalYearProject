@@ -112,18 +112,4 @@ public class JwtService  {
             throw new RuntimeException("JWT token expired");
         }
     }
-
-    public String extractEmailFromJwtToken(HttpServletRequest request){// may need in further
-        String token;
-        String authHeader =request.getHeader("Authorization");//contain auth heder
-
-        if(authHeader==null || !authHeader.startsWith("Bearer ")){
-            throw new RuntimeException("Invalid Authorization Header");
-        }
-
-        token=authHeader.substring(7);//separate the heder type form heder
-        isTokenExpiredOrThrow(token);
-
-        return extractUserEmail(token);
-    }
 }

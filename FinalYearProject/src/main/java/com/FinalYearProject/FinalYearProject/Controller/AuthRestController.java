@@ -2,6 +2,7 @@ package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.DtoForEmailAnd2PasswordsInRequest;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +33,18 @@ import java.util.Map;
 public class AuthRestController {
     @Autowired
     private final UserService userService;
-
+    @Autowired
+    private final JwtService jwtService;
+//TODO clean from System.out.println in prod
     @PostMapping("/login")
     public ResponseEntity<?> processLoginByEmail(@RequestBody DtoForEmailAnd2PasswordsInRequest dto){
-        Map<String,Object> temp=userService.verifyLoginByEmail(dto.getEmail(), dto.getPassword());
-        User user=(User) temp.get("user");
+        String temp=userService.verifyLoginByEmail(dto.getEmail(), dto.getPassword());
         return ResponseEntity
                 .ok(
                         Map.of(
                                 "status","successful",
-                                "token",temp.get("token"),
-                                "role",user.getRole()
+                                "token",temp,
+                                "role",jwtService.extractUserRole(temp)
                         )
                 );
     }
