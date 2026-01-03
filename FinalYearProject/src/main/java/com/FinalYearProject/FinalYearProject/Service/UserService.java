@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -55,6 +53,7 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder encoder;
 
+    //TODO send user dto and not user
     //  CREATE user
     @Transactional
     public User creatUser(User user) {
@@ -422,7 +421,28 @@ public class UserService {
         }
 
         throw new RuntimeException("Login failed");
-    }//todo verify Login by Id
+    }
+
+    public String verifyLoginById(Long id,String password){
+        User user=findUserById(id);
+        Authentication authentication=authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.getEmail(),password)
+        );
+
+        if (authentication.isAuthenticated()){
+            UserPrincipal userPrincipal=(UserPrincipal) authentication.getPrincipal();
+            if (
+                    userPrincipal==null
+                    ||!userPrincipal.isAccountNonExpired()
+                    ||!userPrincipal.isAccountNonLocked()
+                    ||!userPrincipal.isEnabled()
+            ){
+                throw new UserLockedException("Login failed due to user is locked");
+            }
+            return jwtService.jwtToken(userPrincipal.getUsername(),userPrincipal.getRole());
+        }
+        throw new RuntimeException("Login failed");
+    }
 
     //todo use frontend to logout user
 
