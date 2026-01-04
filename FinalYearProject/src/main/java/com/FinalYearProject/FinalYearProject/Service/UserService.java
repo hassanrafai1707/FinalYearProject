@@ -135,22 +135,15 @@ public class UserService {
 
     public User updateUserEmail(String NewEmail) {
         String email=UserUtil.getUserAuthentication().getUsername();
-        System.out.println(email);
-        User existingUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found "));
-
+        User existingUser = findByEmail(email);
         existingUser.setEmail(NewEmail);
-
         return userRepository.save(existingUser);
     }
 
     public User updateUserPassword(String newPassword){
         String email= UserUtil.getUserAuthentication().getUsername();
-        User existingUser=userRepository.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"));
-
+        User existingUser=findByEmail(email);
         existingUser.setPassword(encoder.encode(newPassword));
-
         return userRepository.save(existingUser);
     }
 
