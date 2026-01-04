@@ -156,7 +156,7 @@ public class UserService {
     public User updateUserPasswordByEmail(String email,String password,String adminPassword){
         UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
@@ -173,7 +173,7 @@ public class UserService {
     public User updateUserPasswordById(Long id,String password,String adminPassword){
         UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
@@ -190,7 +190,7 @@ public class UserService {
     public User updateUserRoleById(String role,Long id,String password){
         UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
         if (userPrincipal==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(userPrincipal.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
@@ -228,7 +228,7 @@ public class UserService {
     public User updateUserRoleByEmail(String email,String role,String password){
         UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
         if (userPrincipal==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(userPrincipal.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
@@ -262,7 +262,7 @@ public class UserService {
     public void deleteUserByEmail(String email,String adminPassword) {
         UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
              throw new UserNotAuthorizesException("User not authorized to make this request");
@@ -297,7 +297,7 @@ public class UserService {
     public void deleteUserInBatchById(List<Long> ids , String adminPassword) {
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not authorized to make this request");
@@ -314,7 +314,7 @@ public class UserService {
     public void deleteUserInBatchEmail(List<String> emails , String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not authorized to make this request");
@@ -331,7 +331,7 @@ public class UserService {
     public User suspendUserById(Long id , String adminPassword) {
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not authorized to make this request");
@@ -351,7 +351,7 @@ public class UserService {
     public User unsuspendUserById(Long id,String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not authorized to make this request");
@@ -371,7 +371,7 @@ public class UserService {
     public User suspendUserByEmail(String email, String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not authorized to make this request");
@@ -391,7 +391,7 @@ public class UserService {
     public User unsuspendUserByEmail(String email,String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
-            throw new UserNotAuthorizesException("some thing went wrong user not fount in security context");
+            throw new RuntimeException("some thing went wrong user not fount in security context");
         }
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not authorized to make this request");
