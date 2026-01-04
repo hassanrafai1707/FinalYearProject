@@ -177,8 +177,9 @@ public class UserService {
     }
 
     public User updateUserRoleById(String role,Long id,String password){
-        String adminRole= UserUtil.getUserAuthentication().getAuthorities().toString();
-        String adminPassword=UserUtil.getUserAuthentication().getPassword();
+        UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
+        String adminRole= userPrincipal.getAuthorities().toString();
+        String adminPassword=userPrincipal.getPassword();
         if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
