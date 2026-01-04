@@ -340,8 +340,7 @@ public class UserService {
             throw new WrongPasswordException("wrong password");
         }
         else {
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
+            User user = findUserById(id);
             user.setLocked(true);
             user.setExpired(true);
             userRepository.save(user);
@@ -361,8 +360,7 @@ public class UserService {
             throw new WrongPasswordException("wrong password");
         }
         else {
-            User user = userRepository.findById(id)
-                    .orElseThrow(()-> new UsernameNotFoundException("User not found with id: " + id));
+            User user = findUserById(id);
             user.setExpired(false);
             user.setLocked(false);
             userRepository.save(user);
@@ -382,8 +380,7 @@ public class UserService {
             throw new WrongPasswordException("wrong password");
         }
         else {
-            User user=userRepository.findByEmail(email)
-                    .orElseThrow(()-> new UsernameNotFoundException( "User not found with email"+email));
+            User user=findByEmail(email);
             user.setExpired(true);
             user.setLocked(true);
             userRepository.save(user);
@@ -403,8 +400,7 @@ public class UserService {
             throw new WrongPasswordException("wrong password");
         }
         else {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(()-> new UsernameNotFoundException("User not found with email"+email));
+            User user = findByEmail(email);
             user.setExpired(false);
             user.setLocked(false);
             userRepository.save(user);
