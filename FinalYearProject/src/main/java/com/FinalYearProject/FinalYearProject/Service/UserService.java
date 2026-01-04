@@ -214,28 +214,33 @@ public class UserService {
 
 
     public User updateUserRoleByEmail(String email,String role,String password){
-        String adminRole= UserUtil.getUserAuthentication().getAuthorities().toString();
-        String adminPassword=UserUtil.getUserAuthentication().getPassword();
+        UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
+        String adminRole= userPrincipal.getAuthorities().toString();
+        String adminPassword=userPrincipal.getPassword();
         if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
-        if (!(adminPassword.equals(encoder.encode(password)))){
+        if (!(encoder.matches(password,adminPassword))){
             throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
         }
-        if (
-                !(role.contains("ROLE_ADMIN"))
-                || !(role.contains("ROLE_TEACHER"))
-                || !(role.contains("ROLE_STUDENT"))
-                || !(role.contains("ROLE_SUPERVISOR"))
-        ){
-            throw new UnacceptableRequestException("the role not formated properly");
-        }
-        else {
-            User user=userRepository.findByEmail(email)
-                    .orElseThrow(()-> new UserNotFoundException("User not found with email "+email));
-            user.setRole(role);
-            userRepository.save(user);
-            return user;
+        switch (role){
+            case "ROLE_ADMIN"->{
+                User user =findByEmail(email);
+                return updateRole(user,role);
+            }
+            case "ROLE_TEACHER"->{
+                User user =findByEmail(email);
+                return updateRole(user,role);
+            }
+            case "ROLE_STUDENT"->{
+                User user =findByEmail(email);
+                return updateRole(user,role);
+            }
+            case "ROLE_SUPERVISOR"->{
+                User user =findByEmail(email);
+                return updateRole(user,role);
+            }
+            default -> throw new RoleNotValidException("the role not formated properly");
         }
     }
 
