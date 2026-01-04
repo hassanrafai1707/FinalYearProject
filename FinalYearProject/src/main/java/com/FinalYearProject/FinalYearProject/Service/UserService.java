@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -162,7 +163,6 @@ public class UserService {
     }
 
     public User updateUserPasswordById(Long id,String password,String adminPassword){
-
         User adminUser=findByEmail(UserUtil.getUserAuthentication().getUsername());
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
@@ -176,32 +176,41 @@ public class UserService {
         return user;
     }
 
-    public User updateUserRoleById(String role,Long Id,String password){
+    public User updateUserRoleById(String role,Long id,String password){
         String adminRole= UserUtil.getUserAuthentication().getAuthorities().toString();
         String adminPassword=UserUtil.getUserAuthentication().getPassword();
         if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
-        if (!(adminPassword.equals(encoder.encode(password)))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
+        if (!(encoder.matches(password,adminPassword))){
+            throw new UserNotAuthorizesException("User not Authorized to make this request due to password beeing ");
         }
-        if (
-                role.startsWith("ROLE_")||
-                role.equals("ROLE_ADMIN")||
-                role.equals("ROLE_TEACHER")||
-                role.equals("ROLE_STUDENT")||
-                role.equals("ROLE_SUPERVISOR")
-        ){
-            throw new UnacceptableRequestException("the role not formated properly");
-        }
-        else {
-            User user =userRepository.findById(Id)
-                    .orElseThrow(()-> new UserNotFoundException("User not found with ID :"+Id));
-            user.setRole(role);
-            userRepository.save(user);
-            return user;
+        switch (role){
+            case "ROLE_ADMIN"->{
+                User user =findUserById(id);
+                return updateRole(user,role);
+            }
+            case "ROLE_TEACHER"->{
+                User user =findUserById(id);
+                return updateRole(user,role);
+            }
+            case "ROLE_STUDENT"->{
+                User user =findUserById(id);
+                return updateRole(user,role);
+            }
+            case "ROLE_SUPERVISOR"->{
+                User user =findUserById(id);
+                return updateRole(user,role);
+            }
+            default -> throw new RoleNotValidException("the role not formated properly");
         }
     }
+
+    private User updateRole(User user,String role){
+        user.setRole(role);
+        return userRepository.save(user);
+    }
+
 
     public User updateUserRoleByEmail(String email,String role,String password){
         String adminRole= UserUtil.getUserAuthentication().getAuthorities().toString();
