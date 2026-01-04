@@ -7,6 +7,7 @@ import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 /**
@@ -81,9 +83,11 @@ public class UserService {
                 conformation.getToken(),
                 conformation.getOtp()
         );
-        System.out.println(redisService.get(conformation.getToken(),Conformation.class));
-        System.out.println("user saved success");
-
+        if(log.isDebugEnabled()){
+            System.out.println(redisService.get(conformation.getToken(),Conformation.class));
+            log.debug(redisService.get(conformation.getToken(),Conformation.class).toString());
+            System.out.println("user saved success");
+        }
         userRepository.save(user);
         return user;
     }
