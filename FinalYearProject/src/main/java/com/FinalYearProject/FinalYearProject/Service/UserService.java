@@ -148,36 +148,29 @@ public class UserService {
     }
 
     public User updateUserPasswordByEmail(String email,String password,String adminPassword){
-        User adminUser=userRepository.findByEmail(UserUtil.getUserAuthentication().getUsername()).orElseThrow(()-> new UsernameNotFoundException("try again some thing went wrong user not found"));
+        User adminUser=findByEmail(UserUtil.getUserAuthentication().getUsername());
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
         }
-        User user=userRepository.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with email "+email));
+        User user=findByEmail(email);
         user.setPassword(encoder.encode(password));
         userRepository.save(user);
         return user;
     }
 
-    public User updateUserPasswordById(Long Id,String password,String adminPassword){
+    public User updateUserPasswordById(Long id,String password,String adminPassword){
 
-        User adminUser=userRepository.findByEmail(
-                UserUtil.getUserAuthentication().getUsername()
-        ).orElseThrow(
-                ()-> new UsernameNotFoundException("try again some thing went wrong user not found")
-        );
-
+        User adminUser=findByEmail(UserUtil.getUserAuthentication().getUsername());
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
         }
-        User user=userRepository.findById(Id)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found with ID :"+Id));
+        User user=findUserById(id);
         user.setPassword(encoder.encode(password));
         userRepository.save(user);
         return user;
