@@ -149,7 +149,7 @@ public class UserService {
     }
 
     public User updateUserPasswordByEmail(String email,String password,String adminPassword){
-        User adminUser=findByEmail(UserUtil.getUserAuthentication().getUsername());
+        UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
@@ -163,7 +163,7 @@ public class UserService {
     }
 
     public User updateUserPasswordById(Long id,String password,String adminPassword){
-        User adminUser=findByEmail(UserUtil.getUserAuthentication().getUsername());
+        UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
