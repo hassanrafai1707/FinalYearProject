@@ -7,7 +7,6 @@ import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 
-@Slf4j
 @Service
 @AllArgsConstructor
 /**
@@ -137,10 +135,11 @@ public class UserService {
 
     public User updateUserEmail(String NewEmail) {
         String email=UserUtil.getUserAuthentication().getUsername();
+        System.out.println(email);
         User existingUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found "));
 
-        existingUser.setEmail(email);
+        existingUser.setEmail(NewEmail);
 
         return userRepository.save(existingUser);
     }
@@ -469,7 +468,6 @@ public class UserService {
             }
         }
         catch (Exception e){
-            log.error("Error in verify Token in UserServices "+e.getMessage());
             throw new RuntimeException(e);
         }
     }
