@@ -178,7 +178,7 @@ public class UserService {
 
     public User updateUserRoleById(String role,Long id,String password){
         UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
-        String adminRole= userPrincipal.getAuthorities().toString();
+        String adminRole= userPrincipal.getRole();
         String adminPassword=userPrincipal.getPassword();
         if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
@@ -215,7 +215,7 @@ public class UserService {
 
     public User updateUserRoleByEmail(String email,String role,String password){
         UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
-        String adminRole= userPrincipal.getAuthorities().toString();
+        String adminRole= userPrincipal.getRole();
         String adminPassword=userPrincipal.getPassword();
         if (!(adminRole.contains("ROLE_ADMIN"))){
             throw new UserNotAuthorizesException("User not Authorized to make this request");
@@ -247,11 +247,7 @@ public class UserService {
     //  DELETE (by email)
     @Transactional
     public void deleteUserByEmail(String email,String adminPassword) {
-        User adminUser=userRepository.findByEmail(
-                UserUtil.getUserAuthentication().getUsername()
-        ).orElseThrow(
-                ()-> new UserNotAuthorizesException("some thing went wrong user not fount in security context")
-        );
+        UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
              throw new UserNotAuthorizesException("User not authorized to make this request");
         }
