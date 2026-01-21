@@ -92,8 +92,7 @@ public class JwtFilter extends OncePerRequestFilter {
                  path.startsWith("/images") ||
                  path.startsWith("/webjars") ||
                  path.equals("/")
-        ) {
-
+        ) {//todo add the admin , student ,supervisor , teacher paths on the if  ka ()
             System.out.println("path "+path);//for debuging check path
             System.out.println("🔓 Skipped JwtFilter for path: " + path);//for debugging
             filterChain.doFilter(request, response);

@@ -82,6 +82,7 @@ public class SecurityConfig {
                                                 appVersion+"/auth/**",
                                                 "/login",
                                                 "/register",
+//todo uncomment this and all the same paths are to be adder in jwt filter
 //                                                "/admin-dashboard",
 //                                                "/teacher-dashboard",
 //                                                "/supervisor-dashboard",
