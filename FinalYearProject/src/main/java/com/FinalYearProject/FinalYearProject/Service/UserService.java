@@ -503,61 +503,33 @@ public class UserService {
             return Boolean.FALSE;
         }
     }
-//no need to use this
+//todo use this
     public User regenerateOtp(User user){
-        Conformation temp=redisService.get(user.getEmail(), Conformation.class);
-            if (!(temp==null)) {
-                if (
-                        temp.getUser().isLocked()||
-                        !temp.getUser().isIs_enable()||
-                        temp.getUser().isExpired()
-                ){
-                    return temp.getUser();
-                }
-                temp.generateOtp();
-                redisService.set(user.getEmail(), temp, 10L);
-                conformationService.sendEmail(
-                        temp.getUser().getEmail(),
-                        temp.getUser().getName(),
-                        temp.getToken(),
-                        temp.getOtp()
-                );
-                return temp.getUser();
-            }
-            User tempUser=findByEmail(user.getEmail());
-            if (!(tempUser==null)){//todo remove this condition is being checked before
-                if (
-                        !tempUser.isExpired() ||
-                        tempUser.isIs_enable() ||
-                        !tempUser.isLocked()
-                ){
-
-                    return tempUser;
-                }
-                tempUser.setIs_enable(false);
-                tempUser.setRole("ROLE_STUDENT");
-                tempUser.setPassword(encoder.encode(user.getPassword()));
-                tempUser.setExpired(true);
-                tempUser.setLocked(true);
-                Conformation conformation = new Conformation(tempUser);
-                redisService.set(
-                        conformation.getUser().getEmail(),
-                        conformation,
-                        10L
-                );
-                conformationService.sendEmail(
-                        tempUser.getEmail(),
-                        tempUser.getName(),
-                        conformation.getToken(),
-                        conformation.getOtp()
-                );
-                if(log.isDebugEnabled()){
-                    System.out.println(redisService.get(conformation.getToken(),Conformation.class));
-                    log.debug(redisService.get(conformation.getToken(),Conformation.class).toString());
-                    System.out.println("user saved success");
-                }
-                return userRepository.save(tempUser);
-            }
-            throw new RuntimeException();
+        User tempUser=findByEmail(user.getEmail());
+        if (
+              tempUser.isExpired() ||
+              tempUser.isLocked()
+        ){
+            return tempUser;
+        }
+        tempUser.setIs_enable(false);
+        tempUser.setRole("ROLE_STUDENT");
+        tempUser.setPassword(encoder.encode(user.getPassword()));
+        tempUser.setExpired(true);
+        tempUser.setLocked(true);
+        Conformation conformation = new Conformation(tempUser);
+        redisService.set(
+                conformation.getUser().getEmail(),
+                conformation,
+                10L
+        );
+        conformationService.sendEmail(
+                tempUser.getEmail(),
+                tempUser.getName(),
+                conformation.getToken(),
+                conformation.getOtp()
+        );
+        System.out.println("Debug: "+tempUser.getEmail()+" ");
+    return userRepository.save(tempUser);
     }
 }
