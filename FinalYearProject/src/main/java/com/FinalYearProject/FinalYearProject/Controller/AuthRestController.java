@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -44,7 +45,8 @@ public class AuthRestController {
                         Map.of(
                                 "status","successful",
                                 "token",temp,
-                                "role",jwtService.extractUserRole(temp)
+                                "role",jwtService.extractUserRole(temp),
+                                "time", LocalDateTime.now()
                         )
                 );
     }
@@ -55,7 +57,9 @@ public class AuthRestController {
         return ResponseEntity.ok(
                 Map.of(
                         "message", "User registered successfully. Please verifyLoginByEmail your email.",
-                        "user", saveUser
+                        "user", saveUser,
+                        "time", LocalDateTime.now()
+
                 )
         );
     }
@@ -72,7 +76,8 @@ public class AuthRestController {
             return ResponseEntity.ok(
                     Map.of(
                             "message", "User confirm",
-                            "User Confirm token", ConformToken
+                            "User Confirm token", ConformToken,
+                            "time", LocalDateTime.now()
                     )
             );
         }
