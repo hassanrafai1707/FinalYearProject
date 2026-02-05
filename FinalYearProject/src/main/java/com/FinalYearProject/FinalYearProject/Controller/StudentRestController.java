@@ -4,6 +4,7 @@ import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,6 @@ import java.util.Map;
  */
 @RequestMapping("${app.version}/student")
 @RestController
-//todo use proper naming standers to name endpoints
 public class StudentRestController {
     private final UserService userService;
     private final QuestionService questionService;
@@ -53,14 +53,12 @@ public class StudentRestController {
     @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestion(){
         List<QuestionDTO> questionList=questionService.getAllQuestionWithDTO();
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data", questionList,
-                                "time",getTimeNow()
-                        )
-                );
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                questionList.toArray(),
+                "All questions",
+                200
+        );
     }
 
     @GetMapping("/questions/paged")
@@ -83,14 +81,13 @@ public class StudentRestController {
         if (!request.containsKey("id")){
             throw new BadRequestException("the request must contain 'id'");
         }
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data",questionService.getQuestionDtoById(request.get("id")),
-                                "time",getTimeNow()
-                        )
-                );
+        Long id= request.get("id");
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                questionService.getQuestionDtoById(id),
+                "question with id "+id,
+                200
+        );
     }
 
     @GetMapping("/questions/subjectCode")
@@ -99,14 +96,13 @@ public class StudentRestController {
         if (!request.containsKey("subjectCode")){
             throw new BadRequestException("the request must contain 'subjectCode'");
         }
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data",questionService.findBySubjectCodeDto(request.get("subjectCode")),
-                                "time",getTimeNow()
-                        )
-                );
+        String subjectCode=request.get("subjectCode");
+        return ResponseUtility.responseTemplateForMultipleData(
+                "sucessful",
+                questionService.findBySubjectCodeDto(subjectCode).toArray(),
+                "questions with subject code "+subjectCode,
+                200
+        );
     }
 
     @GetMapping("/questions/subjectCode/pagged")
@@ -141,17 +137,15 @@ public class StudentRestController {
         ){
             throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
         }
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data",questionService.findBySubjectCodeMappedCODto(
-                                        dto.getSubjectCode(),
-                                        dto.getMappedCO()
-                                ),
-                                "time",getTimeNow()
-                        )
-                );
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                questionService.findBySubjectCodeMappedCODto(
+                        dto.getSubjectCode(),
+                        dto.getMappedCO()
+                ).toArray(),
+                "questions with subject code and mapped CO "+dto.getSubjectCode()+" "+dto.getMappedCO(),
+                200
+        );
     }
 
     @GetMapping("/questions/subjectCode/mappedCO/pagged")
@@ -181,7 +175,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel")
+    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel/pagged")
     @SneakyThrows
     private ResponseEntity<?> findByCognitiveLevel(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
@@ -217,14 +211,12 @@ public class StudentRestController {
         if (!request.containsKey("subjectName")){
             throw new BadRequestException("the request must contain 'subjectName'");
         }
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data",questionService.findBySubjectNameDto(request.get("subjectName")),
-                                "time",getTimeNow()
-                        )
-                );
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                questionService.findBySubjectNameDto(request.get("subjectName")).toArray(),
+                "questions with subject name "+request.get("subjectName"),
+                200
+        );
     }
 
     @GetMapping("/questions/subjectName/pagged")
@@ -259,17 +251,15 @@ public class StudentRestController {
         ){
             throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
         }
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data", questionService.findBySubjectNameMappedCODto(
-                                        dto.getSubjectName(),
-                                        dto.getMappedCO()
-                                ),
-                                "time",getTimeNow()
-                        )
-                );
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                questionService.findBySubjectNameMappedCODto(
+                        dto.getSubjectName(),
+                        dto.getMappedCO()
+                ).toArray(),
+                "questions with subject name and mapped Co"+dto.getSubjectName()+" "+dto.getMappedCO(),
+                200
+        );
     }
 
     @GetMapping("/questions/subjectName/mappedCO/pagged")
