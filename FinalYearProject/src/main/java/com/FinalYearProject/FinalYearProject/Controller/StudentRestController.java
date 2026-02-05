@@ -50,7 +50,7 @@ public class StudentRestController {
         return LocalDateTime.now();
     }
 
-    @GetMapping("/getAllQuestion")
+    @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestion(){
         List<QuestionDTO> questionList=questionService.getAllQuestionWithDTO();
         return ResponseEntity
@@ -63,7 +63,7 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/getAllQuestionPaged")
+    @GetMapping("/questions/paged")
     public ResponseEntity<?>  getAllQuestionsPaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
@@ -77,7 +77,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/getQuestionById")
+    @GetMapping("/question/id")
     @SneakyThrows
     public ResponseEntity<?> getQuestionById (@RequestBody Map<String,Long> request){
         if (!request.containsKey("id")){
@@ -93,7 +93,7 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/findBySubjectCode")
+    @GetMapping("/questions/subjectCode")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCode(@RequestBody Map<String,String> request) {
         if (!request.containsKey("subjectCode")){
@@ -109,7 +109,7 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/findBySubjectCodePagged")
+    @GetMapping("/questions/subjectCode/pagged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCode(
             @RequestParam(value = "pageNo" ,defaultValue = "0") int pageNo,
@@ -132,7 +132,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/findBySubjectCode-MappedCO")
+    @GetMapping("/questions/subjectCode/mappedCO")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCodeMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
         if (
@@ -154,7 +154,7 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/findBySubjectCode-MappedCOPaged")
+    @GetMapping("/questions/subjectCode/mappedCO/pagged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCodeMappedCO(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
@@ -181,7 +181,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
+    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel")
     @SneakyThrows
     private ResponseEntity<?> findByCognitiveLevel(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
@@ -211,7 +211,7 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/findBySubjectName")
+    @GetMapping("/questions/subjectName")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectName(@RequestBody Map<String,String> request){
         if (!request.containsKey("subjectName")){
@@ -227,7 +227,7 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/findBySubjectNamePaged")
+    @GetMapping("/questions/subjectName/pagged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectName(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
@@ -250,7 +250,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/findBySubjectName-MappedCO")
+    @GetMapping("/questions/subjectName/mappedCO")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
         if (
@@ -272,7 +272,7 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/findBySubjectName-MappedCOPaged")
+    @GetMapping("/questions/subjectName/mappedCO/pagged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCO(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
@@ -299,7 +299,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
+    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
@@ -329,7 +329,7 @@ public class StudentRestController {
                 );
     }
 
-    @PatchMapping("/updateUserEmail")
+    @PatchMapping("/update/user/email")
     public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
     ){
         String email= request.get("email");
@@ -343,7 +343,7 @@ public class StudentRestController {
         );
     }
 
-    @PatchMapping("/updateUserPassword")
+    @PatchMapping("/update/user/password")
     public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
         String password= request.get("password");
         User updatedUser = userService.updateUserPassword(password);
