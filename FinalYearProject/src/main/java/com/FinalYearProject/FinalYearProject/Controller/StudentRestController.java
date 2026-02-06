@@ -75,13 +75,12 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/question/id")
+    @GetMapping("/question/id/{id}")
     @SneakyThrows
-    public ResponseEntity<?> getQuestionById (@RequestBody Map<String,Long> request){
-        if (!request.containsKey("id")){
+    public ResponseEntity<?> getQuestionById (@RequestParam("id") Long id){
+        if (id.toString().isEmpty()){
             throw new BadRequestException("the request must contain 'id'");
         }
-        Long id= request.get("id");
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 questionService.getQuestionDtoById(id),
@@ -90,15 +89,14 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode")
+    @GetMapping("/questions/subjectCode/{subjectCode}")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectCode(@RequestBody Map<String,String> request) {
-        if (!request.containsKey("subjectCode")){
+    public ResponseEntity<?> findBySubjectCode(@RequestParam("subjectCode") String subjectCode) {
+        if (!subjectCode.isEmpty()){
             throw new BadRequestException("the request must contain 'subjectCode'");
         }
-        String subjectCode=request.get("subjectCode");
         return ResponseUtility.responseTemplateForMultipleData(
-                "sucessful",
+                "successful",
                 questionService.findBySubjectCodeDto(subjectCode).toArray(),
                 "questions with subject code "+subjectCode,
                 200
@@ -128,22 +126,25 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/mappedCO")
+    @GetMapping("/questions/subjectCode/{subjectCode}/mappedCO/{mappedCO}")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectCodeMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
+    public ResponseEntity<?> findBySubjectCodeMappedCO(
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO
+            ){
         if (
-                dto.getSubjectCode().isEmpty()
-                ||dto.getMappedCO().isEmpty()
+                subjectCode.isEmpty()
+                ||mappedCO.isEmpty()
         ){
             throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
                 questionService.findBySubjectCodeMappedCODto(
-                        dto.getSubjectCode(),
-                        dto.getMappedCO()
+                        subjectCode,
+                        mappedCO
                 ).toArray(),
-                "questions with subject code and mapped CO "+dto.getSubjectCode()+" "+dto.getMappedCO(),
+                "questions with subject code and mapped CO "+subjectCode+" "+mappedCO,
                 200
         );
     }
@@ -205,16 +206,16 @@ public class StudentRestController {
                 );
     }
 
-    @GetMapping("/questions/subjectName")
+    @GetMapping("/questions/subjectName/{subjectName}")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectName(@RequestBody Map<String,String> request){
-        if (!request.containsKey("subjectName")){
+    public ResponseEntity<?> findBySubjectName(@RequestParam("subjectName") String subjectName){
+        if (!subjectName.isEmpty()){
             throw new BadRequestException("the request must contain 'subjectName'");
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionService.findBySubjectNameDto(request.get("subjectName")).toArray(),
-                "questions with subject name "+request.get("subjectName"),
+                questionService.findBySubjectNameDto(subjectName).toArray(),
+                "questions with subject name "+subjectName,
                 200
         );
     }
@@ -242,7 +243,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/mappedCO")
+    @GetMapping("/questions/subjectName/{subjectName}/mappedCO/{mappedCO}")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
         if (
@@ -289,7 +290,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel")
+    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel/pagged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
