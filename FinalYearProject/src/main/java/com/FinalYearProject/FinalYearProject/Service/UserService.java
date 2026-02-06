@@ -137,7 +137,6 @@ public class UserService {
 
     //  UPDATE
 
-    //todo send confor mation email to unlock
     public User updateUserEmail(String NewEmail) {
         String email=UserUtil.getUserAuthentication().getUsername();
         if(email.isEmpty()){
@@ -145,6 +144,25 @@ public class UserService {
         }
         User existingUser = findByEmail(email);
         existingUser.setEmail(NewEmail);
+        existingUser.setIs_enable(false);
+        existingUser.setPassword(encoder.encode(existingUser.getPassword()));
+        existingUser.setExpired(true);
+        existingUser.setLocked(true);
+
+        Conformation conformation = new Conformation(existingUser);
+
+        redisService.set(
+                conformation.getUser().getEmail(),
+                conformation,
+                10L
+        );
+
+        conformationService.sendEmail(
+                existingUser.getEmail(),
+                existingUser.getName(),
+                conformation.getToken(),
+                conformation.getOtp()
+        );
         return userRepository.save(existingUser);
     }
 
