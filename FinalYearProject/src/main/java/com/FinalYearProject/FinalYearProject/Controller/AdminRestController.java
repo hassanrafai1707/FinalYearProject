@@ -3,6 +3,7 @@ package com.FinalYearProject.FinalYearProject.Controller;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -93,23 +94,21 @@ public class AdminRestController {
 
     @GetMapping("/user/id/{id}")
     public ResponseEntity<?> findUserById(@PathVariable("id") Long id){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful" ,
-                        "data",userService.findUserById(id),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.findUserById(id),
+                "User with id: "+id,
+                200
         );
     }
 
     @GetMapping("/user/email/{email}")
     public ResponseEntity<?> findByEmail(@PathVariable("email") String email) {
-        return ResponseEntity.ok(
-                Map.of(
-                        "status", "successful",
-                        "data", userService.findByEmail(email),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.findByEmail(email),
+                "user with email: "+email,
+                200
         );
     }
 
@@ -125,12 +124,11 @@ public class AdminRestController {
         ){
             throw new RoleNotValidException("User role must be ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT, or ROLE_SUPERVISOR");
         }
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",userService.listOfUserByRole(role),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.listOfUserByRole(role),
+                "All users with Role : "+role,
+                200
         );
     }
 
@@ -169,12 +167,11 @@ public class AdminRestController {
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data", userService.findAllUsers(),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                userService.findAllUsers().toArray(),
+                "All users ",
+                200
         );
     }
 
@@ -266,15 +263,14 @@ public class AdminRestController {
     public ResponseEntity<?> suspendUserById(
             @RequestBody DtoForIdAndAdminPasswordInRequest dto
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data", userService.suspendUserById(
-                                        dto.getId(),
-                                        dto.getAdminPassword()
-                        ),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.suspendUserById(
+                        dto.getId(),
+                        dto.getAdminPassword()
+                ),
+                "User suspended successful",
+                200
         );
     }
 
@@ -282,15 +278,14 @@ public class AdminRestController {
     public ResponseEntity<?> unsuspendUserById(
             @RequestBody DtoForIdAndAdminPasswordInRequest dto
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data", userService.unsuspendUserById(
-                                dto.getId(),
-                                dto.getAdminPassword()
-                        ),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.unsuspendUserById(
+                        dto.getId(),
+                        dto.getAdminPassword()
+                ),
+                "User unsuspended successful",
+                200
         );
     }
 
@@ -298,15 +293,14 @@ public class AdminRestController {
     public ResponseEntity<?> suspendUserByEmail(
             @RequestBody DtoForEmailAndAdminPasswordInRequest dto
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data", userService.suspendUserByEmail(
-                                dto.getEmail(),
-                                dto.getAdminPassword()
-                        ),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.suspendUserByEmail(
+                        dto.getEmail(),
+                        dto.getAdminPassword()
+                ),
+                "user suspend successfully",
+                200
         );
     }
 
@@ -330,35 +324,31 @@ public class AdminRestController {
     public ResponseEntity<?> updatePasswordByEmail(
             @RequestBody DtoForEmailAnd2PasswordsInRequest dto
     ){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data",userService.updateUserPasswordByEmail(
-                                        dto.getEmail(),
-                                        dto.getPassword(),
-                                        dto.getAdminPassword()
-                                ),
-                                "time",getNowTime()
-
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.updateUserPasswordByEmail(
+                        dto.getEmail(),
+                        dto.getPassword(),
+                        dto.getAdminPassword()
+                ),
+                "User password successfully",
+                200
+        );
     }
 
     @PatchMapping("/update/user/password/id")
     public ResponseEntity<?> updateUserPasswordById(
             @RequestBody DtoForUserIdAndPasswordInRequest dto
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",userService.updateUserPasswordById(
-                                dto.getId(),
-                                dto.getPassword(),
-                                dto.getAdminPassword()
-                        ),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.updateUserPasswordById(
+                        dto.getId(),
+                        dto.getPassword(),
+                        dto.getAdminPassword()
+                ),
+                "User with id has been updated successfully",
+                200
         );
     }
 
@@ -366,59 +356,53 @@ public class AdminRestController {
     public ResponseEntity<?> updateUserRoleById(
             @RequestBody DtoForRoleAndIdAndPassworedInRequest dto
     ){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data", userService.updateUserRoleById(
-                                        dto.getRole(),
-                                        dto.getId(),
-                                        dto.getPassword()
-                                ),
-                                "time",getNowTime()
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.updateUserRoleById(
+                        dto.getRole(),
+                        dto.getId(),
+                        dto.getPassword()
+                ),
+                "user role updated successfully ",
+                200
+        );
     }
 
     @PatchMapping("/update/user/role/email")
     public ResponseEntity<?> updateUserRoleByEmail(
             @RequestBody DtoForRoleAndEmailAndPasswordInRequest dto
     ){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data",userService.updateUserRoleByEmail(
-                                        dto.getEmail(),
-                                        dto.getRole(),
-                                        dto.getPassword()
-                                ),
-                                "time",getNowTime()
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.updateUserRoleByEmail(
+                        dto.getRole(),
+                        dto.getEmail(),
+                        dto.getPassword()
+                ),
+                "users role is updated successfully",
+                200
+        );
     }
 
     @PatchMapping("/update/my/email")
     public ResponseEntity<?>updateUserEmail(@RequestBody Map<String,String> request){
         String email= request.get("newEmail");
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",userService.updateUserEmail(email),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.updateUserEmail(email),
+                "your email has been updated",
+                200
         );
     }
 
     @PatchMapping("/update/my/password")
     public ResponseEntity<?> updateUserPassword(@RequestBody Map<String,String> request){
         String password= request.get("password");
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",userService.updateUserPassword(password),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.updateUserPassword(password),
+                "your password has been updated successfully ",
+                200
         );
     }
 

@@ -137,6 +137,7 @@ public class UserService {
 
     //  UPDATE
 
+    //todo send confor mation email to unlock
     public User updateUserEmail(String NewEmail) {
         String email=UserUtil.getUserAuthentication().getUsername();
         if(email.isEmpty()){
