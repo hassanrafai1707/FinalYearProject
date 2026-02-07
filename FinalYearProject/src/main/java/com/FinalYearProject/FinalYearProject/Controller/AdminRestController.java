@@ -150,18 +150,15 @@ public class AdminRestController {
                     "User role must be ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT, or ROLE_SUPERVISOR"
             );
         }
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data", new PagedModel<>(
-                                userService.listOfUserByRole(
-                                        role,
-                                        pageNo,
-                                        size
-                                )
-                        ),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                userService.listOfUserByRole(
+                        role,
+                        pageNo,
+                        size
+                ),
+                "all users with the selected role",
+                200
         );
     }
 
