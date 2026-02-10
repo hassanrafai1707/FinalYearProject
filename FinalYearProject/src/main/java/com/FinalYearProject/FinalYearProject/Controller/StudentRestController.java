@@ -204,20 +204,22 @@ public class StudentRestController {
         ){
             throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO' and 'cognitiveLevel'");
         }
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data",questionService.findBySubjectCodeMappedCOCognitiveLevelDtoPaged(
-                                        dto.getSubjectCode(),
-                                        dto.getMappedCO(),
-                                        dto.getCognitiveLevel(),
-                                        pageNo,
-                                        size
-                                ),
-                                "time",getTimeNow()
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCodeMappedCOCognitiveLevel(
+                                dto.getSubjectCode(),
+                                dto.getMappedCO(),
+                                dto.getCognitiveLevel(),
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "All questions with selected subject code, mapped co and cognitiveLevel ",
+                200
+        );
     }
 
     @GetMapping("/questions/subjectName/{subjectName}")
@@ -328,20 +330,22 @@ public class StudentRestController {
         ){
             throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO' and 'cognitiveLevel'");
         }
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","successful",
-                                "data", questionService.findBySubjectNameMappedCOCognitiveLevelDtoPaged(
-                                        dto.getSubjectName(),
-                                        dto.getMappedCO(),
-                                        dto.getCognitiveLevel(),
-                                        pageNo,
-                                        size
-                                ),
-                                "time",getTimeNow()
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                dto.getSubjectName(),
+                                dto.getMappedCO(),
+                                dto.getCognitiveLevel(),
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "All questions with selected subject name, mapped co and cognitiveLevel ",
+                200
+        );
     }
 
     @PatchMapping("/update/user/email")
