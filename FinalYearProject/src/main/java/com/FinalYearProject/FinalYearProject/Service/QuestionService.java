@@ -113,12 +113,36 @@ public class QuestionService {
         }
     }
 
-    public List<Question> findBySubjectCodeMappedCOCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel){
+    public List<Question> findBySubjectCodeMappedCOCognitiveLevel(
+            String subjectCode,
+            String mappedCO,
+            String cognitiveLevel
+    ){
         List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
         if (!(tempQuestions.isEmpty())){
             return tempQuestions;
         }
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
+    }
+
+    public Page<Question> findBySubjectCodeMappedCOCognitiveLevel(
+            String subjectCode,
+            String mappedCO,
+            String cognitiveLevel,
+            int pageNo,
+            int size
+            ){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> questions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(
+                subjectCode,
+                mappedCO,
+                cognitiveLevel,
+                pageable
+        );
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
+        }
+        return questions;
     }
 
     public List<Question> findBySubjectName(String subjectName){
@@ -157,7 +181,11 @@ public class QuestionService {
         }
     }
 
-    public List<Question> findBySubjectNameMappedCOCognitiveLevel(String subjectName,String mappedCO,String cognitiveLevel){
+    public List<Question> findBySubjectNameMappedCOCognitiveLevel(
+            String subjectName,
+            String mappedCO,
+            String cognitiveLevel
+    ){
         List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(subjectName, mappedCO, cognitiveLevel);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
@@ -165,6 +193,25 @@ public class QuestionService {
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
     }
 
+    public Page<Question> findBySubjectNameMappedCOCognitiveLevel(
+            String subjectName,
+            String mappedCO,
+            String cognitiveLevel,
+            int pageNo,
+            int size
+    ){
+        Pageable pageable=PageRequest.of(pageNo,size);
+        Page<Question> questions=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(
+                subjectName,
+                mappedCO,
+                cognitiveLevel,
+                pageable
+        );
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
+        }
+        return questions;
+    }
     public List<Question> findByCreatedByUsingEmail(String email){
         User tempUser= userService.findByEmail(email);
         if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
