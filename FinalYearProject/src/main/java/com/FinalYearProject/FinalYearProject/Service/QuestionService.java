@@ -1,6 +1,5 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
-import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.QuestionDTO;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
@@ -13,7 +12,6 @@ import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,33 +43,6 @@ public class QuestionService {
     @Autowired
     private UserService userService;
 
-    private List<QuestionDTO> listOfQuestionToQuestionDto(List<Question> questions){
-        if (questions.isEmpty()){
-            throw new IllegalArgumentException("the question passed in this method can not be null");
-        }
-        List<QuestionDTO> temp=new ArrayList<>();
-        for (Question question:questions){
-            temp.add(
-                    questionToQuestionDto(
-                            question
-                    )
-            );
-        }
-        return temp;
-    }
-
-    private QuestionDTO questionToQuestionDto(Question question){
-        return new QuestionDTO(
-                question.getId(),
-                question.getSubjectName(),
-                question.getQuestionMarks(),
-                question.getMappedCO(),
-                question.getSubjectCode(),
-                question.getCognitiveLevel(),
-                question.getQuestionBody()
-        );
-    }
-
     public List<Question> getAllQuestion(){
         List<Question> tempQuestion=questionRepository.findAll();
         if (!(tempQuestion.isEmpty())){
@@ -80,14 +51,6 @@ public class QuestionService {
         else {
             throw new QuestionNotFoundException("no Question in DataBase");
         }
-    }
-
-    public List<QuestionDTO> getAllQuestionWithDTO(){
-        List<Question> questions=questionRepository.findAll();
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("no Question in DataBase");
-        }
-        return listOfQuestionToQuestionDto(questions);
     }
 
     public Page<Question> getAllQuestionsPaged(int pageNo,int size){
@@ -101,32 +64,9 @@ public class QuestionService {
         }
     }
 
-    public PageImpl<QuestionDTO> getAllQuestionsDTOPagedImpl(int pageNo, int size){
-        Pageable pageable=PageRequest.of(pageNo, size);
-        Page<Question> temp=questionRepository.findAll(pageable);
-        if (temp.isEmpty()){
-            throw new QuestionNotFoundException("no more Question in DataBase");
-        }
-        else {
-            return new PageImpl<>(
-                    listOfQuestionToQuestionDto(temp.getContent()),
-                    pageable,
-                    temp.getTotalElements()
-            );
-        }
-    }
-
     public Question getQuestionById(Long id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
-    }
-
-    public QuestionDTO getQuestionDtoById(Long id){
-        Question temp=questionRepository.findById(id)
-                .orElseThrow(
-                        ()->new QuestionNotFoundException("Question with id:"+id+"not found")
-                );
-        return questionToQuestionDto(temp);
     }
 
     public List<Question> getQuestionByIds(List<Long> Ids){
@@ -137,28 +77,12 @@ public class QuestionService {
         return temp;
     }
 
-    public List<QuestionDTO> getQuestionDtoByIds(List<Long> ids){
-        List<Question> questions=questionRepository.findAllById(ids);
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("questions with the given ids not found");
-        }
-        return listOfQuestionToQuestionDto(questions);
-    }
-
     public List<Question> findBySubjectCode(String subjectCode){
         List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
-    }
-
-    public List<QuestionDTO> findBySubjectCodeDto(String subjectCode){
-        List<Question> questions=questionRepository.findBySubjectCode(subjectCode);
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("no question with subjectCode:"+subjectCode+"found");
-        }
-        return listOfQuestionToQuestionDto(questions);
     }
 
     public Page<Question> findBySubjectCode(String subjectCode,int pageNo,int size){
@@ -170,39 +94,12 @@ public class QuestionService {
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
     }
 
-    public PageImpl<QuestionDTO> findBySubjectCodeDtoPaged(
-            String subjectCode,
-            int pageNo,
-            int size
-    ){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> questions=questionRepository.findBySubjectCode(subjectCode,pageable);
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(questions.getContent()),
-                pageable,
-                questions.getTotalElements()
-        );
-    }
-
     public List<Question> findBySubjectCodeMappedCO(String subjectCode , String mappedCO){
         List<Question> tempQuestion=questionRepository.findBySubjectCodeAndMappedCO(subjectCode,mappedCO);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
-    }
-
-    public List<QuestionDTO> findBySubjectCodeMappedCODto(String subjectCode,String mappedCO){
-        List<QuestionDTO> questionDTOList=listOfQuestionToQuestionDto(
-                questionRepository.findBySubjectCodeAndMappedCO(
-                        subjectCode,
-                        mappedCO
-                )
-        );
-        if (questionDTOList.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
-        }
-        return questionDTOList;
     }
 
     public Page<Question> findBySubjectCodeMappedCO(String subjectCode,String mappedCO, int pageNo, int size){
@@ -216,28 +113,6 @@ public class QuestionService {
         }
     }
 
-    public PageImpl<QuestionDTO>findBySubjectCodeMappedCODtoPaged(
-            String subjectCode,
-            String mappedCO,
-            int pageNo,
-            int size
-    ){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> questions=questionRepository.findBySubjectCodeAndMappedCO(
-                subjectCode,
-                mappedCO,
-                pageable
-        );
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO);
-        }
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(questions.getContent()),
-                pageable,
-                questions.getTotalElements()
-        );
-    }
-
     public List<Question> findBySubjectCodeMappedCOCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel){
         List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
         if (!(tempQuestions.isEmpty())){
@@ -246,48 +121,12 @@ public class QuestionService {
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
     }
 
-    public PageImpl<QuestionDTO> findBySubjectCodeMappedCOCognitiveLevelDtoPaged(
-            String subjectCode,
-            String mappedCO,
-            String cognitiveLevel,
-            int pageNo,
-            int size
-            ){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> temp=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(
-                subjectCode,
-                mappedCO,
-                cognitiveLevel,
-                pageable
-        );
-        if (temp.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
-        }
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(temp.getContent()),
-                pageable,
-                temp.getTotalElements()
-        );
-    }
-
     public List<Question> findBySubjectName(String subjectName){
         List<Question> tempQuestion=questionRepository.findBySubjectName(subjectName);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
-    }
-
-    public List<QuestionDTO> findBySubjectNameDto(String subjectName){
-        List<QuestionDTO> questionDTOS=listOfQuestionToQuestionDto(
-                questionRepository.findBySubjectName(
-                        subjectName
-                )
-        );
-        if (questionDTOS.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
-        }
-        return questionDTOS;
     }
 
     public Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
@@ -299,48 +138,12 @@ public class QuestionService {
         throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
     }
 
-    public PageImpl<QuestionDTO>findBySubjectNameDtoPaged(
-            String subjectName,
-            int pageNo,
-            int size
-    ){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question>questions=questionRepository.findBySubjectName(
-                subjectName,
-                pageable
-        );
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName);
-        }
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(questions.getContent()),
-                pageable,
-                questions.getTotalElements()
-        );
-    }
-
     public List<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO){
         List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(subjectName,mappedCO);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped "+mappedCO);
-    }
-
-    public List<QuestionDTO> findBySubjectNameMappedCODto(
-            String subjectName,
-            String mappedCO
-    ){
-        List<QuestionDTO> questionDTOS=listOfQuestionToQuestionDto(
-                questionRepository.findBySubjectNameAndMappedCO(
-                        subjectName, mappedCO
-                )
-        );
-
-        if (questionDTOS.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped "+mappedCO);
-        }
-        return questionDTOS;
     }
 
     public Page<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO,int pageNo,int size){
@@ -354,58 +157,12 @@ public class QuestionService {
         }
     }
 
-    public PageImpl<QuestionDTO> findBySubjectNameMappedCODtoPaged(
-            String subjectName,
-            String mappedCO,
-            int pageNo,
-            int size
-    ){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> question =questionRepository.findBySubjectNameAndMappedCO(
-                subjectName,
-                mappedCO,
-                pageable
-        );
-        if (question.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+" and Mapped "+mappedCO);
-        }
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(question.getContent()),
-                pageable,
-                question.getTotalElements()
-        );
-    }
-
     public List<Question> findBySubjectNameMappedCOCognitiveLevel(String subjectName,String mappedCO,String cognitiveLevel){
         List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(subjectName, mappedCO, cognitiveLevel);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
         throw  new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
-    }
-
-    public PageImpl<QuestionDTO> findBySubjectNameMappedCOCognitiveLevelDtoPaged(
-            String subjectName,
-            String mappedCO,
-            String cognitiveLevel,
-            int pageNo ,
-            int size
-    ){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> questions=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(
-                subjectName,
-                mappedCO,
-                cognitiveLevel,
-                pageable
-        );
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
-        }
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(questions.getContent()),
-                pageable,
-                questions.getTotalElements()
-        );
     }
 
     public List<Question> findByCreatedByUsingEmail(String email){
@@ -441,28 +198,6 @@ public class QuestionService {
         }
     }
 
-    public PageImpl<QuestionDTO> findByCreatedByUsingEmailDto(
-            String email,
-            int pageNo,
-            int size
-    ){
-        //todo check if user is ROLE_SUPERVISOR
-        Pageable pageable=PageRequest.of(pageNo,size);
-        User user=userService.findByEmail(email);
-        if (!(user.getRole().equalsIgnoreCase("ROLE_TEACHER"))){
-           throw new UserNotAuthorizesException("user with email: "+email+"is not authorized to make question");
-        }
-        Page<Question> questions=questionRepository.findByCreatedBy(user,pageable);
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("the user with email: "+email+" has not made any questions");
-        }
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(questions.getContent()),
-                pageable,
-                questions.getTotalElements()
-        );
-    }
-
     public List<Question> findByCreatedByUsingId(Long Id){
         User tempUser=userService.findUserById(Id);
         if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
@@ -494,28 +229,6 @@ public class QuestionService {
                 throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
             }
         }
-    }
-
-    public PageImpl<QuestionDTO> findByCreatedByUsingIdDto(
-            Long id,
-            int pageNo,
-            int size
-    ){
-        //todo check if user is ROLE_SUPERVISOR
-        User user=userService.findUserById(id);
-        if (!(user.getRole().equalsIgnoreCase("ROLE_TEACHER"))){
-            throw new UserNotAuthorizesException("User with the Id"+id+" has not created any Question");
-        }
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> questions=questionRepository.findByCreatedBy(user,pageable);
-        if (questions.isEmpty()){
-            throw new QuestionNotFoundException("User with id:"+id+" has not created any question");
-        }
-        return new PageImpl<>(
-                listOfQuestionToQuestionDto(questions.getContent()),
-                pageable,
-                questions.getTotalElements()
-        );
     }
 
     public List<Question> getAllQuestionsByCurrentUser(){
