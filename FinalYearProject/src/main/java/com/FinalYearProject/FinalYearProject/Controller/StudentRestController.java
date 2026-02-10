@@ -4,6 +4,7 @@ import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,10 +52,11 @@ public class StudentRestController {
 
     @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestion(){
-        List<QuestionDTO> questionList=questionService.getAllQuestionWithDTO();
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionList.toArray(),
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.getAllQuestion()
+                ).toArray(),
                 "All questions",
                 200
         );
@@ -66,12 +67,15 @@ public class StudentRestController {
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",questionService.getAllQuestionsDTOPagedImpl(pageNo, size),
-                        "time",getTimeNow()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.getAllQuestionsPaged(pageNo, size),
+                        pageNo,
+                        size
+                ),
+                "All questions in the given page",
+                200
         );
     }
 
@@ -83,7 +87,9 @@ public class StudentRestController {
         }
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                questionService.getQuestionDtoById(id),
+                QuestionDtoUtil.QuestionToQuestionDto(
+                        questionService.getQuestionById(id)
+                ),
                 "question with id "+id,
                 200
         );
@@ -97,7 +103,9 @@ public class StudentRestController {
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionService.findBySubjectCodeDto(subjectCode).toArray(),
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectCode(subjectCode)
+                ).toArray(),
                 "questions with subject code "+subjectCode,
                 200
         );
@@ -113,16 +121,19 @@ public class StudentRestController {
         if (!request.containsKey("subjectCode")){
             throw new BadRequestException("the request must contain 'subjectCode'");
         }
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",questionService.findBySubjectCodeDtoPaged(
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCode(
                                 request.get("subjectCode"),
                                 pageNo,
                                 size
                         ),
-                        "time",getTimeNow()
-                )
+                        pageNo,
+                        size
+                ),
+                "All questions in the given page",
+                200
         );
     }
 
@@ -140,7 +151,7 @@ public class StudentRestController {
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionService.findBySubjectCodeMappedCODto(
+                questionService.findBySubjectCodeMappedCO(
                         subjectCode,
                         mappedCO
                 ).toArray(),
@@ -162,17 +173,20 @@ public class StudentRestController {
         ){
             throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
         }
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data", questionService.findBySubjectCodeMappedCODtoPaged(
-                              dto.getSubjectCode(),
-                              dto.getMappedCO(),
-                              pageNo,
-                              size
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCodeMappedCO(
+                                dto.getSubjectCode(),
+                                dto.getMappedCO(),
+                                pageNo,
+                                size
                         ),
-                        "time",getTimeNow()
-                )
+                        pageNo,
+                        size
+                ),
+                "All questions in the given page",
+                200
         );
     }
 
@@ -214,7 +228,11 @@ public class StudentRestController {
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionService.findBySubjectNameDto(subjectName).toArray(),
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectName(
+                                subjectName
+                        )
+                ).toArray(),
                 "questions with subject name "+subjectName,
                 200
         );
@@ -230,16 +248,19 @@ public class StudentRestController {
         if (!request.containsKey("subjectName")){
             throw new BadRequestException("the request must contain 'subjectName'");
         }
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",questionService.findBySubjectNameDtoPaged(
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectName(
                                 request.get("subjectName"),
                                 pageNo,
                                 size
                         ),
-                        "time",getTimeNow()
-                )
+                        pageNo,
+                        size
+                ),
+                "All questions with selected subject name :"+request.get("subjectName"),
+                200
         );
     }
 
@@ -254,7 +275,7 @@ public class StudentRestController {
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionService.findBySubjectNameMappedCODto(
+                questionService.findBySubjectNameMappedCO(
                         dto.getSubjectName(),
                         dto.getMappedCO()
                 ).toArray(),
@@ -276,17 +297,20 @@ public class StudentRestController {
         ){
             throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
         }
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",questionService.findBySubjectNameMappedCODtoPaged(
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCodeMappedCO(
                                 dto.getSubjectName(),
                                 dto.getMappedCO(),
                                 pageNo,
                                 size
                         ),
-                        "time",getTimeNow()
-                )
+                        pageNo,
+                        size
+                ),
+                "all questions with selected subject name and mapped co ",
+                200
         );
     }
 
