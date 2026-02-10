@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
+import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
@@ -177,17 +178,16 @@ public class AdminRestController {
             @RequestParam(value = "pageNo",defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",new PagedModel<>(
-                                userService.findAllUsersPage(
-                                        pageNo,
-                                        size
-                                )
-                        ),
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                new PagedModel<>(
+                        userService.findAllUsersPage(
+                                pageNo,
+                                size
+                        )
+                ),
+                "all users ",
+                200
         );
     }
 
@@ -199,12 +199,12 @@ public class AdminRestController {
                 dto.getEmail(),
                 dto.getAdminPassword()
         );
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "message","users with email deleted successfully",
-                        "time",getNowTime()
-                )
+        User user=new User();
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                user,
+                "users with email deleted successfully",
+                200
         );
     }
 
@@ -216,12 +216,12 @@ public class AdminRestController {
                 dto.getId(),
                 dto.getAdminPassword()
         );
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "message","users with id deleted successfully",
-                        "time",getNowTime()
-                )
+        User user = new User();
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                user,
+                "users with id deleted successfully",
+                200
         );
     }
 
@@ -233,12 +233,12 @@ public class AdminRestController {
                 dto.getIds(),
                 dto.getAdminPassword()
         );
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "message","all users with ids deleted successfully",
-                        "time",getNowTime()
-                )
+        User user=new User();
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                user,
+                "all users with ids deleted successfully",
+                200
         );
     }
 

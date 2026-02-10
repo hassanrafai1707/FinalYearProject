@@ -63,7 +63,7 @@ public class User {
     private boolean locked;
 
     @Column(nullable = false)
-    private boolean expired;
+    private boolean expired; //in logout, I can set this to false and prevent login again
 
     public boolean isExpired() {
         return expired;
