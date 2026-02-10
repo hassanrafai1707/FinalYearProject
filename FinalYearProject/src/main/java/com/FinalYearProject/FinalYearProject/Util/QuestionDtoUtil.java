@@ -2,6 +2,9 @@ package com.FinalYearProject.FinalYearProject.Util;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.QuestionDTO;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,4 +43,15 @@ public class QuestionDtoUtil {
         }
         return temp;
     }
+
+    public static PageImpl<QuestionDTO> questionToQuestionDTO_Paged(Page<Question> questionPage, Pageable pageable){
+        return new PageImpl<>(
+                listOfQuestionToQuestionDto(
+                        questionPage.getContent()
+                ),
+                pageable,
+                questionPage.getTotalElements()
+        );
+    }
+
 }
