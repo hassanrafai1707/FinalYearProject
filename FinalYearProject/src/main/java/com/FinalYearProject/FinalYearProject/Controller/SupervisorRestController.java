@@ -10,7 +10,6 @@ import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,12 +37,15 @@ import java.util.Map;
 @RequestMapping("${app.version}/supervisor")
 @RestController
 public class SupervisorRestController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private QuestionService questionService;
-    @Autowired
-    private QuestionPaperService questionPaperService;
+    private final UserService userService;
+    private final QuestionService questionService;
+    private final QuestionPaperService questionPaperService;
+
+    public SupervisorRestController(UserService userService,QuestionService questionService,QuestionPaperService questionPaperService){
+       this.userService=userService;
+       this.questionService=questionService;
+       this.questionPaperService=questionPaperService;
+    }
 
     @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestion(){
