@@ -1,6 +1,5 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -411,30 +409,36 @@ public class SupervisorRestController {
         );
     }
 
-    @GetMapping("/findByCreatedByUsingEmail")
-    public ResponseEntity<?> findByCreatedByUsingEmail(@RequestBody Map<String,String> request){
-        String email= request.get("email");
-        List<Question> questions = questionService.findByCreatedByUsingEmail(email);
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with CO" ,questions
-                        )
-                );
+    @GetMapping("/questions/user/email")
+    @SneakyThrows
+    public ResponseEntity<?> findByCreatedByUsingEmail(@RequestParam("email") String email){
+        if (!email.contains("@")){
+            throw new BadRequestException("the given email is not correct");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findByCreatedByUsingEmail(email)
+                ),
+                "all questions that are made my user with email :"+email,
+                200
+        );
     }
 
-    @GetMapping("/findByCreatedByUsingId")
-    public ResponseEntity<?> findByCreatedByUsingId(@RequestBody Map<String,Long> request){
-        Long Id=request.get("id");
-        List<Question> questions =questionService.findByCreatedByUsingId(Id);
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with CO" ,questions
-                        )
-                );
+    @GetMapping("/questions/user/id")
+    @SneakyThrows
+    public ResponseEntity<?> findByCreatedByUsingId(@RequestParam("id")Long id){
+        if (id.toString().isEmpty()){
+            throw new BadRequestException("the id must contain some value");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findByCreatedByUsingId(id)
+                ),
+                "all questions that are made my user with id :"+id,
+                200
+        );
     }
 
     @GetMapping("/getAllQuestionsPaper")
