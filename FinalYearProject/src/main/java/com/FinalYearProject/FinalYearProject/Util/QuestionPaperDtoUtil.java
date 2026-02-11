@@ -37,7 +37,7 @@ public class QuestionPaperDtoUtil {
         ).collect(Collectors.toList());
     }
 
-    public static PageImpl<QuestionPaperDto> questionPaperToQuestionPaperDto(Page<QuestionPaper> questionPapers,int pageNo, int size){
+    public static PageImpl<QuestionPaperDto> questionPaperToQuestionPaperDtoPaged(Page<QuestionPaper> questionPapers,int pageNo, int size){
         return new PageImpl<>(
                 questionPapers.getContent().stream().map(questionPaper -> new QuestionPaperDto(
                         questionPaper.getId(),

@@ -6,6 +6,8 @@ import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
+import com.FinalYearProject.FinalYearProject.Util.QuestionPaperDtoUtil;
+import com.FinalYearProject.FinalYearProject.Util.QuestionPaperUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
@@ -441,46 +443,62 @@ public class SupervisorRestController {
         );
     }
 
-    @GetMapping("/getAllQuestionsPaper")
+    @GetMapping("/questionsPapers")
     public ResponseEntity<?> getAllQuestionPapers(){
-        return ResponseEntity.
-                ok(
-                        Map.of(
-                                "status","Successful",
-                                "allQuestionsPaper",questionPaperService.getAllQuestionPapers()
-                        )
-                );
-    }
-
-    @GetMapping("/getAllQuestionsPaperPaged")
-    public PagedModel<QuestionPaper> getAllQuestionsPaper(
-            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
-            @RequestParam(value = "size" , defaultValue = "100")int size
-    ){
-        return new PagedModel<>(questionPaperService.getAllQuestionPapers(pageNo, size));
-    }
-
-    @GetMapping("findQuestionPaperById")
-    public ResponseEntity<?> getAllQuestionPapers(
-            @RequestBody Map<String,Long> request
-    ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "questionPaper",questionPaperService.findById(request.get("id"))
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
+                        questionPaperService.getAllQuestionPapers()
+                ),
+                "all question papers ",
+                200
         );
     }
 
-    @GetMapping("/findByExamTitle")
-    public ResponseEntity<?> findByExamTitle(
-            @RequestBody Map<String,String> request
+    @GetMapping("/questionsPapers/paged")
+    public ResponseEntity<?> getAllQuestionsPaper(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "questionPaper",questionPaperService.findByExamTitle(request.get("examTitle"))
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDtoPaged(
+                        questionPaperService.getAllQuestionPapers(
+                                pageNo, size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "all questions papers",
+                200
+        );
+    }
+
+    @GetMapping("/questionsPapers/id")
+    public ResponseEntity<?> getAllQuestionPapers(
+           @RequestParam("id") Long id
+    ){
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                        questionPaperService.findById(id)
+                ),
+                "question paper with id:"+id,
+                200
+        );
+    }
+
+    @GetMapping("/questionsPapers/examTitle")
+    public ResponseEntity<?> findByExamTitle(
+            @RequestParam String examTitle
+    ){
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                        questionPaperService.findByExamTitle(examTitle)
+                ),
+                "question paper with exam title:"+examTitle,
+                200
         );
     }
 
