@@ -1,6 +1,5 @@
 package com.FinalYearProject.FinalYearProject.DTO.QuestionDto;
 
-import com.FinalYearProject.FinalYearProject.Domain.Question;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

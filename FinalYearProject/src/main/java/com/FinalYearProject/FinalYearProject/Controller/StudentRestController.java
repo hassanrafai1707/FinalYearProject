@@ -1,18 +1,17 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
-import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
+import com.FinalYearProject.FinalYearProject.Util.UserDtoUtil;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -44,10 +43,6 @@ public class StudentRestController {
     public StudentRestController(UserService userService,QuestionService questionService){
         this.userService=userService;
         this.questionService=questionService;
-    }
-
-    private LocalDateTime getTimeNow(){
-        return LocalDateTime.now();
     }
 
     @GetMapping("/questions")
@@ -358,29 +353,35 @@ public class StudentRestController {
     }
 
     @PatchMapping("/update/user/email")
+    @SneakyThrows
     public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
     ){
-        String email= request.get("email");
-        User upDatedUser= userService.updateUserEmail(email);
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",upDatedUser,
-                        "time",getTimeNow()
-                )
+        if(!request.containsKey("email")){
+            throw new BadRequestException("the request must contain email");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserEmail(request.get("email"))
+                ),
+                "your email has been updated",
+                200
         );
     }
 
     @PatchMapping("/update/user/password")
+    @SneakyThrows
     public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
-        String password= request.get("password");
-        User updatedUser = userService.updateUserPassword(password);
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data",updatedUser,
-                        "time",getTimeNow()
-                )
+        if (!request.containsKey("password")){
+            throw new BadRequestException("the request must contain password");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserPassword(request.get("password"))
+                ),
+                "your password has been updated",
+                200
         );
     }
 
