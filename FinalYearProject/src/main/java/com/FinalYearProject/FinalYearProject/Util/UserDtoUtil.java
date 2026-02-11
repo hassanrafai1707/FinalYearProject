@@ -26,6 +26,9 @@ public class UserDtoUtil {
     }
 
     public static List<UserDto> listOfUserToUserDto(List<User> users){
+        if (users.isEmpty()){
+            throw new IllegalArgumentException("the user passed in this method can not be null");
+        }
         return users.stream().map(user -> new UserDto(
                 user.getId(),
                 user.getName(),
@@ -38,6 +41,9 @@ public class UserDtoUtil {
     }
 
     public static PageImpl<UserDto> UserToUserDtoPaged(Page<User> users, int pageNo,int size){
+        if (users.isEmpty()||users.getContent().isEmpty()){
+            throw new IllegalArgumentException("the user passed in this method can not be null");
+        }
         return new PageImpl<>(
                 users.getContent().stream().map(user -> new UserDto(
                         user.getId(),
