@@ -186,6 +186,34 @@ public class StudentRestController {
         );
     }
 
+    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectCodeMappedCOCognitiveLevel(
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
+    ){
+        if (
+                subjectCode.isEmpty()
+                        ||mappedCO.isEmpty()
+                        ||cognitiveLevel.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO' and 'cognitiveLevel'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectCodeMappedCOCognitiveLevel(
+                                subjectCode,
+                                mappedCO,
+                                cognitiveLevel
+                        )
+                ),
+                "All questions with selected subject code, mapped co and cognitiveLevel ",
+                200
+        );
+    }
+
     @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel/pagged")
     @SneakyThrows
     private ResponseEntity<?> findByCognitiveLevel(
@@ -314,6 +342,35 @@ public class StudentRestController {
                         size
                 ),
                 "all questions with selected subject name and mapped co ",
+                200
+        );
+    }
+
+    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
+    ){
+        if (
+                subjectName.isEmpty()||
+                mappedCO.isEmpty()||
+                cognitiveLevel.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO' and 'cognitiveLevel'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                subjectName,
+                                mappedCO,
+                                cognitiveLevel
+
+                        )
+                ),
+                "All questions with selected subject name, mapped co and cognitiveLevel ",
                 200
         );
     }
