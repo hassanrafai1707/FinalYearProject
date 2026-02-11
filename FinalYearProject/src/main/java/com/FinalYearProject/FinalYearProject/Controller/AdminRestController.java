@@ -5,6 +5,7 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
+import com.FinalYearProject.FinalYearProject.Util.UserDtoUtil;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -89,15 +90,13 @@ public class AdminRestController {
         this.userService=userService;
     }
 
-    private LocalDateTime getNowTime(){
-        return LocalDateTime.now();
-    }
-
     @GetMapping("/user/id/{id}")
     public ResponseEntity<?> findUserById(@PathVariable("id") Long id){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.findUserById(id),
+                UserDtoUtil.UserToUserDto(
+                        userService.findUserById(id)
+                ),
                 "User with id: "+id,
                 200
         );
@@ -107,7 +106,9 @@ public class AdminRestController {
     public ResponseEntity<?> findByEmail(@PathVariable("email") String email) {
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.findByEmail(email),
+                UserDtoUtil.UserToUserDto(
+                        userService.findByEmail(email)
+                ),
                 "user with email: "+email,
                 200
         );
@@ -125,9 +126,11 @@ public class AdminRestController {
         ){
             throw new RoleNotValidException("User role must be ROLE_ADMIN, ROLE_TEACHER, ROLE_STUDENT, or ROLE_SUPERVISOR");
         }
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                userService.listOfUserByRole(role),
+                UserDtoUtil.listOfUserToUserDto(
+                        userService.listOfUserByRole(role)
+                ).toArray(),
                 "All users with Role : "+role,
                 200
         );
@@ -153,8 +156,12 @@ public class AdminRestController {
         }
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.listOfUserByRole(
-                        role,
+                UserDtoUtil.UserToUserDtoPaged(
+                        userService.listOfUserByRole(
+                                role,
+                                pageNo,
+                                size
+                        ),
                         pageNo,
                         size
                 ),
@@ -180,11 +187,13 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                new PagedModel<>(
+                UserDtoUtil.UserToUserDtoPaged(
                         userService.findAllUsersPage(
                                 pageNo,
                                 size
-                        )
+                        ),
+                        pageNo,
+                        size
                 ),
                 "all users ",
                 200
@@ -233,10 +242,9 @@ public class AdminRestController {
                 dto.getIds(),
                 dto.getAdminPassword()
         );
-        User user=new User();
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                user,
+                new UserDto(),
                 "all users with ids deleted successfully",
                 200
         );
@@ -247,12 +255,11 @@ public class AdminRestController {
             @RequestBody DtoForEmailsAndPasswordInRequest dto
     ){
         userService.deleteUserInBatchEmail(dto.getEmails(),dto.getAdminPassword());
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "message","all users deleted successfully with emails",
-                        "time",getNowTime()
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                new UserDto(),
+                "all users with emails have been deleted",
+                200
         );
     }
 
@@ -262,10 +269,10 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.suspendUserById(
+                UserDtoUtil.UserToUserDto(userService.suspendUserById(
                         dto.getId(),
                         dto.getAdminPassword()
-                ),
+                )),
                 "User suspended successful",
                 200
         );
@@ -277,10 +284,10 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.unsuspendUserById(
+                UserDtoUtil.UserToUserDto(userService.unsuspendUserById(
                         dto.getId(),
                         dto.getAdminPassword()
-                ),
+                )),
                 "User unsuspended successful",
                 200
         );
@@ -292,10 +299,10 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.suspendUserByEmail(
+                UserDtoUtil.UserToUserDto(userService.suspendUserByEmail(
                         dto.getEmail(),
                         dto.getAdminPassword()
-                ),
+                )),
                 "user suspend successfully",
                 200
         );
@@ -305,15 +312,16 @@ public class AdminRestController {
     public ResponseEntity<?> unsuspendUserByEmail(
             @RequestBody DtoForEmailAndAdminPasswordInRequest dto
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful",
-                        "data", userService.unsuspendUserByEmail(
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                UserDtoUtil.UserToUserDto(
+                        userService.unsuspendUserByEmail(
                                 dto.getEmail(),
                                 dto.getAdminPassword()
-                        ),
-                        "time",getNowTime()
-                )
+                        )
+                ),
+                "user with email :"+dto.getEmail()+" has been unsuspend successful",
+                200
         );
     }
 
@@ -323,11 +331,11 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.updateUserPasswordByEmail(
+                UserDtoUtil.UserToUserDto(userService.updateUserPasswordByEmail(
                         dto.getEmail(),
                         dto.getPassword(),
                         dto.getAdminPassword()
-                ),
+                )),
                 "User password successfully",
                 200
         );
@@ -339,11 +347,11 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.updateUserPasswordById(
+                UserDtoUtil.UserToUserDto(userService.updateUserPasswordById(
                         dto.getId(),
                         dto.getPassword(),
                         dto.getAdminPassword()
-                ),
+                )),
                 "User with id has been updated successfully",
                 200
         );
@@ -355,11 +363,11 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.updateUserRoleById(
+                UserDtoUtil.UserToUserDto(userService.updateUserRoleById(
                         dto.getRole(),
                         dto.getId(),
                         dto.getPassword()
-                ),
+                )),
                 "user role updated successfully ",
                 200
         );
@@ -371,11 +379,11 @@ public class AdminRestController {
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.updateUserRoleByEmail(
+                UserDtoUtil.UserToUserDto(userService.updateUserRoleByEmail(
                         dto.getRole(),
                         dto.getEmail(),
                         dto.getPassword()
-                ),
+                )),
                 "users role is updated successfully",
                 200
         );
@@ -386,7 +394,9 @@ public class AdminRestController {
         String email= request.get("newEmail");
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.updateUserEmail(email),
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserEmail(email)
+                ),
                 "your email has been updated",
                 200
         );
@@ -397,7 +407,9 @@ public class AdminRestController {
         String password= request.get("password");
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                userService.updateUserPassword(password),
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserPassword(password)
+                ),
                 "your password has been updated successfully ",
                 200
         );
