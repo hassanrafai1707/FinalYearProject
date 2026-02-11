@@ -46,12 +46,11 @@ public class QuestionDtoUtil {
     }
 
     public static PageImpl<QuestionDTO> questionToQuestionDTO_Paged(Page<Question> questionPage, int pageNo, int size){
-        Pageable pageable= PageRequest.of(pageNo,size);
         return new PageImpl<>(
                 listOfQuestionToQuestionDto(
                         questionPage.getContent()
                 ),
-                pageable,
+                PageRequest.of(pageNo,size),
                 questionPage.getTotalElements()
         );
     }

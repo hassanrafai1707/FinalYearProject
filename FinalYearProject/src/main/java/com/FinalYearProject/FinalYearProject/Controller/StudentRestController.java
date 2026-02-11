@@ -79,7 +79,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/question/id/{id}")
+    @GetMapping("/question/id")
     @SneakyThrows
     public ResponseEntity<?> getQuestionById (@RequestParam("id") Long id){
         if (id.toString().isEmpty()){
@@ -95,10 +95,10 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/{subjectCode}")
+    @GetMapping("/questions/subjectCode")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCode(@RequestParam("subjectCode") String subjectCode) {
-        if (!subjectCode.isEmpty()){
+        if (subjectCode.isEmpty()){
             throw new BadRequestException("the request must contain 'subjectCode'");
         }
         return ResponseUtility.responseTemplateForMultipleData(
@@ -116,16 +116,16 @@ public class StudentRestController {
     public ResponseEntity<?> findBySubjectCode(
             @RequestParam(value = "pageNo" ,defaultValue = "0") int pageNo,
             @RequestParam(value = "size" , defaultValue = "100") int size,
-            @RequestBody Map<String,String> request
+            @RequestParam("subjectCode") String subjectCode
     ){
-        if (!request.containsKey("subjectCode")){
+        if (subjectCode.isEmpty()){
             throw new BadRequestException("the request must contain 'subjectCode'");
         }
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
                         questionService.findBySubjectCode(
-                                request.get("subjectCode"),
+                                subjectCode,
                                 pageNo,
                                 size
                         ),
@@ -137,12 +137,12 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/{subjectCode}/mappedCO/{mappedCO}")
+    @GetMapping("/questions/subjectCode/mappedCO")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCodeMappedCO(
             @RequestParam("subjectCode") String subjectCode,
             @RequestParam("mappedCO") String mappedCO
-            ){
+    ){
         if (
                 subjectCode.isEmpty()
                 ||mappedCO.isEmpty()
@@ -165,11 +165,12 @@ public class StudentRestController {
     public ResponseEntity<?> findBySubjectCodeMappedCO(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
-            @RequestBody DtoForSubjectCodeAndMappedCO dto
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO
     ){
         if (
-                dto.getSubjectCode().isEmpty()
-                ||dto.getMappedCO().isEmpty()
+                subjectCode.isEmpty()
+                ||mappedCO.isEmpty()
         ){
             throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
         }
@@ -177,8 +178,8 @@ public class StudentRestController {
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
                         questionService.findBySubjectCodeMappedCO(
-                                dto.getSubjectCode(),
-                                dto.getMappedCO(),
+                                subjectCode,
+                                mappedCO,
                                 pageNo,
                                 size
                         ),
@@ -195,12 +196,14 @@ public class StudentRestController {
     private ResponseEntity<?> findByCognitiveLevel(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
-            @RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
     ){
         if (
-                dto.getSubjectCode().isEmpty()
-                ||dto.getMappedCO().isEmpty()
-                ||dto.getCognitiveLevel().isEmpty()
+                subjectCode.isEmpty()
+                ||mappedCO.isEmpty()
+                ||cognitiveLevel.isEmpty()
         ){
             throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO' and 'cognitiveLevel'");
         }
@@ -208,9 +211,9 @@ public class StudentRestController {
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
                         questionService.findBySubjectCodeMappedCOCognitiveLevel(
-                                dto.getSubjectCode(),
-                                dto.getMappedCO(),
-                                dto.getCognitiveLevel(),
+                                subjectCode,
+                                mappedCO,
+                                cognitiveLevel,
                                 pageNo,
                                 size
                         ),
@@ -222,7 +225,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/{subjectName}")
+    @GetMapping("/questions/subjectName")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectName(@RequestParam("subjectName") String subjectName){
         if (!subjectName.isEmpty()){
@@ -245,43 +248,46 @@ public class StudentRestController {
     public ResponseEntity<?> findBySubjectName(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
-            @RequestBody Map<String,String> request
+            @RequestParam("subjectName") String subjectName
     ){
-        if (!request.containsKey("subjectName")){
+        if (subjectName.isEmpty()){
             throw new BadRequestException("the request must contain 'subjectName'");
         }
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
                         questionService.findBySubjectName(
-                                request.get("subjectName"),
+                                subjectName,
                                 pageNo,
                                 size
                         ),
                         pageNo,
                         size
                 ),
-                "All questions with selected subject name :"+request.get("subjectName"),
+                "All questions with selected subject name :"+subjectName,
                 200
         );
     }
 
-    @GetMapping("/questions/subjectName/{subjectName}/mappedCO/{mappedCO}")
+    @GetMapping("/questions/subjectName/mappedCO")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
+    public ResponseEntity<?> findBySubjectNameMappedCO(
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO
+            ){
         if (
-                dto.getSubjectName().isEmpty()
-                ||dto.getMappedCO().isEmpty()
+                subjectName.isEmpty()
+                ||mappedCO.isEmpty()
         ){
             throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
                 questionService.findBySubjectNameMappedCO(
-                        dto.getSubjectName(),
-                        dto.getMappedCO()
+                        subjectName,
+                        mappedCO
                 ).toArray(),
-                "questions with subject name and mapped Co"+dto.getSubjectName()+" "+dto.getMappedCO(),
+                "questions with subject name and mapped Co"+subjectName+" "+mappedCO,
                 200
         );
     }
@@ -291,11 +297,12 @@ public class StudentRestController {
     public ResponseEntity<?> findBySubjectNameMappedCO(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
-            @RequestBody DtoForSubjectNameAndMappedCO dto
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO
     ){
         if (
-                dto.getSubjectName().isEmpty()
-                ||dto.getMappedCO().isEmpty()
+                subjectName.isEmpty()
+                ||mappedCO.isEmpty()
         ){
             throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
         }
@@ -303,8 +310,8 @@ public class StudentRestController {
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
                         questionService.findBySubjectCodeMappedCO(
-                                dto.getSubjectName(),
-                                dto.getMappedCO(),
+                                subjectName,
+                                mappedCO,
                                 pageNo,
                                 size
                         ),
@@ -321,12 +328,14 @@ public class StudentRestController {
     public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
-            @RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
     ){
         if (
-                dto.getSubjectName().isEmpty()
-                ||dto.getMappedCO().isEmpty()
-                ||dto.getCognitiveLevel().isEmpty()
+                subjectName.isEmpty()||
+                mappedCO.isEmpty()||
+                cognitiveLevel.isEmpty()
         ){
             throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO' and 'cognitiveLevel'");
         }
@@ -334,9 +343,9 @@ public class StudentRestController {
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
                         questionService.findBySubjectNameMappedCOCognitiveLevel(
-                                dto.getSubjectName(),
-                                dto.getMappedCO(),
-                                dto.getCognitiveLevel(),
+                                subjectName,
+                                mappedCO,
+                                cognitiveLevel,
                                 pageNo,
                                 size
                         ),
