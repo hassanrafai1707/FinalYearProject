@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class QuestionPaperDtoUtil {
     private QuestionPaperDtoUtil(){};
@@ -18,7 +17,8 @@ public class QuestionPaperDtoUtil {
                 questionPaper.getExamTitle(),
                 questionPaper.getGeneratedBy(),
                 questionPaper.getApproved(),
-                questionPaper.getApprovedBy()
+                questionPaper.getApprovedBy(),
+                questionPaper.getListOfQuestion()
         );
     }
 
@@ -32,9 +32,10 @@ public class QuestionPaperDtoUtil {
                         questionPaper.getExamTitle(),
                         questionPaper.getGeneratedBy(),
                         questionPaper.getApproved(),
-                        questionPaper.getApprovedBy()
+                        questionPaper.getApprovedBy(),
+                        questionPaper.getListOfQuestion()
                 )
-        ).collect(Collectors.toList());
+        ).toList();
     }
 
     public static PageImpl<QuestionPaperDto> questionPaperToQuestionPaperDtoPaged(Page<QuestionPaper> questionPapers,int pageNo, int size){
@@ -44,8 +45,9 @@ public class QuestionPaperDtoUtil {
                         questionPaper.getExamTitle(),
                         questionPaper.getGeneratedBy(),
                         questionPaper.getApproved(),
-                        questionPaper.getApprovedBy()
-                )).collect(Collectors.toList()),
+                        questionPaper.getApprovedBy(),
+                        questionPaper.getListOfQuestion()
+                )).toList(),
                 PageRequest.of(pageNo,size),
                 questionPapers.getTotalElements()
         );
