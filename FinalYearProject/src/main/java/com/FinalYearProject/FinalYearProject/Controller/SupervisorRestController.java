@@ -502,43 +502,54 @@ public class SupervisorRestController {
         );
     }
 
-    @GetMapping("/findByGeneratedByUsingEmail")
+    @GetMapping("/questionsPapers/user/email")
     public ResponseEntity<?> findByGeneratedByUsingEmail(
-            @RequestBody Map<String,String> request
+            @RequestParam("email") String email
     ){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "questionPaper",questionPaperService.findByGeneratedByUsingEmail(request.get("email"))
-                        )
-                );
-    }
-
-    @GetMapping("/findByGeneratedByUsingEmailPaged")
-    public PagedModel<QuestionPaper> findByGeneratedByUsingEmail(
-            @RequestParam(value = "pageNo" ,defaultValue =  "0") int pageNo,
-            @RequestParam(value = "size", defaultValue = "100") int size,
-            @RequestBody Map<String,String> request
-    ){
-        return new PagedModel<>(questionPaperService.
-                        findByGeneratedByUsingEmail(
-                                request.get("email"),
-                                pageNo,
-                                size
-                        )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
+                        questionPaperService.findByGeneratedByUsingEmail(email)
+                ),
+                "all question papers my user with email:"+email,
+                200
         );
     }
 
-    @GetMapping("/findByGeneratedByUsingId")
-    public ResponseEntity<?> findByGeneratedByUsingId(
-            @RequestBody Map<String,Long> request
+    @GetMapping("/questionsPapers/user/email/paged")
+    public ResponseEntity<?> findByGeneratedByUsingEmail(
+            @RequestParam(value = "pageNo" ,defaultValue =  "0") int pageNo,
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam("email") String email
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "questionPaper",questionPaperService.findByGeneratedByUsingId(request.get("id"))
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDtoPaged(
+                        questionPaperService.
+                                findByGeneratedByUsingEmail(
+                                        email,
+                                        pageNo,
+                                        size
+                                ),
+                        pageNo,
+                        size
+                ),
+                "all question papers my user with email:"+email,
+                200
+        );
+    }
+
+    @GetMapping("/questionsPapers/user/id")
+    public ResponseEntity<?> findByGeneratedByUsingId(
+            @RequestParam("id") Long id
+    ){
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
+                        questionPaperService.findByGeneratedByUsingId(id)
+                ),
+                "all question papers my user with id:"+id,
+                200
         );
     }
 
