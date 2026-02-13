@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,11 +47,8 @@ public class QuestionPaperService {
     @Autowired
     private QuestionService questionService;
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> getAllQuestionPapers(){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         List<QuestionPaper> questionPapers=questionPaperRepository.findAll();
         if (questionPapers.isEmpty()){
             throw new QuestionPaperNotFoundException("no question paper in db");
@@ -60,11 +58,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<QuestionPaper> getAllQuestionPapers(int pageNo , int size){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<QuestionPaper> questionPaperPage=questionPaperRepository.findAll(pageable);
         if (!(questionPaperPage.isEmpty())){
@@ -75,29 +70,20 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public QuestionPaper findById(Long Id){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         return questionPaperRepository.findById(Id)
                 .orElseThrow(()-> new QuestionPaperNotFoundException("no question paper with id"+Id));
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public QuestionPaper findByExamTitle(String examTitle) {
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         return questionPaperRepository.findByExamTitle(examTitle)
                 .orElseThrow(()-> new QuestionPaperNotFoundException("no question paper with exam title"+examTitle));
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> findByGeneratedByUsingEmail(String email){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         User user=userService.findByEmail(email);
         List<QuestionPaper> questionPapersGeneratedByUser=questionPaperRepository.findByGeneratedBy(user);
         if (questionPapersGeneratedByUser.isEmpty()){
@@ -108,6 +94,7 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<QuestionPaper> findByGeneratedByUsingEmail(String email, int pageNo, int size){
         String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
         if (!(userRole.contains("ROLE_SUPERVISOR"))){
@@ -124,11 +111,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> findByGeneratedByUsingId(Long Id){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         User user=userService.findUserById(Id);
         List<QuestionPaper> questionPapers=questionPaperRepository.findByGeneratedBy(user);
         if (questionPapers.isEmpty()){
@@ -139,11 +123,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<QuestionPaper> findByGeneratedByUsingId(Long Id,int pageNo,int size){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         Pageable pageable=PageRequest.of(pageNo,size);
         User user=userService.findUserById(Id);
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByGeneratedBy(user,pageable);
@@ -155,11 +136,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> findByApprovedByUsingEmail(String email){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         User user=userService.findByEmail(email);
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(user);
         if (questionPapers.isEmpty()){
@@ -170,11 +148,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public  Page<QuestionPaper> findByApprovedByUsingEmail(String email, int pageNo , int size){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         Pageable pageable=PageRequest.of(pageNo,size);
         User user=userService.findByEmail(email);
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(user,pageable);
@@ -187,11 +162,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> findByApprovedByUsingId(Long Id){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         User user=userService.findUserById(Id);
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(user);
         if (questionPapers.isEmpty()){
@@ -202,11 +174,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<QuestionPaper> findByApprovedByUsingId(Long Id,int pageNo,int size){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         Pageable pageable=PageRequest.of(pageNo,size);
         User user=userService.findUserById(Id);
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(user,pageable);
@@ -218,11 +187,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> findApproved(){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(Boolean.TRUE);
         if (questionPapers.isEmpty()){
             throw new QuestionPaperNotFoundException("no question paper has been approved yet ");
@@ -232,11 +198,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<QuestionPaper> findApproved(int pageNo,int size){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(Boolean.TRUE,pageable);
         if (!(questionPapers.isEmpty())){
@@ -247,11 +210,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> findNotApproved(){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(Boolean.FALSE);
         if (questionPapers.isEmpty()){
             throw new QuestionPaperNotFoundException("no question paper has been left to approve");
@@ -261,11 +221,8 @@ public class QuestionPaperService {
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<QuestionPaper> findNotApproved(int pageNo,int size){
-        String userRole=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(userRole.contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("user not authorized to make this request");
-        }
         Pageable pageable=PageRequest.of(pageNo,size);
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(Boolean.FALSE,pageable);
         if (!(questionPapers.isEmpty())){
@@ -277,106 +234,91 @@ public class QuestionPaperService {
     }
 
     @Transactional
+    @PreAuthorize("ROLE_SUPERVISOR")
     public QuestionPaper approveQuestionPaperById(Long id){
         String userEmail=UserUtil.getUserAuthentication().getUsername();
         User user=userService.findByEmail(userEmail);
-        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        QuestionPaper questionPaper=questionPaperRepository
+                .findById(id)
+                .orElseThrow(
+                        ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
+                );
+        if (questionPaper.getApproved().equals(Boolean.TRUE)){
+            return questionPaper;
         }
         else {
-           QuestionPaper questionPaper=questionPaperRepository
-                   .findById(id)
-                   .orElseThrow(
-                           ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
-                   );
-           if (questionPaper.getApproved().equals(Boolean.TRUE)){
-               return questionPaper;
-           }
-           else {
-               questionPaper.setApproved(Boolean.TRUE);
-               questionPaper.setApprovedBy(user);
-               questionPaperRepository.save(questionPaper);
-               return questionPaper;
-           }
+            questionPaper.setApproved(Boolean.TRUE);
+            questionPaper.setApprovedBy(user);
+            questionPaperRepository.save(questionPaper);
+            return questionPaper;
         }
     }
 
     @Transactional
+    @PreAuthorize("ROLE_SUPERVISOR")
     public QuestionPaper notApproveQuestionPaperById(Long id){
         String userEmail=UserUtil.getUserAuthentication().getUsername();
         User user=userService.findByEmail(userEmail);
-        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        QuestionPaper questionPaper=questionPaperRepository
+                .findById(id)
+                .orElseThrow(
+                        ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
+                );
+        if (questionPaper.getApproved().equals(Boolean.FALSE)){
+                return questionPaper;
         }
         else {
-            QuestionPaper questionPaper=questionPaperRepository
-                    .findById(id)
-                    .orElseThrow(
-                            ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
-                    );
-            if (questionPaper.getApproved().equals(Boolean.FALSE)){
-                return questionPaper;
-            }
-            else {
-                questionPaper.setApproved(Boolean.FALSE);
-                questionPaper.setApprovedBy(user);
-                questionPaperRepository.save(questionPaper);
-                return questionPaper;
-            }
+            questionPaper.setApproved(Boolean.FALSE);
+            questionPaper.setApprovedBy(user);
+            questionPaperRepository.save(questionPaper);
+            return questionPaper;
         }
     }
 
     @Transactional
+    @PreAuthorize("ROLE_SUPERVISOR")
     public QuestionPaper approvedQuestionPaperByTile(String examTitle){
         String userEmail=UserUtil.getUserAuthentication().getUsername();
         User user=userService.findByEmail(userEmail);
-        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        QuestionPaper questionPaper = questionPaperRepository
+                .findByExamTitle(examTitle)
+                .orElseThrow(
+                        ()-> new QuestionPaperNotFoundException("question paper with title :"+examTitle+" does not exist ")
+                );
+        if (questionPaper.getApproved().equals(Boolean.TRUE)){
+            return questionPaper;
         }
         else {
-            QuestionPaper questionPaper = questionPaperRepository
-                    .findByExamTitle(examTitle)
-                    .orElseThrow(
-                            ()-> new QuestionPaperNotFoundException("question paper with title :"+examTitle+" does not exist ")
-                    );
-            if (questionPaper.getApproved().equals(Boolean.TRUE)){
-                return questionPaper;
-            }
-            else {
-                questionPaper.setApproved(Boolean.TRUE);
-                questionPaper.setApprovedBy(user);
-                questionPaperRepository.save(questionPaper);
-                return questionPaper;
-            }
+            questionPaper.setApproved(Boolean.TRUE);
+            questionPaper.setApprovedBy(user);
+            questionPaperRepository.save(questionPaper);
+            return questionPaper;
         }
     }
 
     @Transactional
+    @PreAuthorize("ROLE_SUPERVISOR")
     public QuestionPaper notApprovedQuestionPaperByTile(String examTitle){
         String userEmail=UserUtil.getUserAuthentication().getUsername();
         User user=userService.findByEmail(userEmail);
-        if (!(user.getRole().contains("ROLE_SUPERVISOR"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
+        QuestionPaper questionPaper = questionPaperRepository
+                .findByExamTitle(examTitle)
+                .orElseThrow(
+                        ()-> new QuestionPaperNotFoundException("question paper with title :"+examTitle+" does not exist ")
+                );
+        if (questionPaper.getApproved().equals(Boolean.FALSE)){
+            return questionPaper;
         }
         else {
-            QuestionPaper questionPaper = questionPaperRepository
-                    .findByExamTitle(examTitle)
-                    .orElseThrow(
-                            ()-> new QuestionPaperNotFoundException("question paper with title :"+examTitle+" does not exist ")
-                    );
-            if (questionPaper.getApproved().equals(Boolean.FALSE)){
-                return questionPaper;
-            }
-            else {
-                questionPaper.setApproved(Boolean.FALSE);
-                questionPaper.setApprovedBy(user);
-                questionPaperRepository.save(questionPaper);
-                return questionPaper;
-            }
+            questionPaper.setApproved(Boolean.FALSE);
+            questionPaper.setApprovedBy(user);
+            questionPaperRepository.save(questionPaper);
+            return questionPaper;
         }
     }
 
     @Transactional
+    @PreAuthorize("ROLE_TEACHER")
     public QuestionPaper addQuestionPaper(QuestionPaper questionPaper) throws BadRequestException{
         String email = UserUtil.getUserAuthentication().getUsername();
         User user = userService.findByEmail(email);
@@ -386,29 +328,22 @@ public class QuestionPaperService {
                 .map(Question::getId)
                 .toList();
         String questionPaperFingerprint;
-        Set<Question> questions;
-        if (!user.getRole().equals("ROLE_TEACHER")){
-            throw new UserNotAuthorizesException("User not Authorizes to make this request");
+        Set<Question> questions=new HashSet<>(questionService.getQuestionByIds(Ids));
+        if (!(Ids.size()==questions.size())){
+            throw new BadRequestException("there are a few band questions");
         }
         else {
-            questions= new HashSet<>(questionService.getQuestionByIds(Ids));
-            if (!(Ids.size()==questions.size())){
-                throw new BadRequestException("there are a few band questions");
-            }
-            else {
-                questionPaperFingerprint = QuestionPaperUtil.sha256FingerPrintUsingIds(Ids);
-                if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)) {
-                    throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
-                } else {
-                    questionPaper.setListOfQuestion(questions);
-                    questionPaper.setGeneratedBy(user);
-                    questionPaper.setApproved(Boolean.FALSE);
-                    questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
-                    questionPaperRepository.save(questionPaper);
-                }
+            questionPaperFingerprint = QuestionPaperUtil.sha256FingerPrintUsingIds(Ids);
+            if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)) {
+                throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
+            } else {
+                questionPaper.setListOfQuestion(questions);
+                questionPaper.setGeneratedBy(user);
+                questionPaper.setApproved(Boolean.FALSE);
+                questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
+                questionPaperRepository.save(questionPaper);
             }
         }
         return questionPaper;
     }
-
 }
