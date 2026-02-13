@@ -7,6 +7,7 @@ import com.FinalYearProject.FinalYearProject.Service.UserService;
 import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.QuestionPaperDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
+import com.FinalYearProject.FinalYearProject.Util.UserDtoUtil;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -714,86 +715,103 @@ public class SupervisorRestController {
         );
     }
 
-    @PatchMapping("/approveQuestionPaperById")
+    @PatchMapping("/questionsPapers/approv/id")
     public ResponseEntity<?> approveQuestionPaperById(
             @RequestBody Map<String,Long> request
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "approved Question paper",questionPaperService.
-                                approveQuestionPaperById(
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                        questionPaperService.approveQuestionPaperById(
                                         request.get("id")
-                                )
-                )
+                        )
+                ),
+                "the selected question has been approved with id:"+request.get("id"),
+                200
         );
     }
 
-    @PatchMapping("/notApproveQuestionPaperById")
+    @PatchMapping("/questionsPapers/not-approv/id")
     public ResponseEntity<?> notApproveQuestionPaperById(
             @RequestBody Map<String,Long> request
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "not approved Question paper",questionPaperService
-                                .notApproveQuestionPaperById(
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                        questionPaperService.notApproveQuestionPaperById(
                                 request.get("id")
                         )
-                )
+                ),
+                "the selected question has been not approved with id:"+request.get("id"),
+                200
         );
     }
 
-    @PatchMapping("/approvedQuestionPaperByTile")
+    @PatchMapping("/questionsPapers/approv/examTitle")
     public ResponseEntity<?> approvedQuestionPaperByTile(
             @RequestBody Map<String,String> request
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "approved Question paper",questionPaperService
-                                .approvedQuestionPaperByTile(
-                                        request.get("examTitle")
-                                )
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                        questionPaperService.approvedQuestionPaperByTile(
+                                request.get("examTitle")
+                        )
+                ),
+                "the selected question has been approved with examTitle:"+request.get("examTitle"),
+                200
         );
     }
 
-    @PatchMapping("/notApprovedQuestionPaperByTile")
+    @PatchMapping("/questionsPapers/not-approv/examTitle")
     public ResponseEntity<?> notApprovedQuestionPaperByTile(
             @RequestBody Map<String,String> request
     ){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "not approved Question paper",questionPaperService
-                                .notApprovedQuestionPaperByTile(request.get("examTitle"))
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                        questionPaperService.notApprovedQuestionPaperByTile(
+                                request.get("examTitle")
+                        )
+                ),
+                "the selected question has been not approved with examTitle:"+request.get("examTitle"),
+                200
         );
     }
 
-    @PatchMapping("/updateUserEmail")
-    public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
+    @PatchMapping("/update/user/email")
+    @SneakyThrows
+    public ResponseEntity<?>updateUserEmailById(
+            @RequestBody Map<String,String> request
     ){
-        String email= request.get("email");
-        User upDatedUser= userService.updateUserEmail(email);
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "updatedUser",upDatedUser
-                )
+        if(!request.containsKey("email")){
+            throw new BadRequestException("the request must contain email");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserEmail(request.get("email"))
+                ),
+                "your email has been updated",
+                200
         );
     }
 
-    @PatchMapping("/updateUserPassword")
-    public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
-        String password= request.get("password");
-        User updatedUser = userService.updateUserPassword(password);
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "updatedUser",updatedUser
-                )
+    @PatchMapping("/update/user/password")
+    @SneakyThrows
+    public ResponseEntity<?> updateUserPasswordById(
+            @RequestBody Map<String,String> request
+    ){
+        if (!request.containsKey("password")){
+            throw new BadRequestException("the request must contain password");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserPassword(request.get("password"))
+                ),
+                "your password has been updated",
+                200
         );
     }
 
