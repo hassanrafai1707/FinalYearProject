@@ -67,7 +67,10 @@ public class QuestionPaper {
     @JoinColumn(name = "approved_by", nullable = true)
     private User approvedBy;
 
-    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = {
+            CascadeType.MERGE,
+            CascadeType.PERSIST
+    })
     @JoinTable(name = "question_paper_and_qusetion",
             joinColumns = {
             @JoinColumn(name = "question_paper_id" ,referencedColumnName = "id")
