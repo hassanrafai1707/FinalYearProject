@@ -4,24 +4,19 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
-import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import com.FinalYearProject.FinalYearProject.Util.QuestionUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.*;
 
-@Service
-@AllArgsConstructor
 /**
  * QuestionService - Business Logic Service for Question Bank Management
  * PURPOSE: Core service for question bank operations including CRUD, advanced filtering, intelligent paper generation, and business rule enforcement.
@@ -36,12 +31,16 @@ import java.util.*;
  * ERROR HANDLING: Comprehensive exception handling - QuestionNotFoundException, DuplicateQuestionException, UnacceptableQuestion, UserNotAuthorizesException with meaningful messages.
  * INTEGRATION: Works with QuestionRepository for data access, UserService for user validation, and QuestionUtil for fingerprint generation and validation.
  */
+@Service
 public class QuestionService {
 
-    @Autowired
-    private QuestionRepository questionRepository;
-    @Autowired
-    private UserService userService;
+    private final QuestionRepository questionRepository;
+    private final UserService userService;
+
+    public QuestionService( QuestionRepository questionRepository, UserService userService){
+        this.questionRepository=questionRepository;
+        this.userService=userService;
+    }
 
     public List<Question> getAllQuestion(){
         List<Question> tempQuestion=questionRepository.findAll();
@@ -54,8 +53,7 @@ public class QuestionService {
     }
 
     public Page<Question> getAllQuestionsPaged(int pageNo,int size){
-        Pageable pageable= PageRequest.of(pageNo,size);
-        Page<Question> temp=questionRepository.findAll(pageable);
+        Page<Question> temp=questionRepository.findAll(PageRequest.of(pageNo,size));
         if (!(temp.isEmpty())){
             return temp;
         }
@@ -86,8 +84,7 @@ public class QuestionService {
     }
 
     public Page<Question> findBySubjectCode(String subjectCode,int pageNo,int size){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> temp = questionRepository.findBySubjectCode(subjectCode,pageable);
+        Page<Question> temp = questionRepository.findBySubjectCode(subjectCode,PageRequest.of(pageNo,size));
         if (!(temp.isEmpty())){
             return temp;
         }
@@ -103,8 +100,11 @@ public class QuestionService {
     }
 
     public Page<Question> findBySubjectCodeMappedCO(String subjectCode,String mappedCO, int pageNo, int size){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCO(subjectCode,mappedCO,pageable);
+        Page<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCO(
+                subjectCode,
+                mappedCO,
+                PageRequest.of(pageNo,size)
+        );
         if (!(tempQuestions.isEmpty())){
             return tempQuestions;
         }
@@ -132,12 +132,11 @@ public class QuestionService {
             int pageNo,
             int size
             ){
-        Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> questions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(
                 subjectCode,
                 mappedCO,
                 cognitiveLevel,
-                pageable
+                PageRequest.of(pageNo,size)
         );
         if (questions.isEmpty()){
             throw new QuestionNotFoundException("No questions found with Subject name: "+subjectCode+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
@@ -154,8 +153,7 @@ public class QuestionService {
     }
 
     public Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> temp=questionRepository.findBySubjectName(subjectName,pageable);
+        Page<Question> temp=questionRepository.findBySubjectName(subjectName,PageRequest.of(pageNo,size));
         if (!(temp.isEmpty())){
             return temp;
         }
@@ -171,8 +169,11 @@ public class QuestionService {
     }
 
     public Page<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO,int pageNo,int size){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        Page<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(subjectName,mappedCO,pageable);
+        Page<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(
+                subjectName,
+                mappedCO,
+                PageRequest.of(pageNo,size)
+        );
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -200,104 +201,93 @@ public class QuestionService {
             int pageNo,
             int size
     ){
-        Pageable pageable=PageRequest.of(pageNo,size);
         Page<Question> questions=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(
                 subjectName,
                 mappedCO,
                 cognitiveLevel,
-                pageable
+                PageRequest.of(pageNo,size)
         );
         if (questions.isEmpty()){
             throw new QuestionNotFoundException("No questions found with Subject name: "+subjectName+"and Mapped CO"+mappedCO+"Cognitive level"+cognitiveLevel);
         }
         return questions;
     }
+
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<Question> findByCreatedByUsingEmail(String email){
-        User tempUser= userService.findByEmail(email);
-        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
-            throw new UserNotAuthorizesException("User with email is not authorized to make questions"+email);
+        List<Question> tempQuestion=questionRepository.findByCreatedBy(userService.findByEmail(email));
+        if (!(tempQuestion.isEmpty())){
+            return tempQuestion;
         }
         else {
-            List<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser);
-            if (!(tempQuestion.isEmpty())){
-                return tempQuestion;
-            }
-            else {
-                throw new QuestionNotFoundException("User with the email has not created any Question"+email);
-            }
+            throw new QuestionNotFoundException("User with the email has not created any Question"+email);
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<Question> findByCreatedByUsingEmail(String email, int pageNo,int size){
-        User tempUser= userService.findByEmail(email);
-        Pageable pageable= PageRequest.of(pageNo,size);
-        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
-            throw new UserNotAuthorizesException("User with email is not authorized to make questions"+email);
+        Page<Question> tempQuestion=questionRepository.findByCreatedBy(
+                userService.findByEmail(email),
+                PageRequest.of(pageNo,size)
+        );
+        if (!(tempQuestion.isEmpty())){
+            return tempQuestion;
         }
         else {
-            Page<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser,pageable);
-            if (!(tempQuestion.isEmpty())){
-                return tempQuestion;
-            }
-            else {
-                throw new QuestionNotFoundException("User with the email has not created any Question"+email);
-            }
+            throw new QuestionNotFoundException("User with the email has not created any Question"+email);
         }
     }
 
+    @PreAuthorize("ROLE_SUPERVISOR")
     public List<Question> findByCreatedByUsingId(Long Id){
-        User tempUser=userService.findUserById(Id);
-        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
-            throw new UserNotAuthorizesException("User with id is not authorized to make questions"+Id);
+        List<Question> tempQuestion=questionRepository.findByCreatedBy(userService.findUserById(Id));
+        if (!(tempQuestion.isEmpty())){
+            return tempQuestion;
         }
         else {
-            List<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser);
-            if (!(tempQuestion.isEmpty())){
-                return tempQuestion;
-            }
-            else {
-                throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
-            }
+            throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
         }
     }
-    //todo use this method in supervise
+
+    @PreAuthorize("ROLE_SUPERVISOR")
     public Page<Question> findByCreatedByUsingId(Long Id,int pageNo,int size){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        User tempUser=userService.findUserById(Id);
-        if (!tempUser.getRole().equalsIgnoreCase("ROLE_TEACHER")) {
-            throw new UserNotAuthorizesException("User with id is not authorized to make questions"+Id);
+        Page<Question> tempQuestion=questionRepository.findByCreatedBy(
+                userService.findUserById(Id),
+                PageRequest.of(pageNo,size)
+        );
+        if (!(tempQuestion.isEmpty())){
+            return tempQuestion;
         }
         else {
-            Page<Question> tempQuestion=questionRepository.findByCreatedBy(tempUser,pageable);
-            if (!(tempQuestion.isEmpty())){
-                return tempQuestion;
-            }
-            else {
-                throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
-            }
+            throw new QuestionNotFoundException("User with the Id has not created any Question"+Id);
         }
     }
 
+    @PreAuthorize("ROLE_TEACHER")
     public List<Question> getAllQuestionsByCurrentUser(){
-        String email=UserUtil.getUserAuthentication().getUsername();
-        String role=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(role.contains("ROLE_TEACHER"))){
-            throw new UserNotAuthorizesException("You are not authorized to make this request");
+        List<Question> questions=questionRepository.findByCreatedBy(
+                userService.findByEmail(
+                        UserUtil.getUserAuthentication().getUsername()
+                )
+        );
+        if (questions.isEmpty()){
+            throw new QuestionNotFoundException("you have not created any questions");
         }
-        else {
-            return findByCreatedByUsingEmail(email);
-        }
+        return questions;
     }
 
+    @PreAuthorize("ROLE_TEACHER")
     public Page<Question> getAllQuestionsByCurrentUser(int pageNo,int size){
-        String email=UserUtil.getUserAuthentication().getUsername();
-        String role=UserUtil.getUserAuthentication().getAuthorities().toString();
-        if (!(role.contains("ROLE_TEACHER"))){
-            throw new UserNotAuthorizesException("You are not authorized to make this request");
+        Page<Question> questionPage=questionRepository.findByCreatedBy(
+                userService.findByEmail(
+                        UserUtil.getUserAuthentication().getUsername()
+                ),
+                PageRequest.of(pageNo, size)
+        );
+        if (questionPage.isEmpty()||questionPage.getContent().isEmpty()){
+            throw new QuestionNotFoundException("you have not created any questions");
         }
-        else {
-           return findByCreatedByUsingEmail(email,pageNo,size);
-        }
+        return questionPage;
     }
     //todo use this metho
     public Question findQuestionByQuestionBody(String questionBody){
@@ -309,6 +299,7 @@ public class QuestionService {
                 );
     }
 
+    @PreAuthorize("ROLE_TEACHER")
     public void deleteQuestionByQuestionBody(String questionBody){
         Question temp=questionRepository.findByQuestionTitle(
                 QuestionUtil.sha256(questionBody)
@@ -319,10 +310,10 @@ public class QuestionService {
     }
 
     @Transactional
+    @PreAuthorize("ROLE_TEACHER")
     public Question addQuestion(Question question) {
         String email= UserUtil.getUserAuthentication().getUsername();
         String questionTitle=QuestionUtil.sha256(question.getQuestionBody());
-        System.out.println(email+"in security context holder");
         User user=userService.findByEmail(email);
         if (
                 question.getQuestionBody().isEmpty()||
@@ -335,32 +326,27 @@ public class QuestionService {
         ){
             throw new DuplicateQuestionException("question already present");
         }
-        if (question.getQuestionMarks()>4 || question.getQuestionMarks()<2){
+        if (!(question.getQuestionMarks()==2||question.getQuestionMarks()==4)){
             throw new UnacceptableQuestion("one question in db that has more that has Marks >4 or Marks<2 ");
         }
-        else {
-            // possible to remove this part in future as we are taking email from security context holder so no way to forge
-            if (!user.getRole().equalsIgnoreCase("ROLE_TEACHER")){
-                throw new UserNotAuthorizesException("User unauthorised to make this request");
-            }
-            else {
-                question.setQuestionTitle(questionTitle);
-                question.setCreatedBy(user);
-                question.setInUse(false);
-                return questionRepository.save(question);
-            }
-        }
+        question.setQuestionTitle(questionTitle);
+        question.setCreatedBy(user);
+        question.setInUse(false);
+        return questionRepository.save(question);
     }
 
+    @Transactional
+    @PreAuthorize("ROLE_TEACHER")
     public void deleteQuestionById(Long id){
-        if (questionRepository.existsById(id)){
-            questionRepository.deleteById(id);
-        }
-        else {
+        if (!questionRepository.existsById(id)){
             throw new QuestionNotFoundException("Question not found with ID: " + id);
         }
+        else {
+            questionRepository.deleteById(id);
+        }
     }
 
+    @PreAuthorize("ROLE_TEACHER")
     public List<Question> generateBySubjectCodeQuestion(
             String subjectCode,
             String[] mappedCOs,
@@ -460,6 +446,7 @@ public class QuestionService {
     }
 
 
+    @PreAuthorize("ROLE_TEACHER")
     public List<Question> generateBySubjectNameQuestion(
             String subjectName,
             String[] mappedCOs,
