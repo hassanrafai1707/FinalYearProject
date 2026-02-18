@@ -6,27 +6,21 @@ import com.FinalYearProject.FinalYearProject.Domain.UserPrincipal;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.*;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
 
-@Slf4j
-@Service
-@AllArgsConstructor
 /**
  * UserService - Core Business Logic Service for User Management and Authentication
  * PURPOSE: Comprehensive service handling all user-related operations including registration, authentication, account management, admin functions, and email verification workflows.
@@ -41,42 +35,49 @@ import java.util.List;
  * ERROR HANDLING: Comprehensive exception hierarchy - UserNotFoundException, UserNotAuthorizesException, WrongPasswordException, DuplicateEmailException, UserLockedException.
  * INTEGRATION: Works with UserRepository (data), JwtService (tokens), ConformationService (emails), RedisService (cache), BCryptPasswordEncoder (security), AuthenticationManager (auth).
  */
+@Slf4j
+@Service
 public class UserService {
-    @Autowired
-    private  UserRepository userRepository;
-    @Autowired
-    private ConformationService conformationService;
-    @Autowired
-    private AuthenticationManager authManager;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private RedisService redisService;
-    @Autowired
-    private BCryptPasswordEncoder encoder;
+    private final UserRepository userRepository;
+    private final ConformationService conformationService;
+    private final AuthenticationManager authManager;
+    private final JwtService jwtService;
+    private final RedisService redisService;
+    private final BCryptPasswordEncoder encoder;
 
-    //TODO send user dto and not user
+    public UserService(
+            UserRepository userRepository,
+            ConformationService conformationService,
+            AuthenticationManager authManager,
+            JwtService jwtService,
+            RedisService redisService,
+            BCryptPasswordEncoder encoder
+    ){
+        this.userRepository=userRepository;
+        this.conformationService=conformationService;
+        this.authManager=authManager;
+        this.jwtService=jwtService;
+        this.redisService=redisService;
+        this.encoder=encoder;
+    }
+
     //  CREATE user
     @Transactional
     public User creatUser(User user) {
         if (existsByEmail(user.getEmail())) {
-            throw new DuplicateEmailException( "Email already taken");
+            throw new DuplicateEmailException("Email already taken");
         }
-
         user.setIs_enable(false);
         user.setRole("ROLE_STUDENT");
         user.setPassword(encoder.encode(user.getPassword()));
         user.setExpired(true);
         user.setLocked(true);
-
         Conformation conformation = new Conformation(user);
-
         redisService.set(
                 conformation.getUser().getEmail(),
                 conformation,
                 10L
         );
-
         conformationService.sendEmail(
                 user.getEmail(),
                 user.getName(),
@@ -105,8 +106,7 @@ public class UserService {
     }
 
     public Page<User> findAllUsersPage(int pageNo,int size){
-        Pageable pageable= PageRequest.of(pageNo,size);
-        Page<User> temp=userRepository.findAll(pageable);
+        Page<User> temp=userRepository.findAll(PageRequest.of(pageNo,size));
         if (!(temp.isEmpty())){
             return temp;
         }
@@ -148,15 +148,12 @@ public class UserService {
         existingUser.setPassword(encoder.encode(existingUser.getPassword()));
         existingUser.setExpired(true);
         existingUser.setLocked(true);
-
         Conformation conformation = new Conformation(existingUser);
-
         redisService.set(
                 conformation.getUser().getEmail(),
                 conformation,
                 10L
         );
-
         conformationService.sendEmail(
                 existingUser.getEmail(),
                 existingUser.getName(),
@@ -176,13 +173,11 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
+    @PreAuthorize("ROLE_ADMIN")
     public User updateUserPasswordByEmail(String email,String password,String adminPassword){
         UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (adminUser==null){
             throw new RuntimeException("some thing went wrong user not fount in security context");
-        }
-        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
@@ -193,13 +188,11 @@ public class UserService {
         return user;
     }
 
+    @PreAuthorize("ROLE_ADMIN")
     public User updateUserPasswordById(Long id,String password,String adminPassword){
         UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (adminUser==null){
             throw new RuntimeException("some thing went wrong user not fount in security context");
-        }
-        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
@@ -210,13 +203,11 @@ public class UserService {
         return user;
     }
 
+    @PreAuthorize("ROLE_ADMIN")
     public User updateUserRoleById(String role,Long id,String password){
         UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
         if (userPrincipal==null){
             throw new RuntimeException("some thing went wrong user not fount in security context");
-        }
-        if (!(userPrincipal.getRole().contains("ROLE_ADMIN"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         if (!(encoder.matches(password,userPrincipal.getPassword()))){
             throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
@@ -248,13 +239,11 @@ public class UserService {
     }
 
 
+    @PreAuthorize("ROLE_ADMIN")
     public User updateUserRoleByEmail(String email,String role,String password){
         UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
         if (userPrincipal==null){
             throw new RuntimeException("some thing went wrong user not fount in security context");
-        }
-        if (!(userPrincipal.getRole().contains("ROLE_ADMIN"))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request");
         }
         if (!(encoder.matches(password,userPrincipal.getPassword()))){
             throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
@@ -282,6 +271,7 @@ public class UserService {
 
     //  DELETE (by email)
     @Transactional
+    @PreAuthorize("ROLE_ADMIN")
     public void deleteUserByEmail(String email,String adminPassword) {
         UserPrincipal adminUser=UserUtil.getUserAuthentication();
         if (adminUser==null){
@@ -300,6 +290,7 @@ public class UserService {
 
     //  DELETE (by ID)
     @Transactional
+    @PreAuthorize("ROLE_ADMIN")
     public void deleteUserById(Long id , String adminPassword) {
         UserPrincipal adminUser = UserUtil.getUserAuthentication();
         if (adminUser==null){
@@ -317,6 +308,7 @@ public class UserService {
     }
 
     @Transactional
+    @PreAuthorize("ROLE_ADMIN")
     public void deleteUserInBatchById(List<Long> ids , String adminPassword) {
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
@@ -334,6 +326,7 @@ public class UserService {
     }
 
     @Transactional
+    @PreAuthorize("ROLE_ADMIN")
     public void deleteUserInBatchEmail(List<String> emails , String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
@@ -351,13 +344,11 @@ public class UserService {
     }
 
     //  Suspend User
+    @PreAuthorize("ROLE_ADMIN")
     public User suspendUserById(Long id , String adminPassword) {
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
             throw new RuntimeException("some thing went wrong user not fount in security context");
-        }
-        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
-            throw new UserNotAuthorizesException("User not authorized to make this request");
         }
         if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -371,13 +362,11 @@ public class UserService {
         }
     }
 
+    @PreAuthorize("ROLE_ADMIN")
     public User unsuspendUserById(Long id,String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
             throw new RuntimeException("some thing went wrong user not fount in security context");
-        }
-        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
-            throw new UserNotAuthorizesException("User not authorized to make this request");
         }
         if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -391,13 +380,11 @@ public class UserService {
         }
     }
 
+    @PreAuthorize("ROLE_ADMIN")
     public User suspendUserByEmail(String email, String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
             throw new RuntimeException("some thing went wrong user not fount in security context");
-        }
-        if (!(adminUser.getRole().contains("ROLE_ADMIN"))){
-            throw new UserNotAuthorizesException("User not authorized to make this request");
         }
         if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -411,6 +398,7 @@ public class UserService {
         }
     }
 
+    @PreAuthorize("ROLE_ADMIN")
     public User unsuspendUserByEmail(String email,String adminPassword){
         UserPrincipal adminUser= UserUtil.getUserAuthentication();
         if (adminUser==null){
@@ -430,6 +418,7 @@ public class UserService {
             return user;
         }
     }
+
     //  VERIFY LOGIN
     public String verifyLoginByEmail(String email, String password) {
         Authentication authentication = authManager.authenticate(
@@ -438,7 +427,7 @@ public class UserService {
 
         if (authentication.isAuthenticated()) {
             UserPrincipal foundUser=(UserPrincipal) authentication.getPrincipal();
-            if (!foundUser.isEnabled() || !foundUser.isAccountNonExpired() || !foundUser.isAccountNonExpired() ){
+            if (!foundUser.isEnabled() || foundUser.isAccountNonExpired() || foundUser.isAccountNonLocked() ){
                 throw new UserLockedException("Login failed due to user is locked");
             }
             else {
@@ -459,8 +448,8 @@ public class UserService {
             UserPrincipal userPrincipal=(UserPrincipal) authentication.getPrincipal();
             if (
                     userPrincipal==null
-                    ||!userPrincipal.isAccountNonExpired()
-                    ||!userPrincipal.isAccountNonLocked()
+                    ||userPrincipal.isAccountNonExpired()
+                    ||userPrincipal.isAccountNonLocked()
                     ||!userPrincipal.isEnabled()
             ){
                 throw new UserLockedException("Login failed due to user is locked");
@@ -473,7 +462,6 @@ public class UserService {
     //todo use frontend to logout user
 
     // VERIFY Token
-    @Transactional(propagation = Propagation.REQUIRED)
     public Boolean verifyTokenAndOTP(String email ,String token, int otp) {
         try {
             Conformation conformation=redisService.get(email,Conformation.class);
@@ -483,9 +471,7 @@ public class UserService {
                     && token.equals(conformation.getToken())
             ) {
                 userRepository.updateIsEnableLockedExpiredToTrue(conformation.getUser().getEmail());
-
                 redisService.delete(email);//delete conformation after verifying token and otp
-
                 return Boolean.TRUE;
             }
             else {
@@ -497,12 +483,14 @@ public class UserService {
         }
     }
 
+    @PreAuthorize("ROLE_ADMIN")
     public List<User> listOfUserByRole(String role){
         return userRepository.findByRole(role);
     }
+
+    @PreAuthorize("ROLE_ADMIN")
     public Page<User> listOfUserByRole(String role ,int pageNo, int size){
-        Pageable pageable=PageRequest.of(pageNo,size);
-        return userRepository.findByRole(role,pageable);
+        return userRepository.findByRole(role,PageRequest.of(pageNo,size));
     }
 
     public Boolean existsByEmail(String email){
