@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,26 +29,34 @@ import java.util.Optional;
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
     //simple query handled by spring boot
-    public Optional<User> findByEmail(String email);
-    public Boolean existsByEmail(String email);
-    public List<User> findByRole(String role);
-    public Page<User> findByRole(String role, Pageable pageable);
+    Optional<User> findByEmail(String email);
+    Boolean existsByEmail(String email);
+    List<User> findByRole(String role);
+    Page<User> findByRole(String role, Pageable pageable);
+
     //complex query handle by @Query
     @Transactional
     @Modifying
     @Query("DELETE FROM User u WHERE u.email =:email")
-    public void deleteByEmail(String email);
+    void deleteByEmail(@Param("email") String email);
     @Transactional
     @Modifying
     @Query("UPDATE User u set u.is_enable=true, u.locked=false,u.expired=false where u.email=:email")
-    public  void updateIsEnableLockedExpiredToTrue(String email);
+    void updateIsEnableLockedExpiredToTrue(@Param("email")String email);
     @Transactional
     @Modifying
     @Query("DELETE User u WHERE u.Id IN:Ids")
-    public void deleteUserInBatchById(List<Long> Ids);
+    void deleteUserInBatchById(@Param("ids") List<Long> Ids);
     @Transactional
     @Modifying
     @Query("DELETE User u WHERE u.email IN:emails")
-    public void deleteUserInBatchByEmail(List<String> emails);
+    void deleteUserInBatchByEmail(@Param("emails")List<String> emails);
+
+    @Query("SELECT u.id FROM User u WHERE u.id IN:ids")
+    List<Long> validIDs(@Param("ids") List<Long> ids);
+
+    @Query("SELECT u.email FROM User u WHERE u.email IN:emails")
+    List<String> validEmails(@Param("emails") List<String> emails);
 }

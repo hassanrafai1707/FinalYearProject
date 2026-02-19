@@ -283,7 +283,6 @@ public class UserService {
         }
     }
 
-    //todo change
     @SneakyThrows
     private Boolean checkIfIdsAreValid(List<Long> ids){
         Map<Long,Boolean> tmap=new HashMap<>();
