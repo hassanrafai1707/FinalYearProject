@@ -282,6 +282,10 @@ public class UserService {
         return userRepository.validIDs(ids.stream().distinct().toList());
     }
 
+    public List<String> validEmails(List<String> emails){
+        return userRepository.validEmails(emails.stream().distinct().toList());
+    }
+
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public void deleteUserInBatchEmail(List<String> emails , String adminPassword){
