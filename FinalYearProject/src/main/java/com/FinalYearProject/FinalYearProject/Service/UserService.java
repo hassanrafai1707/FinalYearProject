@@ -184,7 +184,7 @@ public class UserService {
     public User updateUserRoleById(String role,Long id,String password){
         @NonNull UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
         if (!(encoder.matches(password,userPrincipal.getPassword()))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
+            throw new WrongPasswordException("You gave the wrong password");
         }
         switch (role){
             case "ROLE_ADMIN"->{
@@ -217,7 +217,7 @@ public class UserService {
     public User updateUserRoleByEmail(String email,String role,String password){
         @NonNull UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
         if (!(encoder.matches(password,userPrincipal.getPassword()))){
-            throw new UserNotAuthorizesException("User not Authorized to make this request due to password");
+            throw new WrongPasswordException("You gave the wrong password");
         }
         switch (role){
             case "ROLE_ADMIN"->{
