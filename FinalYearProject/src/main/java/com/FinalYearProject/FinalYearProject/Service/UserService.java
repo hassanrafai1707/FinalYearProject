@@ -274,7 +274,7 @@ public class UserService {
             throw new WrongPasswordException("wrong password");
         }
         else {
-            userRepository.deleteUserInBatchById(ids);
+            userRepository.deleteUserInBatchById(validIDs(ids));
         }
     }
 
@@ -294,7 +294,7 @@ public class UserService {
             throw new WrongPasswordException("wrong password");
         }
         else {
-            userRepository.deleteUserInBatchByEmail(emails);
+            userRepository.deleteUserInBatchByEmail(validEmails(emails));
         }
     }
 
