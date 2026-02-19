@@ -283,32 +283,8 @@ public class UserService {
         }
     }
 
-    @SneakyThrows
-    private Boolean checkIfIdsAreValid(List<Long> ids){
-        Map<Long,Boolean> tmap=new HashMap<>();
-        for (Long id:ids.stream().distinct().toList()){
-            if (existsById(id)){
-                tmap.put(id,Boolean.TRUE);
-            }
-            else {
-                tmap.put(id,Boolean.FALSE);
-            }
-        }
-        if (tmap.containsValue(Boolean.FALSE)){//technically not needed but good for debugging and error response
-            Map<Long,Boolean> temp1= tmap.entrySet()
-                    .stream()
-                    .filter(
-                    e->
-                        Boolean.FALSE.equals(e.getValue())
-                    ).collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue
-                    ));
-            throw new BadRequestException("IDs that are invalid {\n"+temp1.keySet()+" \n}");
-        }
-        else {
-            return Boolean.TRUE;
-        }
+    private List<Long> validIDs(List<Long> ids){
+        return userRepository.validIDs(ids.stream().distinct().toList());
     }
 
     @Transactional
