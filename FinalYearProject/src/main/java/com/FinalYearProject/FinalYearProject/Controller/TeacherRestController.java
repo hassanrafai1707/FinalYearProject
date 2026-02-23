@@ -7,10 +7,12 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
+import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import lombok.SneakyThrows;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,178 +44,368 @@ public class TeacherRestController {
     @Autowired
     private QuestionPaperService questionPaperService;
 
-    @GetMapping("/getAllQuestion")
+    @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestion(){
-        List<Question> questionList=questionService.getAllQuestion();
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "all Question", questionList
-                        )
-                );
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.getAllQuestion()
+                ).toArray(),
+                "All questions",
+                200
+        );
     }
 
-    @GetMapping("/getAllQuestionPaged")
-    public PagedModel<Question>  getAllQuestionsPaged(
+    @GetMapping("/questions/paged")
+    public ResponseEntity<?>  getAllQuestionsPaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
     ){
-        return new PagedModel<>(questionService.getAllQuestionsPaged(pageNo,size));
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.getAllQuestionsPaged(pageNo, size),
+                        pageNo,
+                        size
+                ),
+                "All questions in the given page",
+                200
+        );
     }
 
-    @GetMapping("/getQuestionById")
-    public ResponseEntity<?> getQuestionById (@RequestBody Map<String,Long> request){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "question with giver id",questionService.getQuestionById(request.get("id"))
-                        )
-                );
+    @GetMapping("/question/id")
+    @SneakyThrows
+    public ResponseEntity<?> getQuestionById (@RequestParam("id") Long id){
+        if (id.toString().isEmpty()){
+            throw new BadRequestException("the request must contain 'id'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.QuestionToQuestionDto(
+                        questionService.getQuestionById(id)
+                ),
+                "question with id "+id,
+                200
+        );
     }
 
-    @GetMapping("/findBySubjectCode")
-    public ResponseEntity<?> findBySubjectCode(@RequestBody Map<String,String> request){
-        String subjectCode =request.get("subjectCode");
-        List<Question> questions=questionService.findBySubjectCode(subjectCode);
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with CO" ,questions
-                        )
-                );
+    @GetMapping("/questions/subjectCode")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectCode(@RequestParam("subjectCode") String subjectCode) {
+        if (subjectCode.isEmpty()){
+            throw new BadRequestException("the request must contain 'subjectCode'");
+        }
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectCode(subjectCode)
+                ).toArray(),
+                "questions with subject code "+subjectCode,
+                200
+        );
     }
 
-    @GetMapping("/findBySubjectCodePagged")
-    public PagedModel<Question> findBySubjectCode(
-            @RequestParam(value = "pageNo" ,defaultValue = "0") int page,
+    @GetMapping("/questions/subjectCode/pagged")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectCode(
+            @RequestParam(value = "pageNo" ,defaultValue = "0") int pageNo,
             @RequestParam(value = "size" , defaultValue = "100") int size,
-            @RequestBody Map<String,String> request
+            @RequestParam("subjectCode") String subjectCode
     ){
-        String subjectCode =request.get("subjectCode");
-        return new PagedModel<>(questionService.findBySubjectCode(subjectCode,page,size));
+        if (subjectCode.isEmpty()){
+            throw new BadRequestException("the request must contain 'subjectCode'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCode(
+                                subjectCode,
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "All questions in the given page",
+                200
+        );
     }
 
-    @GetMapping("/findBySubjectCode-MappedCO")
-    public ResponseEntity<?> findBySubjectCodeMappedCO(@RequestBody DtoForSubjectCodeAndMappedCO dto){
-        List<Question> question=questionService.findBySubjectCodeMappedCO(dto.getSubjectCode(), dto.getMappedCO());
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name and mapped CO" ,question
-                        )
-                );
-    }
-
-    @GetMapping("/findBySubjectCode-MappedCOPaged")
-    public PagedModel<Question> findBySubjectCodeMappedCO(
-            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
-            @RequestParam(value = "size",defaultValue = "100")int size,
-            @RequestBody DtoForSubjectCodeAndMappedCO dto
+    @GetMapping("/questions/subjectCode/mappedCO")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectCodeMappedCO(
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO
     ){
-        return new PagedModel<>(
+        if (
+                subjectCode.isEmpty()
+                        ||mappedCO.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
+        }
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
                 questionService.findBySubjectCodeMappedCO(
-                        dto.getSubjectCode(),
-                        dto.getMappedCO(),
-                        pageNo,
-                        size
-                )
+                        subjectCode,
+                        mappedCO
+                ).toArray(),
+                "questions with subject code and mapped CO "+subjectCode+" "+mappedCO,
+                200
         );
     }
 
-    @GetMapping("/findBySubjectCode-MappedCO-CognitiveLevel")
-    private ResponseEntity<?> findByCognitiveLevel(@RequestBody DtoForSubjectCodeAndMappedCOAndCognitiveLevel dto){
-        List<Question> questions=questionService.findBySubjectCodeMappedCOCognitiveLevel(
-                dto.getSubjectCode(),
-                dto.getMappedCO(),
-                dto.getCognitiveLevel()
-        );
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with subject code and mapped CO and cognitive level",questions
-                        )
-                );
-    }
-
-    @GetMapping("/findBySubjectName")
-    public ResponseEntity<?> findBySubjectName(@RequestBody Map<String,String> request){
-        String subjectName = request.get("subjectName");
-        List<Question> questions=questionService.findBySubjectName(subjectName);
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name" ,questions
-                        )
-                );
-    }
-
-    @GetMapping("/findBySubjectNamePaged")
-    public PagedModel<Question> findBySubjectName(
+    @GetMapping("/questions/subjectCode/mappedCO/pagged")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectCodeMappedCO(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
-            @RequestBody Map<String,String> request
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO
     ){
-        String subjectName=request.get("subjectName");
-        return new PagedModel<>(
-                questionService.findBySubjectName(
-                        subjectName,
+        if (
+                subjectCode.isEmpty()
+                        ||mappedCO.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCodeMappedCO(
+                                subjectCode,
+                                mappedCO,
+                                pageNo,
+                                size
+                        ),
                         pageNo,
                         size
-                )
+                ),
+                "All questions in the given page",
+                200
         );
     }
 
-    @GetMapping("/findBySubjectName-MappedCO")
-    public ResponseEntity<?> findBySubjectNameMappedCO(@RequestBody DtoForSubjectNameAndMappedCO dto){
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "list of all questions with subject name and mapped CO",
-                                questionService.findBySubjectNameMappedCO(
-                                                dto.getSubjectName(),
-                                                dto.getMappedCO()
-                                )
+    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectCodeMappedCOCognitiveLevel(
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
+    ){
+        if (
+                subjectCode.isEmpty()
+                        ||mappedCO.isEmpty()
+                        ||cognitiveLevel.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO' and 'cognitiveLevel'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectCodeMappedCOCognitiveLevel(
+                                subjectCode,
+                                mappedCO,
+                                cognitiveLevel
                         )
-                );
+                ),
+                "All questions with selected subject code, mapped co and cognitiveLevel ",
+                200
+        );
     }
 
-    @GetMapping("/findBySubjectName-MappedCOPaged")
-    public PagedModel<Question> findBySubjectNameMappedCO(
+    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel/pagged")
+    @SneakyThrows
+    private ResponseEntity<?> findByCognitiveLevel(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestParam("subjectCode") String subjectCode,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
+    ){
+        if (
+                subjectCode.isEmpty()
+                        ||mappedCO.isEmpty()
+                        ||cognitiveLevel.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectCode' and 'mappedCO' and 'cognitiveLevel'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCodeMappedCOCognitiveLevel(
+                                subjectCode,
+                                mappedCO,
+                                cognitiveLevel,
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "All questions with selected subject code, mapped co and cognitiveLevel ",
+                200
+        );
+    }
+
+    @GetMapping("/questions/subjectName")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectName(@RequestParam("subjectName") String subjectName){
+        if (!subjectName.isEmpty()){
+            throw new BadRequestException("the request must contain 'subjectName'");
+        }
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectName(
+                                subjectName
+                        )
+                ).toArray(),
+                "questions with subject name "+subjectName,
+                200
+        );
+    }
+
+    @GetMapping("/questions/subjectName/pagged")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectName(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size,
+            @RequestParam("subjectName") String subjectName
+    ){
+        if (subjectName.isEmpty()){
+            throw new BadRequestException("the request must contain 'subjectName'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectName(
+                                subjectName,
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "All questions with selected subject name :"+subjectName,
+                200
+        );
+    }
+
+    @GetMapping("/questions/subjectName/mappedCO")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectNameMappedCO(
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO
+    ){
+        if (
+                subjectName.isEmpty()
+                        ||mappedCO.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
+        }
+        return ResponseUtility.responseTemplateForMultipleData(
+                "successful",
+                questionService.findBySubjectNameMappedCO(
+                        subjectName,
+                        mappedCO
+                ).toArray(),
+                "questions with subject name and mapped Co"+subjectName+" "+mappedCO,
+                200
+        );
+    }
+
+    @GetMapping("/questions/subjectName/mappedCO/pagged")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectNameMappedCO(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
-            @RequestBody DtoForSubjectNameAndMappedCO dto
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO
     ){
-        return new PagedModel<>(
-                questionService.findBySubjectNameMappedCO(
-                        dto.getSubjectName(),
-                        dto.getMappedCO(),
+        if (
+                subjectName.isEmpty()
+                        ||mappedCO.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectCodeMappedCO(
+                                subjectName,
+                                mappedCO,
+                                pageNo,
+                                size
+                        ),
                         pageNo,
                         size
-                )
+                ),
+                "all questions with selected subject name and mapped co ",
+                200
         );
     }
 
-    @GetMapping("/findBySubjectName-MappedCO-CognitiveLevel")
-    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(@RequestBody DtoForSubjectNameAndMappedCOAndCognitiveLevel dto){
-    return ResponseEntity
-            .ok(
-                    Map.of(
-                            "status" ,"Successful",
-                            "list of all questions with subject name and mapped CO and cognitive level",
-                            questionService.findBySubjectNameMappedCOCognitiveLevel(
-                                    dto.getSubjectName(),
-                                    dto.getMappedCO(),
-                                    dto.getCognitiveLevel()
-                            )
-                    )
-            );
+    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
+    ){
+        if (
+                subjectName.isEmpty()||
+                        mappedCO.isEmpty()||
+                        cognitiveLevel.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO' and 'cognitiveLevel'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                subjectName,
+                                mappedCO,
+                                cognitiveLevel
+
+                        )
+                ),
+                "All questions with selected subject name, mapped co and cognitiveLevel ",
+                200
+        );
+    }
+
+    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel/pagged")
+    @SneakyThrows
+    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
+            @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
+            @RequestParam(value = "size" , defaultValue = "100")int size,
+            @RequestParam("subjectName") String subjectName,
+            @RequestParam("mappedCO") String mappedCO,
+            @RequestParam("cognitiveLevel")String cognitiveLevel
+    ){
+        if (
+                subjectName.isEmpty()||
+                        mappedCO.isEmpty()||
+                        cognitiveLevel.isEmpty()
+        ){
+            throw new BadRequestException("the request must contain 'subjectName' and 'mappedCO' and 'cognitiveLevel'");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.findBySubjectNameMappedCOCognitiveLevel(
+                                subjectName,
+                                mappedCO,
+                                cognitiveLevel,
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "All questions with selected subject name, mapped co and cognitiveLevel ",
+                200
+        );
     }
 
     @PostMapping("/addQuestion")
