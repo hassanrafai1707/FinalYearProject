@@ -442,17 +442,15 @@ public class UserService {
         }
     }
 //todo use this
-    public User regenerateOtp(@NonNull User user){
-        User tempUser=findByEmail(user.getEmail());
+    public User regenerateOtp(String email){
+        User tempUser=findByEmail(email);
         if (
-              tempUser.isExpired() ||
-              tempUser.isLocked()
+              tempUser.isIs_enable()||!tempUser.isExpired()||!tempUser.isLocked()
         ){
             return tempUser;
         }
-        tempUser.setIs_enable(false);
         tempUser.setRole("ROLE_STUDENT");
-        tempUser.setPassword(encoder.encode(user.getPassword()));
+        tempUser.setIs_enable(false);
         tempUser.setExpired(true);
         tempUser.setLocked(true);
         Conformation conformation = new Conformation(tempUser);
