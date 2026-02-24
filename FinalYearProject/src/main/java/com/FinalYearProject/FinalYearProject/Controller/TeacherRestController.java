@@ -424,7 +424,8 @@ public class TeacherRestController {
     public ResponseEntity<?> generateBySubjectCodeQuestionPaper(@RequestBody DtoForSubjectCodeAndMappedCOs_ARU_And_2_4_Marks dto){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                QuestionDtoUtil.listOfQuestionToQuestionDto(questionService.generateBySubjectCodeQuestion(
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.generateBySubjectCodeQuestion(
                         dto.getSubjectCode(),
                         dto.getMappedCOs(),
                         dto.getNumberOfCognitiveLevel_A(),
@@ -432,50 +433,63 @@ public class TeacherRestController {
                         dto.getNumberOfCognitiveLevel_U(),
                         dto.getMaxNumberOf2Marks(),
                         dto.getMaxNumberOf4Marks()
-                )),
+                        )
+                ),
                 "question paper has been gendered successfully copy all ids and past in ",
                 200
         );
     }
 
-    @GetMapping("/generateBySubjectNameAndQuestionPaper")
+    @GetMapping("/generate/question-paper/subjectName")
     public ResponseEntity<?> generateBySubjectAndQuestionPaper(@RequestBody DtoForSubjectNameAndMappedCOs_ARU_And_2_4_Marks dto){
-        List<Question> generatedQuestionPaper=questionService.generateBySubjectNameQuestion(
-                dto.getSubjectName(),
-                dto.getMappedCOs(),
-                dto.getNumberOfCognitiveLevel_A(),
-                dto.getNumberOfCognitiveLevel_R(),
-                dto.getNumberOfCognitiveLevel_U(),
-                dto.getMaxNumberOf2Marks(),
-                dto.getMaxNumberOf4Marks()
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.generateBySubjectNameQuestion(
+                                dto.getSubjectName(),
+                                dto.getMappedCOs(),
+                                dto.getNumberOfCognitiveLevel_A(),
+                                dto.getNumberOfCognitiveLevel_R(),
+                                dto.getNumberOfCognitiveLevel_U(),
+                                dto.getMaxNumberOf2Marks(),
+                                dto.getMaxNumberOf4Marks()
+                        )
+                ),
+                "question paper has been gendered successfully copy all ids and past in ",
+                200
         );
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "generated Question Paper",generatedQuestionPaper
-                        )
-                );
     }
 
-    @GetMapping("/getYourQuestion")
+    @GetMapping("/my/questions")
     public ResponseEntity<?> getYourQuestion(){
-        List<Question> allQuestionPapersGeneratedByUser=questionService.getAllQuestionsByCurrentUser();
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "all your questions " ,allQuestionPapersGeneratedByUser
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.getAllQuestionsByCurrentUser()
+                ),
+                "My questions ",
+                200
+        );
     }
 
-    @GetMapping("/getYourQuestionPaged")
-    public Page<Question> getYourQuestion(
+    @GetMapping("/my/questions/pagged")
+    public ResponseEntity<?> getYourQuestion(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size
     ){
-        return questionService.getAllQuestionsByCurrentUser(pageNo, size);
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.questionToQuestionDTO_Paged(
+                        questionService.getAllQuestionsByCurrentUser(
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "My questions ",
+                200
+        );
     }
 
     @SneakyThrows
