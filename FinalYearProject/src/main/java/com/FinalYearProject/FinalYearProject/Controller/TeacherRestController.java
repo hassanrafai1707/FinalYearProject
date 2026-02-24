@@ -420,24 +420,22 @@ public class TeacherRestController {
         );
     }
 
-    @GetMapping("/generateBySubjectCodeQuestionPaper")
+    @GetMapping("/generate/question-paper/subjectCode")
     public ResponseEntity<?> generateBySubjectCodeQuestionPaper(@RequestBody DtoForSubjectCodeAndMappedCOs_ARU_And_2_4_Marks dto){
-        List<Question> generatedQuestionPaper=questionService.generateBySubjectCodeQuestion(
-                dto.getSubjectCode(),
-                dto.getMappedCOs(),
-                dto.getNumberOfCognitiveLevel_A(),
-                dto.getNumberOfCognitiveLevel_R(),
-                dto.getNumberOfCognitiveLevel_U(),
-                dto.getMaxNumberOf2Marks(),
-                dto.getMaxNumberOf4Marks()
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.listOfQuestionToQuestionDto(questionService.generateBySubjectCodeQuestion(
+                        dto.getSubjectCode(),
+                        dto.getMappedCOs(),
+                        dto.getNumberOfCognitiveLevel_A(),
+                        dto.getNumberOfCognitiveLevel_R(),
+                        dto.getNumberOfCognitiveLevel_U(),
+                        dto.getMaxNumberOf2Marks(),
+                        dto.getMaxNumberOf4Marks()
+                )),
+                "question paper has been gendered successfully copy all ids and past in ",
+                200
         );
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "generated Question Paper",generatedQuestionPaper
-                        )
-                );
     }
 
     @GetMapping("/generateBySubjectNameAndQuestionPaper")
