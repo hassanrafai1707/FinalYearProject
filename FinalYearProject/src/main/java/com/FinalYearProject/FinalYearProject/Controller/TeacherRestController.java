@@ -408,17 +408,16 @@ public class TeacherRestController {
         );
     }
 
-    @PostMapping("/addQuestion")
+    @PostMapping("/question")
     public ResponseEntity<?> addQuestion(@RequestBody Question question){
-        Question savedQuestion=questionService.addQuestion(question);
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "status","Successful",
-                                "message","Question saved",
-                                "Question saved",savedQuestion
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionDtoUtil.QuestionToQuestionDto(
+                        questionService.addQuestion(question)
+                ),
+                "Question crated successfully",
+                201
+        );
     }
 
     @GetMapping("/generateBySubjectCodeQuestionPaper")
