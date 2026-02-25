@@ -299,16 +299,6 @@ public class QuestionService {
                 );
     }
 
-    @PreAuthorize("ROLE_TEACHER")
-    public void deleteQuestionByQuestionBody(String questionBody){
-        Question temp=questionRepository.findByQuestionTitle(
-                QuestionUtil.sha256(questionBody)
-        ).orElseThrow(
-                ()-> new QuestionNotFoundException("no question with this body")
-        );
-        questionRepository.delete(temp);
-    }
-
     @Transactional
     @PreAuthorize("ROLE_TEACHER")
     public Question addQuestion(Question question) {
