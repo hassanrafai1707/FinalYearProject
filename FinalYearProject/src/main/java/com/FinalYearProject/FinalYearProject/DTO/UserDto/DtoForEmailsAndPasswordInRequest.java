@@ -17,7 +17,7 @@ import java.util.List;
  * SERIALIZATION: Contains List<String> for emails and single adminPassword. Enables clean JSON structure for batch operation requests.
  */
 public class DtoForEmailsAndPasswordInRequest {
-    List<String> emails=new ArrayList<>();
+    List<String> emails;
     String adminPassword;
 
     public DtoForEmailsAndPasswordInRequest() {}

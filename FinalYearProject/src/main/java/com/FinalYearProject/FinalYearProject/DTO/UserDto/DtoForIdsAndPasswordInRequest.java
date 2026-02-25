@@ -18,7 +18,7 @@ import java.util.List;
  * SERIALIZATION: Contains List<Long> for IDs and single adminPassword. Enables efficient JSON structure for batch operation requests.
  */
 public class DtoForIdsAndPasswordInRequest {
-    List<Long> ids=new ArrayList<>();
+    List<Long> ids;
     String adminPassword;
 
     public DtoForIdsAndPasswordInRequest(String adminPassword, List<Long> ids){

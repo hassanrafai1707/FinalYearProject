@@ -3,21 +3,17 @@ package com.FinalYearProject.FinalYearProject.Controller;
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
-import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
-import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
-import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
+import com.FinalYearProject.FinalYearProject.Util.*;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,12 +33,15 @@ import java.util.Map;
 @RequestMapping("${app.version}/teacher")
 @RestController
 public class TeacherRestController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private QuestionService questionService;
-    @Autowired
-    private QuestionPaperService questionPaperService;
+    private final UserService userService;
+    private final QuestionService questionService;
+    private final QuestionPaperService questionPaperService;
+
+    public TeacherRestController(UserService userService,QuestionService questionService,QuestionPaperService questionPaperService){
+        this.userService=userService;
+        this.questionService=questionService;
+        this.questionPaperService=questionPaperService;
+    }
 
     @GetMapping("/questions")
     public ResponseEntity<?> getAllQuestion(){
@@ -493,58 +492,59 @@ public class TeacherRestController {
     }
 
     @SneakyThrows
-    @PostMapping("/approveGeneratedQuestionPaper")
+    @PostMapping("/To-approve/questionPaper")
     public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody QuestionPaper questions){
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","Successful",
-                        "saved question paper",questionPaperService.addQuestionPaper(questions)
-                )
-        );
-    }
-    @PatchMapping("/updateUserEmail")
-    public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
-    ){
-        String email= request.get("email");
-        User upDatedUser= userService.updateUserEmail(email);
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "updatedUser",upDatedUser
-                )
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+               QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                       questionPaperService.addQuestionPaper(questions)
+               ),
+                "Question Paper added successfully",
+                200
         );
     }
 
-    @PatchMapping("/updateUserPassword")
-    public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
-        String password= request.get("password");
-        User updatedUser = userService.updateUserPassword(password);
-        return ResponseEntity.ok(
-                Map.of(
-                        "states","successful",
-                        "updatedUser",updatedUser
-                )
-        );
-    }
-
-    @DeleteMapping("/deleteQuestionById")
+    @DeleteMapping("/question/id")
     public ResponseEntity<?> deleteQuestionById(@RequestBody Map<String,Long> request){
         questionService.deleteQuestionById(request.get("id"));
-        return ResponseEntity
-                .ok(
-                        Map.of(
-                                "states","successful"
-                        )
-                );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                new Question(),
+                "selected question has been deleted",
+                401
+        );
     }
 
-    @DeleteMapping("/deleteQuestionByQuestionBody")
-    public ResponseEntity<?> deleteQuestionByQuestionBody(@RequestBody Map<String,String> request){
-        questionService.deleteQuestionByQuestionBody(request.get("questionBody"));
-        return ResponseEntity.ok(
-                Map.of(
-                        "status","successful"
-                )
+    @PatchMapping("/update/user/email")
+    @SneakyThrows
+    public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
+    ){
+        if(!request.containsKey("email")){
+            throw new BadRequestException("the request must contain email");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserEmail(request.get("email"))
+                ),
+                "your email has been updated",
+                200
+        );
+    }
+
+    @PatchMapping("/update/user/password")
+    @SneakyThrows
+    public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
+        if (!request.containsKey("password")){
+            throw new BadRequestException("the request must contain password");
+        }
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                UserDtoUtil.UserToUserDto(
+                        userService.updateUserPassword(request.get("password"))
+                ),
+                "your password has been updated",
+                200
         );
     }
 
