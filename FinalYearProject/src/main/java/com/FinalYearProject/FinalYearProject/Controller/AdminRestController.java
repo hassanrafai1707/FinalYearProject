@@ -415,6 +415,17 @@ public class AdminRestController {
         );
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(){
+        userService.logout();
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                new Object(),
+                "you have been logout ",
+                200
+        );
+    }
+
     @GetMapping("/test")
     public ResponseEntity<?> test(){
         return ResponseEntity.ok(
