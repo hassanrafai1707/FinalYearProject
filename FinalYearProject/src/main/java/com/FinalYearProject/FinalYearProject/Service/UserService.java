@@ -361,13 +361,16 @@ public class UserService {
 
     //  VERIFY LOGIN
     public String verifyLoginByEmail(String email, String password) {
+        User user1=findByEmail(email);
+        user1.setExpired(false);
+        userRepository.save(user1);
         Authentication authentication = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password)
         );
 
         if (authentication.isAuthenticated()) {
             @NonNull UserPrincipal foundUser=(UserPrincipal) authentication.getPrincipal();
-            if (!foundUser.isEnabled() || !foundUser.isAccountNonExpired() || !foundUser.isAccountNonLocked() ){
+            if (!foundUser.isEnabled() || !foundUser.isAccountNonLocked() ){
                 throw new UserLockedException("Login failed due to user is locked");
             }
             else {
@@ -379,14 +382,16 @@ public class UserService {
     }
 
     public String verifyLoginById(Long id,String password){
-        User user=findUserById(id);
+        User user1=findUserById(id);
+        user1.setExpired(false);
+        userRepository.save(user1);
         Authentication authentication=authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(),password)
+                new UsernamePasswordAuthenticationToken(userRepository.userEmailById(id),password)
         );
 
         if (authentication.isAuthenticated()){
             @NonNull UserPrincipal userPrincipal=(UserPrincipal) authentication.getPrincipal();
-            if (!userPrincipal.isAccountNonExpired() ||!userPrincipal.isAccountNonLocked() ||!userPrincipal.isEnabled()){
+            if (!userPrincipal.isAccountNonLocked() ||!userPrincipal.isEnabled()){
                 throw new UserLockedException("Login failed due to user is locked");
             }
             return jwtService.jwtToken(userPrincipal.getUsername(),userPrincipal.getRole());
@@ -394,7 +399,11 @@ public class UserService {
         throw new RuntimeException("Login failed");
     }
 
-    //todo use frontend to logout user
+   public void logout(){
+        User user=UserUtil.getUserAuthentication().getUser();
+        user.setExpired(true);
+        userRepository.save(user);
+   }
 
     // VERIFY Token
     public Boolean verifyTokenAndOTP(String email ,String token, int otp) {

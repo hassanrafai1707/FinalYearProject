@@ -59,4 +59,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.email FROM User u WHERE u.email IN:emails")
     List<String> validEmails(@Param("emails") List<String> emails);
+
+    @Query("SELECT u.email FROM User u WHERE u.id =:id")
+    String userEmailById(@Param("id") Long id);
+
+    @Query("SELECT u.expired FROM User u WHERE u.email=:email")
+    boolean checkUserExpired(@Param("email") String email);
 }

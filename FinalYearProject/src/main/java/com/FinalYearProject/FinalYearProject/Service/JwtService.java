@@ -1,10 +1,11 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
+
+import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -34,12 +35,14 @@ import java.util.function.Function;
  */
 @Service
 public class JwtService  {
-    private String secretKey;
-    public JwtService(){
+    private final UserRepository userRepository;
+    private final String secretKey;
+    public JwtService(UserRepository userRepository){
     try {
         KeyGenerator keyGenerator= KeyGenerator.getInstance("HmacSHA256");
         SecretKey sk=keyGenerator.generateKey();
         secretKey= Base64.getEncoder().encodeToString(sk.getEncoded());
+        this.userRepository=userRepository;
         System.out.println("========================================");
         System.out.println("🧩 New Secret Key Generated at Startup:");
         System.out.println(secretKey);// every user must reLogin after restart
@@ -97,6 +100,7 @@ public class JwtService  {
                         )
         );
     }
+
     private boolean isTokenExpired(String token){
         return extractExpiration(token).before(new Date());
     }
@@ -104,11 +108,18 @@ public class JwtService  {
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
+
     public String extractUserRole(String token){
         return extractClaim(token,claims -> claims.get("role", String.class));
     }
+
+    public boolean checkIfUserStillValidNot(String token){
+        if (userRepository.checkUserExpired(extractUserEmail(token))) return true;
+        return false;
+    }
+
     public void isTokenExpiredOrThrow(String token){
-        if (isTokenExpired(token)){
+        if (isTokenExpired(token)||checkIfUserStillValidNot(token)){
             throw new RuntimeException("JWT token expired");
         }
     }
