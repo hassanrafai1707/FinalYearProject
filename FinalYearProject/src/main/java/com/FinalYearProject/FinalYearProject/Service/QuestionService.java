@@ -289,14 +289,21 @@ public class QuestionService {
         }
         return questionPage;
     }
-    //todo use this metho
-    public Question findQuestionByQuestionBody(String questionBody){
-        return questionRepository.
-                findByQuestionTitle(
-                        QuestionUtil.sha256(questionBody)
-                ).orElseThrow(
-                        ()-> new QuestionNotFoundException("no question with this body")
-                );
+
+    @Transactional
+    @PreAuthorize("ROLE_ADMIN")
+    public Question updateCreatedByUsingEmail(String email,Long id){
+        Question question=getQuestionById(id);
+        question.setCreatedBy(userService.findByEmail(email));
+        return questionRepository.save(question);
+    }
+
+    @Transactional
+    @PreAuthorize("ROLE_ADMIN")
+    public Question updateCreatedByUsingId(Long userId,Long QId){
+        Question question=getQuestionById(QId);
+        question.setCreatedBy(userService.findUserById(userId));
+        return questionRepository.save(question);
     }
 
     @Transactional
