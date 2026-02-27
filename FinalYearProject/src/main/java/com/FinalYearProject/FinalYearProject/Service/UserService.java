@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -362,6 +363,7 @@ public class UserService {
     //  VERIFY LOGIN
     public String verifyLoginByEmail(String email, String password) {
         User user1=findByEmail(email);
+        user1.setLastLogin(LocalDateTime.now());
         user1.setExpired(false);
         userRepository.save(user1);
         Authentication authentication = authManager.authenticate(
@@ -383,6 +385,7 @@ public class UserService {
 
     public String verifyLoginById(Long id,String password){
         User user1=findUserById(id);
+        user1.setLastLogin(LocalDateTime.now());
         user1.setExpired(false);
         userRepository.save(user1);
         Authentication authentication=authManager.authenticate(

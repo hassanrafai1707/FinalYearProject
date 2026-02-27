@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 /**
  * User Domain Entity for System Authentication and Authorization
  * PURPOSE: Core user entity for authentication, authorization, and user management across the exam system. Implements Spring Security UserDetails contract.
@@ -63,7 +66,9 @@ public class User {
     private boolean locked;
 
     @Column(nullable = false)
-    private boolean expired; //in logout, I can set this to false and prevent login again
+    private boolean expired;//in logout, I can set this to false and prevent login again
+
+    private LocalDateTime lastLogin;
 
     public boolean isExpired() {
         return expired;
@@ -125,7 +130,17 @@ public class User {
         return Id;
     }
 
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
     public void setId(Long id) {
         Id = id;
+
+
     }
 }
