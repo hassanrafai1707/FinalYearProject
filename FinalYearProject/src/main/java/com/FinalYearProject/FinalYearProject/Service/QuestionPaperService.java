@@ -11,7 +11,6 @@ import com.FinalYearProject.FinalYearProject.Repository.QuestionPaperRepository;
 import com.FinalYearProject.FinalYearProject.Util.QuestionPaperUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Service
 /**
  * QuestionPaperService - Business Logic Service for Exam Paper Management
  * PURPOSE: Core service for exam paper operations including creation, retrieval, approval workflows, and integrity validation. Manages complete paper lifecycle.
@@ -39,13 +37,21 @@ import java.util.Set;
  * FINGERPRINT GENERATION: Creates content-based fingerprint from sorted question IDs. Enables duplicate detection even with different paper titles.
  * INTEGRATION: Works with QuestionService for question validation, UserService for user lookups, and QuestionPaperRepository for data persistence.
  */
+@Service
 public class QuestionPaperService {
-    @Autowired
-    private QuestionPaperRepository questionPaperRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private QuestionService questionService;
+    private final QuestionPaperRepository questionPaperRepository;
+    private final UserService userService;
+    private final QuestionService questionService;
+
+    public QuestionPaperService(
+            QuestionPaperRepository questionPaperRepository,
+            UserService userService,
+            QuestionService questionService
+    ){
+        this.questionService=questionService;
+        this.questionPaperRepository=questionPaperRepository;
+        this.userService=userService;
+    }
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> getAllQuestionPapers(){
