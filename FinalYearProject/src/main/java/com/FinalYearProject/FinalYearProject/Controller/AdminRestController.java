@@ -393,18 +393,38 @@ public class AdminRestController {
     }
 
     @SneakyThrows
-    @PatchMapping("update/questionsPapers/generatedBy/email")
+    @PatchMapping("/update/questionsPapers/generatedBy/email")
     public ResponseEntity<?> updateGeneratedByUsingEmail(
             @RequestBody DtoFor2EMailsAndPassword dto
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
-                       questionPaperService.updateApprovedByUsingEmail(
+                       questionPaperService.updateGeneratedByUsingEmail(
                                dto.getReplaceEmail(),
                                dto.getOriginalEmail(),
                                dto.getPassword()
                        )
+                ),
+                "the user on all question has been updated ",
+                200
+        );
+    }
+
+
+    @SneakyThrows
+    @PatchMapping("/update/questionsPapers/generatedBy/id")
+    public ResponseEntity<?> updateGeneratedByUsingId(
+            @RequestBody DtoFor2IDsAndPassword dto
+    ){
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
+                        questionPaperService.updateGeneratedByUsingId(
+                                dto.getReplaceID(),
+                                dto.getOriginalID(),
+                                dto.getPassword()
+                        )
                 ),
                 "the user on all question has been updated ",
                 200
