@@ -356,6 +356,54 @@ public class QuestionPaperService {
         }
     }
 
+    @Transactional
+    @PreAuthorize("ROLE_ADMIN")
+    public List<QuestionPaper> updateApprovedByUsingEmail(String replaceEmail,String originalEmail,String password){
+        User replaceUser =userService.findByEmail(replaceEmail);
+        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+            throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
+        }
+        if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userutil is admin user
+            List<QuestionPaper> result=new ArrayList<>();
+            for (QuestionPaper questionPaper:questionPaperRepository.findByGeneratedBy(
+                    userService.findByEmail(
+                            originalEmail
+                    )
+            )){
+                questionPaper.setApprovedBy(replaceUser);
+                result.add(questionPaper);
+            }
+            return questionPaperRepository.saveAll(result);
+        }
+        else {
+            throw new WrongPasswordException("your password is wrong");
+        }
+    }
+
+    @Transactional
+    @PreAuthorize("ROLE_ADMIN")
+    public List<QuestionPaper> updateApprovedByUsingId(Long replaceID,Long originalID,String password){
+        User replaceUser =userService.findUserById(replaceID);
+        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+            throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
+        }
+        if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userUtil is admin user
+            List<QuestionPaper> result=new ArrayList<>();
+            for (QuestionPaper questionPaper:questionPaperRepository.findByGeneratedBy(
+                    userService.findUserById(
+                            originalID
+                    )
+            )){
+                questionPaper.setApprovedBy(replaceUser);
+                result.add(questionPaper);
+            }
+            return questionPaperRepository.saveAll(result);
+        }
+        else {
+            throw new WrongPasswordException("your password is wrong");
+        }
+    }
+
     @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_TEACHER")
