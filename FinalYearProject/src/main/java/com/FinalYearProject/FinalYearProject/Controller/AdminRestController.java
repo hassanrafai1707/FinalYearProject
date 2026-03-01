@@ -3,14 +3,15 @@ package com.FinalYearProject.FinalYearProject.Controller;
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
+import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
+import com.FinalYearProject.FinalYearProject.Util.QuestionPaperDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import com.FinalYearProject.FinalYearProject.Util.UserDtoUtil;
-import org.springframework.data.web.PagedModel;
+import lombok.SneakyThrows;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -85,9 +86,11 @@ import java.util.Map;
 @RestController
 public class AdminRestController {
     private final UserService userService;
+    private final QuestionPaperService questionPaperService;
 
-    AdminRestController(UserService userService){
+    AdminRestController(UserService userService , QuestionPaperService questionPaperService){
         this.userService=userService;
+        this.questionPaperService=questionPaperService;
     }
 
     @GetMapping("/user/id/{id}")
@@ -385,6 +388,25 @@ public class AdminRestController {
                         dto.getPassword()
                 )),
                 "users role is updated successfully",
+                200
+        );
+    }
+
+    @SneakyThrows
+    @PatchMapping("update/questionsPapers/generatedBy/email")
+    public ResponseEntity<?> updateGeneratedByUsingEmail(
+            @RequestBody DtoFor2EMailsAndPassword dto
+    ){
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
+                       questionPaperService.updateApprovedByUsingEmail(
+                               dto.getReplaceEmail(),
+                               dto.getOriginalEmail(),
+                               dto.getPassword()
+                       )
+                ),
+                "the user on all question has been updated ",
                 200
         );
     }

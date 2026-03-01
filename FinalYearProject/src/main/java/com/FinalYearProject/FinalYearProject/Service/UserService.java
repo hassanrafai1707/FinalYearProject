@@ -283,7 +283,7 @@ public class UserService {
         }
     }
 
-    private List<Long> validIDs(List<Long> ids){
+    public List<Long> validIDs(List<Long> ids){
         return userRepository.validIDs(ids.stream().distinct().toList());
     }
 

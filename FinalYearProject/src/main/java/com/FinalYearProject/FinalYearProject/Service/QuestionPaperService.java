@@ -308,9 +308,13 @@ public class QuestionPaperService {
         }
     }
 
+    @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateGeneratedByUsingEmail(String replaceEmail,String originalEmail,String password){
+        if(replaceEmail.isEmpty()||originalEmail.isEmpty()||password.isEmpty()){
+            throw new BadRequestException("this request is invalid because one of the given parameter is empty");
+        }
         User replaceUser =userService.findByEmail(replaceEmail);
         if (replaceUser.getRole().contains("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
@@ -332,9 +336,19 @@ public class QuestionPaperService {
         }
     }
 
+    @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateGeneratedByUsingId(Long replaceID,Long originalID,String password){
+        List<Long> idsToValidate=new ArrayList<>();
+        idsToValidate.add(replaceID);
+        idsToValidate.add(originalID);
+        if (
+                idsToValidate.stream().distinct().toList().isEmpty()||
+                        userService.validIDs(idsToValidate).size()!=idsToValidate.size()
+        ){
+            throw new BadRequestException("the ids given is not valid");
+        }
         User replaceUser =userService.findUserById(replaceID);
         if (replaceUser.getRole().contains("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
@@ -356,11 +370,15 @@ public class QuestionPaperService {
         }
     }
 
+    @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateApprovedByUsingEmail(String replaceEmail,String originalEmail,String password){
+        if(replaceEmail.isEmpty()||originalEmail.isEmpty()||password.isEmpty()){
+            throw new BadRequestException("this request is invalid because one of the given parameter is empty");
+        }
         User replaceUser =userService.findByEmail(replaceEmail);
-        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+        if (!replaceUser.getRole().contains("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
         }
         if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userutil is admin user
@@ -380,9 +398,19 @@ public class QuestionPaperService {
         }
     }
 
+    @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateApprovedByUsingId(Long replaceID,Long originalID,String password){
+        List<Long> idsToValidate=new ArrayList<>();
+        idsToValidate.add(replaceID);
+        idsToValidate.add(originalID);
+        if (
+                idsToValidate.stream().distinct().toList().isEmpty()||
+                userService.validIDs(idsToValidate).size()!=idsToValidate.size()
+        ){
+            throw new BadRequestException("the ids given is not valid");
+        }
         User replaceUser =userService.findUserById(replaceID);
         if (replaceUser.getRole().contains("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
