@@ -1,14 +1,10 @@
 package com.FinalYearProject.FinalYearProject.Domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * User Domain Entity for System Authentication and Authorization
@@ -140,7 +136,5 @@ public class User {
 
     public void setId(Long id) {
         Id = id;
-
-
     }
 }

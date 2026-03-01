@@ -1,6 +1,5 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
-import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Domain.UserPrincipal;
 import com.FinalYearProject.FinalYearProject.Repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -29,10 +28,11 @@ public class MyUserDetailsServices implements UserDetailsService {
     private final UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user =
+        return new UserPrincipal(
                 userRepository.findByEmail(email)
-                        .orElseThrow(()->
-                                new UsernameNotFoundException("User not found: " + email));
-        return new UserPrincipal(user);
+                .orElseThrow(
+                        ()-> new UsernameNotFoundException("User not found: " + email)
+                )
+        );
     }
 }
