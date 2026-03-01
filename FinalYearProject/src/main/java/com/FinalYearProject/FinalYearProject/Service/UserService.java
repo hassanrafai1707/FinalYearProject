@@ -208,6 +208,10 @@ public class UserService {
         }
     }
 
+    public Boolean matchPasswords(String rawPassword,String encodedPassword){
+        return encoder.matches(rawPassword,encodedPassword);
+    }
+
     private User updateRole(User user,String role){
         user.setRole(role);
         return userRepository.save(user);

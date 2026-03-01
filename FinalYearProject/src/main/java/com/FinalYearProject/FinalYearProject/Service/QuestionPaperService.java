@@ -7,6 +7,7 @@ import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.DuplicateQuestionPaperException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.WrongPasswordException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionPaperRepository;
 import com.FinalYearProject.FinalYearProject.Util.QuestionPaperUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
@@ -18,10 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * QuestionPaperService - Business Logic Service for Exam Paper Management
@@ -320,6 +318,54 @@ public class QuestionPaperService {
             questionPaper.setApprovedBy(user);
             questionPaperRepository.save(questionPaper);
             return questionPaper;
+        }
+    }
+
+    @Transactional
+    @PreAuthorize("ROLE_ADMIN")
+    public List<QuestionPaper> updateGeneratedByUsingEmail(String replaceEmail,String originalEmail,String password){
+        User replaceUser =userService.findByEmail(replaceEmail);
+        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+            throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
+        }
+        if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getUser().getPassword())){//the userutil is admin user
+            List<QuestionPaper> result=new ArrayList<>();
+            for (QuestionPaper questionPaper:questionPaperRepository.findByGeneratedBy(
+                    userService.findByEmail(
+                            originalEmail
+                    )
+            )){
+                questionPaper.setGeneratedBy(replaceUser);
+                result.add(questionPaper);
+            }
+            return questionPaperRepository.saveAll(result);
+        }
+        else {
+            throw new WrongPasswordException("your password is wrong");
+        }
+    }
+
+    @Transactional
+    @PreAuthorize("ROLE_ADMIN")
+    public List<QuestionPaper> updateGeneratedByUsingId(Long replaceID,Long originalID,String password){
+        User replaceUser =userService.findUserById(replaceID);
+        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+            throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
+        }
+        if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getUser().getPassword())){//the userUtil is admin user
+            List<QuestionPaper> result=new ArrayList<>();
+            for (QuestionPaper questionPaper:questionPaperRepository.findByGeneratedBy(
+                    userService.findUserById(
+                            originalID
+                    )
+            )){
+                questionPaper.setGeneratedBy(replaceUser);
+                result.add(questionPaper);
+            }
+            return questionPaperRepository.saveAll(result);
+        }
+        else {
+            throw new WrongPasswordException("your password is wrong");
         }
     }
 
