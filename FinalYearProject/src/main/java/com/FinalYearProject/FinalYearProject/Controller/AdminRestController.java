@@ -4,6 +4,7 @@ import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
+import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
 import com.FinalYearProject.FinalYearProject.Util.QuestionPaperDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
@@ -87,10 +88,12 @@ import java.util.Map;
 public class AdminRestController {
     private final UserService userService;
     private final QuestionPaperService questionPaperService;
+    private final QuestionService questionService;
 
-    AdminRestController(UserService userService , QuestionPaperService questionPaperService){
+    AdminRestController(UserService userService , QuestionPaperService questionPaperService,QuestionService questionService){
         this.userService=userService;
         this.questionPaperService=questionPaperService;
+        this.questionService=questionService;
     }
 
     @GetMapping("/user/id/{id}")
@@ -466,6 +469,7 @@ public class AdminRestController {
                 200
         );
     }
+
 
     @PatchMapping("/update/my/email")
     public ResponseEntity<?>updateUserEmail(@RequestBody Map<String,String> request){
