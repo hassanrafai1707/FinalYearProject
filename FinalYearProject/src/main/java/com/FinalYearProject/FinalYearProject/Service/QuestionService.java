@@ -5,6 +5,7 @@ import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.Duplic
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.WrongPasswordException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
 import com.FinalYearProject.FinalYearProject.Util.QuestionUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
@@ -292,7 +293,15 @@ public class QuestionService {
 
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public Question updateCreatedByUsingEmail(String email,Long id){
+    public Question updateCreatedByUsingEmail(String email,Long id,String password){
+        if (
+                !userService.matchPasswords(
+                    password,
+                    UserUtil.getUserAuthentication().getPassword()
+                )
+        ){
+            throw new WrongPasswordException("your password doesn't match");
+        }
         Question question=getQuestionById(id);
         question.setCreatedBy(userService.findByEmail(email));
         return questionRepository.save(question);
@@ -300,7 +309,15 @@ public class QuestionService {
 
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public Question updateCreatedByUsingId(Long userId,Long QId){
+    public Question updateCreatedByUsingId(Long userId,Long QId,String password){
+        if (
+                !userService.matchPasswords(
+                        password,
+                        UserUtil.getUserAuthentication().getPassword()
+                )
+        ){
+            throw new WrongPasswordException("your password doesn't match");
+        }
         Question question=getQuestionById(QId);
         question.setCreatedBy(userService.findUserById(userId));
         return questionRepository.save(question);
