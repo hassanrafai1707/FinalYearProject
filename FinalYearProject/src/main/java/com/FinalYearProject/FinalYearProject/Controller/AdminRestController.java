@@ -411,7 +411,6 @@ public class AdminRestController {
         );
     }
 
-
     @SneakyThrows
     @PatchMapping("/update/questionsPapers/generatedBy/id")
     public ResponseEntity<?> updateGeneratedByUsingId(
@@ -421,6 +420,43 @@ public class AdminRestController {
                 "successful",
                 QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
                         questionPaperService.updateGeneratedByUsingId(
+                                dto.getReplaceID(),
+                                dto.getOriginalID(),
+                                dto.getPassword()
+                        )
+                ),
+                "the user on all question has been updated ",
+                200
+        );
+    }
+
+    @SneakyThrows
+    @PatchMapping("/update/questionsPapers/approvedBy/email")
+    public ResponseEntity<?> updateApprovedByUsingEmail(
+            @RequestBody DtoFor2EMailsAndPassword dto
+    ){//use dto and
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
+                        questionPaperService.updateApprovedByUsingEmail(
+                                dto.getReplaceEmail(),
+                                dto.getOriginalEmail(),
+                                dto.getPassword()
+                        )
+                ),
+                "the user on all question has been updated " ,
+                200
+        );
+    }
+
+    @PatchMapping("/update/questionsPapers/approvedBy/id")
+    public ResponseEntity<?> updateApprovedByUsingId(
+            @RequestBody DtoFor2IDsAndPassword dto
+    ){
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
+                        questionPaperService.updateApprovedByUsingId(
                                 dto.getReplaceID(),
                                 dto.getOriginalID(),
                                 dto.getPassword()
