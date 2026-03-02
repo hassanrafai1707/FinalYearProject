@@ -312,7 +312,15 @@ public class QuestionPaperService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateGeneratedByUsingEmail(String replaceEmail,String originalEmail,String password){
-        if(replaceEmail.isEmpty()||originalEmail.isEmpty()||password.isEmpty()){
+        if(
+                replaceEmail.isEmpty()||
+                originalEmail.isEmpty()||
+                password.isEmpty()||
+                !(
+                        userService.existsByEmail(replaceEmail)&&
+                        userService.existsByEmail(originalEmail)
+               )
+        ){
             throw new BadRequestException("this request is invalid because one of the given parameter is empty");
         }
         User replaceUser =userService.findByEmail(replaceEmail);
@@ -340,12 +348,11 @@ public class QuestionPaperService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateGeneratedByUsingId(Long replaceID,Long originalID,String password){
-        List<Long> idsToValidate=new ArrayList<>();
-        idsToValidate.add(replaceID);
-        idsToValidate.add(originalID);
         if (
-                idsToValidate.stream().distinct().toList().isEmpty()||
-                        userService.validIDs(idsToValidate).size()!=idsToValidate.size()
+                !(
+                        userService.existsById(replaceID) &&
+                        userService.existsById(originalID)
+                )
         ){
             throw new BadRequestException("the ids given is not valid");
         }
@@ -374,7 +381,15 @@ public class QuestionPaperService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateApprovedByUsingEmail(String replaceEmail,String originalEmail,String password){
-        if(replaceEmail.isEmpty()||originalEmail.isEmpty()||password.isEmpty()){
+        if(
+                replaceEmail.isEmpty()||
+                originalEmail.isEmpty()||
+                password.isEmpty()||
+                !(
+                       userService.existsByEmail(replaceEmail)&&
+                       userService.existsByEmail(originalEmail)
+                )
+        ){
             throw new BadRequestException("this request is invalid because one of the given parameter is empty");
         }
         User replaceUser =userService.findByEmail(replaceEmail);
@@ -402,12 +417,12 @@ public class QuestionPaperService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public List<QuestionPaper> updateApprovedByUsingId(Long replaceID,Long originalID,String password){
-        List<Long> idsToValidate=new ArrayList<>();
-        idsToValidate.add(replaceID);
-        idsToValidate.add(originalID);
+
         if (
-                idsToValidate.stream().distinct().toList().isEmpty()||
-                userService.validIDs(idsToValidate).size()!=idsToValidate.size()
+                !(
+                    userService.existsById(replaceID) &&
+                    userService.existsById(originalID)
+                )
         ){
             throw new BadRequestException("the ids given is not valid");
         }
