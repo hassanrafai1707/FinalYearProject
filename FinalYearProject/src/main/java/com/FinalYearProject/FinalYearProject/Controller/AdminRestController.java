@@ -465,6 +465,38 @@ public class AdminRestController {
         );
     }
 
+    @PatchMapping("/update/questions/createdBy/email")
+    public ResponseEntity<?> updateCreatedByUsingEmail(
+            @RequestBody DtoFor2EMailsAndPassword dto
+    ){
+        questionService.updateCreatedByUsingEmail(
+                dto.getReplaceEmail(),
+                dto.getOriginalEmail(),
+                dto.getPassword()
+        );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                new Object(),
+                "the user on all question has been updated",
+                200
+        );
+    }
+
+    public ResponseEntity<?> updateCreatedByUsingId(
+            @RequestBody DtoFor2IDsAndPassword dto
+    ){
+        questionService.updateCreatedByUsingId(
+                dto.getReplaceID(),
+                dto.getOriginalID(),
+                dto.getPassword()
+        );
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                new Object(),
+                "the user on all question has been updated",
+                200
+        );
+    }
 
     @PatchMapping("/update/my/email")
     public ResponseEntity<?>updateUserEmail(@RequestBody Map<String,String> request){
