@@ -35,6 +35,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
     List<User> findByRole(String role);
     Page<User> findByRole(String role, Pageable pageable);
+    List<User> findByDepartment(String department);
+    Page<User> findByDepartment(String department,Pageable pageable);
 
     //complex query handle by @Query
     @Transactional

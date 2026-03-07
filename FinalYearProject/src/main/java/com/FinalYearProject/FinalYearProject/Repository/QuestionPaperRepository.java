@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,26 +29,32 @@ import java.util.Optional;
 public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Long> {
 
     @Query("select q from QuestionPaper q where q.examTitle=:examTitle")
-    public Optional<QuestionPaper> findByExamTitle(String examTitle);
+    Optional<QuestionPaper> findByExamTitle(String examTitle);
 
     @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy")
-    public List<QuestionPaper> findByGeneratedBy(User generatedBy);
+    List<QuestionPaper> findByGeneratedBy(User generatedBy);
 
     @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy")
-    public Page<QuestionPaper> findByGeneratedBy(User generatedBy,Pageable pageable);
+    Page<QuestionPaper> findByGeneratedBy(User generatedBy,Pageable pageable);
 
     @Query("SELECT q FROM QuestionPaper q WHERE q.approvedBy=:approvedBy")
-    public List<QuestionPaper> findByApprovedBy(User approvedBy);
+    List<QuestionPaper> findByApprovedBy(User approvedBy);
 
     @Query("SELECT q FROM QuestionPaper q WHERE q.approvedBy=:approvedBy")
-    public Page<QuestionPaper> findByApprovedBy(User approvedBy ,Pageable pageable);
+    Page<QuestionPaper> findByApprovedBy(User approvedBy ,Pageable pageable);
 
     @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved")
-    public List<QuestionPaper> findByApproved(Boolean approved);
+    List<QuestionPaper> findByApproved(Boolean approved);
 
     @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved")
-    public Page<QuestionPaper> findByApproved(Boolean approved,Pageable pageable);
+    Page<QuestionPaper> findByApproved(Boolean approved,Pageable pageable);
 
-    public Boolean existsByQuestionPaperFingerprint(String questionPaperFingerprint);
+    @Query("select q from QuestionPaper q where q.generatedBy.department=:department")
+    List<QuestionPaper> findByDepartment(@Param("department") String department);
+
+    @Query("select q from QuestionPaper q where q.generatedBy.department=:department")
+    Page<QuestionPaper> findByDepartment(@Param("department") String department,Pageable pageable);
+
+    Boolean existsByQuestionPaperFingerprint(String questionPaperFingerprint);
 
 }
