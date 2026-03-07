@@ -67,7 +67,7 @@ public class QuestionPaper {
     @JoinColumn(name = "approved_by", nullable = true)
     private User approvedBy;
 
-    @Column(name = "comment",columnDefinition = "TEXT",nullable = false)
+    @Column(name = "comment",columnDefinition = "TEXT")
     private String comment;
 
     @ManyToMany(fetch = FetchType.LAZY,cascade = {

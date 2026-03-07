@@ -42,20 +42,20 @@ import java.util.Set;
         @Index(name = "index_Question_id",columnList = "id"),
         @Index(name = "index_subject_name",columnList = "subject_name"),
         @Index(name = "index_subject_code",columnList = "subject_code"),
-        @Index(name = "index_question_title", columnList = "question_title"),
+        @Index(name = "index_question_title", columnList = "question_title",unique = true),
         @Index(name = "index_created_by" , columnList = "user_id"),
         // compound index
         @Index(name = "index_subject_code_and_mapped_co",
                columnList = "subject_code, mapped_co"
         ),
-        @Index(name = "index_subject_code_and_mapped_co_and_cognitive_level",
-               columnList = "subject_code, mapped_co, cognitive_level"
+        @Index(name = "index_subject_code_and_mapped_co_and_cognitive_level_and_user",
+               columnList = "subject_code, mapped_co, cognitive_level,user_id"
         ),
         @Index(name = "index_subject_name_and_mapped_co" ,
                columnList = "subject_name , mapped_co"
         ),
-        @Index(name = "index_subject_name_and_mapped_co_and_cognitive_level",
-               columnList = "subject_name, mapped_co, cognitive_level"
+        @Index(name = "index_subject_name_and_mapped_co_and_cognitive_level_and_user",
+               columnList = "subject_name, mapped_co, cognitive_level, user_id"
         )
 })
 public class Question {
@@ -97,12 +97,13 @@ public class Question {
     private Boolean isInUse;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false,name = "User_Id")
+    @JoinColumn(nullable = false,name = "user_id")
     private User createdBy;
 
     @ManyToMany(mappedBy = "listOfQuestion",fetch = FetchType.LAZY)
     private Set<QuestionPaper> questionPapers;
 
+    @Transient
     public String getDepartment(){
         return createdBy.getDepartment();
     }
