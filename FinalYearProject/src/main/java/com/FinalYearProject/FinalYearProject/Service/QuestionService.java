@@ -1,14 +1,19 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
+import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.WrongPasswordException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
+import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.QuestionUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
+import lombok.SneakyThrows;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -291,9 +296,20 @@ public class QuestionService {
         return questionPage;
     }
 
+    @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public Question updateCreatedByUsingEmail(String email,Long id,String password){
+    public void updateCreatedByUsingEmail(String replaceEmail,String originalEmail,String password){
+        if (
+                replaceEmail.isEmpty()||
+                originalEmail.isEmpty()||
+                password.isEmpty()||
+                !(
+                        userService.existsByEmail(replaceEmail)&&userService.existsByEmail(originalEmail)
+                )
+        ){
+           throw new BadRequestException("this request is invalid because one of the given parameter is empty");
+        }
         if (
                 !userService.matchPasswords(
                     password,
@@ -302,25 +318,51 @@ public class QuestionService {
         ){
             throw new WrongPasswordException("your password doesn't match");
         }
-        Question question=getQuestionById(id);
-        question.setCreatedBy(userService.findByEmail(email));
-        return questionRepository.save(question);
+        User replaceUser =userService.findByEmail(replaceEmail);
+        if (!replaceUser.getRole().contains("ROLE_TEACHER")){
+            throw new UserNotAuthorizesException("the selected user is not Authorizes to make this change");
+        }
+        List<Question> questions=new ArrayList<>();
+        for (Question question:questionRepository.findByCreatedBy(
+                userService.findByEmail(originalEmail)
+        )){
+            question.setCreatedBy(replaceUser);
+            questions.add(question);
+        }
+        questionRepository.saveAll(questions);
     }
 
+    @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public Question updateCreatedByUsingId(Long userId,Long QId,String password){
+    public void updateCreatedByUsingId(Long replaceID,Long originalID, String password){
         if (
-                !userService.matchPasswords(
-                        password,
-                        UserUtil.getUserAuthentication().getPassword()
+                !(
+                        userService.existsById(replaceID) &&
+                        userService.existsById(originalID)
                 )
         ){
-            throw new WrongPasswordException("your password doesn't match");
+            throw new BadRequestException("the ids given is not valid");
         }
-        Question question=getQuestionById(QId);
-        question.setCreatedBy(userService.findUserById(userId));
-        return questionRepository.save(question);
+        User replaceUser =userService.findUserById(replaceID);
+        if (!replaceUser.getRole().contains("ROLE_TEACHER")){
+            throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
+        }
+        if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userUtil is admin user
+            List<Question> result=new ArrayList<>();
+            for (Question question:questionRepository.findByCreatedBy(
+                    userService.findUserById(
+                            originalID
+                    )
+            )){
+                question.setCreatedBy(replaceUser);
+                result.add(question);
+            }
+            questionRepository.saveAll(result);
+        }
+        else {
+            throw new WrongPasswordException("your password is wrong");
+        }
     }
 
     @Transactional

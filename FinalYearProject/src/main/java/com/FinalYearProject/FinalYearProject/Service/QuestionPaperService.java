@@ -324,7 +324,7 @@ public class QuestionPaperService {
             throw new BadRequestException("this request is invalid because one of the given parameter is empty");
         }
         User replaceUser =userService.findByEmail(replaceEmail);
-        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+        if (!replaceUser.getRole().contains("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
         }
         if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userutil is admin user
@@ -357,7 +357,7 @@ public class QuestionPaperService {
             throw new BadRequestException("the ids given is not valid");
         }
         User replaceUser =userService.findUserById(replaceID);
-        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+        if (!replaceUser.getRole().contains("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
         }
         if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userUtil is admin user
@@ -427,7 +427,7 @@ public class QuestionPaperService {
             throw new BadRequestException("the ids given is not valid");
         }
         User replaceUser =userService.findUserById(replaceID);
-        if (replaceUser.getRole().contains("ROLE_TEACHER")){
+        if (!replaceUser.getRole().contains("ROLE_TEACHER")){
             throw new UserNotAuthorizesException("user with email:"+ replaceUser.getEmail()+"has role:"+ replaceUser.getRole()+" and not role ROLE_TEACHER");
         }
         if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userUtil is admin user
