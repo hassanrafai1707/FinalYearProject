@@ -103,6 +103,9 @@ public class Question {
     @ManyToMany(mappedBy = "listOfQuestion",fetch = FetchType.LAZY)
     private Set<QuestionPaper> questionPapers;
 
+    public String getDepartment(){
+        return createdBy.getDepartment();
+    }
     public Set<QuestionPaper> getQuestionPapers() {
         return questionPapers;
     }

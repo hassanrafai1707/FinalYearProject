@@ -1,6 +1,5 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
-import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
@@ -9,7 +8,6 @@ import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.WrongPasswordException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
-import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.QuestionUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.SneakyThrows;
