@@ -482,6 +482,7 @@ public class AdminRestController {
         );
     }
 
+    @PatchMapping("/update/questions/createdBy/id")
     public ResponseEntity<?> updateCreatedByUsingId(
             @RequestBody DtoFor2IDsAndPassword dto
     ){
