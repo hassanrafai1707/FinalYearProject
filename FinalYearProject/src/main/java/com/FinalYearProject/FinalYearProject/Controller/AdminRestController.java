@@ -6,7 +6,6 @@ import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotVa
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
-import com.FinalYearProject.FinalYearProject.Util.QuestionPaperDtoUtil;
 import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import com.FinalYearProject.FinalYearProject.Util.UserDtoUtil;
 import lombok.SneakyThrows;

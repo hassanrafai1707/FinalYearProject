@@ -27,7 +27,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "Users",indexes = {
         @Index(name = "index_id",columnList = "id",unique = true),
-        @Index(name = "index_email" ,columnList = "email",unique = true)
+        @Index(name = "index_email" ,columnList = "email",unique = true),
+        @Index(name = "index_department", columnList = "department")
 })
 public class User {
     @Id
@@ -52,6 +53,7 @@ public class User {
 
     @Column(nullable = false)
     private String role;
+
     @Column(nullable = false)
     private boolean is_enable;
 
@@ -65,6 +67,17 @@ public class User {
     private boolean expired;//in logout, I can set this to false and prevent login again
 
     private LocalDateTime lastLogin;
+
+    @Column(name = "department",length = 3)
+    private String department;
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
 
     public boolean isExpired() {
         return expired;
