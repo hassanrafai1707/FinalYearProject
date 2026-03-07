@@ -311,7 +311,7 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public List<QuestionPaper> updateGeneratedByUsingEmail(String replaceEmail,String originalEmail,String password){
+    public void updateGeneratedByUsingEmail(String replaceEmail,String originalEmail,String password){
         if(
                 replaceEmail.isEmpty()||
                 originalEmail.isEmpty()||
@@ -337,7 +337,7 @@ public class QuestionPaperService {
                 questionPaper.setGeneratedBy(replaceUser);
                 result.add(questionPaper);
             }
-            return questionPaperRepository.saveAll(result);
+            questionPaperRepository.saveAll(result);
         }
         else {
             throw new WrongPasswordException("your password is wrong");
@@ -347,7 +347,7 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public List<QuestionPaper> updateGeneratedByUsingId(Long replaceID,Long originalID,String password){
+    public void updateGeneratedByUsingId(Long replaceID,Long originalID,String password){
         if (
                 !(
                         userService.existsById(replaceID) &&
@@ -370,7 +370,7 @@ public class QuestionPaperService {
                 questionPaper.setGeneratedBy(replaceUser);
                 result.add(questionPaper);
             }
-            return questionPaperRepository.saveAll(result);
+            questionPaperRepository.saveAll(result);
         }
         else {
             throw new WrongPasswordException("your password is wrong");
@@ -380,7 +380,7 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public List<QuestionPaper> updateApprovedByUsingEmail(String replaceEmail,String originalEmail,String password){
+    public void updateApprovedByUsingEmail(String replaceEmail,String originalEmail,String password){
         if(
                 replaceEmail.isEmpty()||
                 originalEmail.isEmpty()||
@@ -406,7 +406,7 @@ public class QuestionPaperService {
                 questionPaper.setApprovedBy(replaceUser);
                 result.add(questionPaper);
             }
-            return questionPaperRepository.saveAll(result);
+            questionPaperRepository.saveAll(result);
         }
         else {
             throw new WrongPasswordException("your password is wrong");
@@ -416,7 +416,7 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
-    public List<QuestionPaper> updateApprovedByUsingId(Long replaceID,Long originalID,String password){
+    public void updateApprovedByUsingId(Long replaceID,Long originalID,String password){
 
         if (
                 !(
@@ -440,7 +440,7 @@ public class QuestionPaperService {
                 questionPaper.setApprovedBy(replaceUser);
                 result.add(questionPaper);
             }
-            return questionPaperRepository.saveAll(result);
+            questionPaperRepository.saveAll(result);
         }
         else {
             throw new WrongPasswordException("your password is wrong");

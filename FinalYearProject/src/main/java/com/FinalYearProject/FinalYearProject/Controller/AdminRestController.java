@@ -400,15 +400,14 @@ public class AdminRestController {
     public ResponseEntity<?> updateGeneratedByUsingEmail(
             @RequestBody DtoFor2EMailsAndPassword dto
     ){
+        questionPaperService.updateGeneratedByUsingEmail(
+                dto.getReplaceEmail(),
+                dto.getOriginalEmail(),
+                dto.getPassword()
+        );
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
-                       questionPaperService.updateGeneratedByUsingEmail(
-                               dto.getReplaceEmail(),
-                               dto.getOriginalEmail(),
-                               dto.getPassword()
-                       )
-                ),
+                new Object(),
                 "the user on all question has been updated ",
                 200
         );
@@ -419,15 +418,14 @@ public class AdminRestController {
     public ResponseEntity<?> updateGeneratedByUsingId(
             @RequestBody DtoFor2IDsAndPassword dto
     ){
+        questionPaperService.updateGeneratedByUsingId(
+                dto.getReplaceID(),
+                dto.getOriginalID(),
+                dto.getPassword()
+        );
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
-                        questionPaperService.updateGeneratedByUsingId(
-                                dto.getReplaceID(),
-                                dto.getOriginalID(),
-                                dto.getPassword()
-                        )
-                ),
+                new Object(),
                 "the user on all question has been updated ",
                 200
         );
@@ -437,16 +435,15 @@ public class AdminRestController {
     @PatchMapping("/update/questionsPapers/approvedBy/email")
     public ResponseEntity<?> updateApprovedByUsingEmail(
             @RequestBody DtoFor2EMailsAndPassword dto
-    ){//use dto and
+    ){
+        questionPaperService.updateApprovedByUsingEmail(
+                dto.getReplaceEmail(),
+                dto.getOriginalEmail(),
+                dto.getPassword()
+        );
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
-                        questionPaperService.updateApprovedByUsingEmail(
-                                dto.getReplaceEmail(),
-                                dto.getOriginalEmail(),
-                                dto.getPassword()
-                        )
-                ),
+                new Object(),
                 "the user on all question has been updated " ,
                 200
         );
@@ -456,15 +453,14 @@ public class AdminRestController {
     public ResponseEntity<?> updateApprovedByUsingId(
             @RequestBody DtoFor2IDsAndPassword dto
     ){
+        questionPaperService.updateApprovedByUsingId(
+                dto.getReplaceID(),
+                dto.getOriginalID(),
+                dto.getPassword()
+        );
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                QuestionPaperDtoUtil.listOfQuestionPaperToQuestionPaperDto(
-                        questionPaperService.updateApprovedByUsingId(
-                                dto.getReplaceID(),
-                                dto.getOriginalID(),
-                                dto.getPassword()
-                        )
-                ),
+                new Object(),
                 "the user on all question has been updated ",
                 200
         );
