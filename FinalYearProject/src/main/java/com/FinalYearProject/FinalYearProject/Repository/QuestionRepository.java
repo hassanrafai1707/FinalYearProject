@@ -65,8 +65,8 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
     Page<Question> findByCreatedBy(User user , Pageable pageable);
 
-    @Query("SELECT q FROM Question q WHERE q.user.department=:department")
+    @Query("SELECT q FROM Question q WHERE q.createdBy.department=:department")
     List<Question> findByDepartment(@Param("department") String department);
-    @Query("SELECT q FROM Question q WHERE q.user.department=:department")
+    @Query("SELECT q FROM Question q WHERE q.createdBy.department=:department")
     Page<Question> findByDepartment(@Param("department") String department,Pageable pageable);
 }
