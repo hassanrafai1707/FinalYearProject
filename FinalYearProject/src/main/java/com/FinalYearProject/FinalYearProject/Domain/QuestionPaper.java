@@ -67,6 +67,9 @@ public class QuestionPaper {
     @JoinColumn(name = "approved_by", nullable = true)
     private User approvedBy;
 
+    @Column(name = "comment",columnDefinition = "TEXT",nullable = false)
+    private String comment;
+
     @ManyToMany(fetch = FetchType.LAZY,cascade = {
             CascadeType.MERGE,
             CascadeType.PERSIST
@@ -81,6 +84,14 @@ public class QuestionPaper {
     )
     private Set<Question> listOfQuestion;
 
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 
     public Long getId() {
         return Id;

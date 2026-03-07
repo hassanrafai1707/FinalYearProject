@@ -18,6 +18,7 @@ public class QuestionPaperDtoUtil {
                 questionPaper.getGeneratedBy(),
                 questionPaper.getApproved(),
                 questionPaper.getApprovedBy(),
+                questionPaper.getComment(),
                 questionPaper.getListOfQuestion()
         );
     }
@@ -33,6 +34,7 @@ public class QuestionPaperDtoUtil {
                         questionPaper.getGeneratedBy(),
                         questionPaper.getApproved(),
                         questionPaper.getApprovedBy(),
+                        questionPaper.getComment(),
                         questionPaper.getListOfQuestion()
                 )
         ).toList();
@@ -49,6 +51,7 @@ public class QuestionPaperDtoUtil {
                         questionPaper.getGeneratedBy(),
                         questionPaper.getApproved(),
                         questionPaper.getApprovedBy(),
+                        questionPaper.getComment(),
                         questionPaper.getListOfQuestion()
                 )).toList(),
                 PageRequest.of(pageNo,size),
@@ -71,6 +74,7 @@ public class QuestionPaperDtoUtil {
                         questionPaper.getGeneratedBy(),
                         questionPaper.getApproved(),
                         questionPaper.getApprovedBy(),
+                        questionPaper.getComment(),
                         questionPaper.getListOfQuestion()
                 )).toList(),
                 PageRequest.of(pageNo,size),

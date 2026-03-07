@@ -23,6 +23,8 @@ public class QuestionPaperDto {
 
     private User approvedBy;
 
+    private String comment;
+
     private Set<QuestionDTO> listOfQuestion;
 
 
@@ -32,6 +34,7 @@ public class QuestionPaperDto {
             User generatedBy,
             Boolean approved,
             User approvedBy,
+            String comment,
             Set<Question> listOfQuestion
     ){
         this.Id=Id;
@@ -39,6 +42,7 @@ public class QuestionPaperDto {
         this.generatedBy=generatedBy;
         this.approved=approved;
         this.approvedBy=approvedBy;
+        this.comment=comment;
         this.listOfQuestion= new HashSet<>(//need to changer the type to question dto to send the info to user ( the reason question dto doesn't have question papers so it can be used )
                 QuestionDtoUtil.listOfQuestionToQuestionDto(
                 listOfQuestion.stream().toList()
