@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Exceptions.DepartmentMissMatchException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
@@ -47,7 +48,7 @@ public class QuestionService {
     }
 
     public List<Question> getAllQuestion(){
-        List<Question> tempQuestion=questionRepository.findAll();
+        List<Question> tempQuestion=questionRepository.findByDepartment(UserUtil.getUserAuthentication().getUser().getDepartment());
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -57,7 +58,7 @@ public class QuestionService {
     }
 
     public Page<Question> getAllQuestionsPaged(int pageNo,int size){
-        Page<Question> temp=questionRepository.findAll(PageRequest.of(pageNo,size));
+        Page<Question> temp=questionRepository.findByDepartment(UserUtil.getUserAuthentication().getUser().getDepartment(),PageRequest.of(pageNo,size));
         if (!(temp.isEmpty())){
             return temp;
         }
@@ -67,8 +68,12 @@ public class QuestionService {
     }
 
     public Question getQuestionById(Long id) {
-        return questionRepository.findById(id)
+        Question question=questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
+        if (QuestionUtil.DepartmentCheck(question)){
+            return question;
+        }
+        throw new DepartmentMissMatchException("you are not allowed to access this as it is not from your department");
     }
 
     public List<Question> getQuestionByIds(List<Long> Ids){
@@ -76,13 +81,18 @@ public class QuestionService {
         if (temp.isEmpty()){
             throw new QuestionNotFoundException("question with the given ids not found");
         }
-        return temp;
+        if (QuestionUtil.DepartmentCheck(temp)){
+            return temp;
+        }
+        throw new DepartmentMissMatchException("you are not allowed to access this as it is not from your department");
     }
 
     public List<Question> findBySubjectCode(String subjectCode){
         List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
         if (!(tempQuestion.isEmpty())){
-            return tempQuestion;
+            if (QuestionUtil.DepartmentCheck(tempQuestion)) {
+                return tempQuestion;
+            }
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
     }

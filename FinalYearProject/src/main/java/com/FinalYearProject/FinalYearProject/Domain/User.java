@@ -68,7 +68,7 @@ public class User {
 
     private LocalDateTime lastLogin;
 
-    @Column(name = "department",length = 3)
+    @Column(name = "department",length = 3,nullable = false)
     private String department;
 
     public String getDepartment() {

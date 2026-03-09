@@ -1,8 +1,13 @@
 package com.FinalYearProject.FinalYearProject.Util;
 
+import com.FinalYearProject.FinalYearProject.Domain.Question;
+
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * QuestionUtil - Utility Class for Question Content Processing and Validation
@@ -50,5 +55,23 @@ public class QuestionUtil {
         else {
             return Boolean.TRUE;
         }
+    }
+
+    public static Boolean DepartmentCheck(List<Question> questions){
+        for (String dep :questions.stream()
+                .map(Question::getDepartment)
+                .distinct()
+                .toArray(String[]::new)
+        ){
+            if (!dep.equals(UserUtil.getUserAuthentication().getUser().getDepartment())) continue;
+        }
+        return true;
+    }
+
+    public static Boolean DepartmentCheck(Question question){
+        if (question.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
+            return true;
+        }
+        return false;
     }
 }
