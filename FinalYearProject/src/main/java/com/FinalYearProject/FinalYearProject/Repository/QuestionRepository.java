@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * QuestionPaperRepository - JPA Repository for Exam Paper Data Access
@@ -28,37 +27,38 @@ import java.util.Optional;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question , Long> {
 
-    //simple Query handled by spring boot
-    List<Question> findBySubjectCode(String subjectCode);
-    Page<Question> findBySubjectCode(String subjectCode,Pageable pageable);
-    List<Question> findBySubjectName(String subjectName);
-    Page<Question> findBySubjectName(String subjectName,Pageable pageable);
+    @Query("SELECT q FROM Question WHERE q.subjectCode=:subjectCode AND q.createdBy.department=:department")
+    List<Question> findBySubjectCode( @Param("subjectCode") String subjectCode, @Param("department") String department);
+    @Query("SELECT q FROM Question WHERE q.subjectCode=:subjectCode AND q.createdBy.department=:department")
+    Page<Question> findBySubjectCode(@Param("subjectCode") String subjectCode,@Param("department") String department,Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.createdBy.department=:department")
+    List<Question> findBySubjectName(@Param("subjectName") String subjectName,@Param("department") String department);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.createdBy.department=:department")
+    Page<Question> findBySubjectName(@Param("subjectName") String subjectName,@Param("department") String department,Pageable pageable);
     Boolean existsByQuestionTitle(String question);
-    Optional<Question> findByQuestionTitle(String questionTitle);
 
-    // complex query handled by @Query
-    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO")
-    List<Question> findBySubjectCodeAndMappedCO(String subjectCode, String mappedCO);
-    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO")
-    Page<Question> findBySubjectCodeAndMappedCO(String subjectCode, String mappedCO,Pageable pageable);
-    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel")
-    List<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel);
-    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel")
-    Page<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(String subjectCode, String mappedCO, String cognitiveLevel,Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.createdBy.department=:department")
+    List<Question> findBySubjectCodeAndMappedCO(@Param("subjectCode") String subjectCode, @Param("mappedCO") String mappedCO,@Param("department") String department);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.createdBy.department=:department")
+    Page<Question> findBySubjectCodeAndMappedCO(@Param("subjectCode") String subjectCode, @Param("mappedCO") String mappedCO,@Param("department") String department,Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel AND q.createdBy.department=:department")
+    List<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(@Param("subjectCode") String subjectCode, @Param("mappedCO") String mappedCO,@Param("department") String department,@Param("cognitiveLevel") String cognitiveLevel);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.cognitiveLevel=:cognitiveLevel AND q.createdBy.department=:department")
+    Page<Question> findBySubjectCodeAndMappedCOAndCognitiveLevel(@Param("subjectCode") String subjectCode, @Param("mappedCO") String mappedCO,@Param("department") String department,@Param("cognitiveLevel") String cognitiveLevel,Pageable pageable);
 
-    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO")
-    List<Question> findBySubjectNameAndMappedCO(String subjectName ,String mappedCO);
-    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO")
-    Page<Question> findBySubjectNameAndMappedCO(String subjectName ,String mappedCO, Pageable pageable);
-    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel")
-    List<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(String subjectName ,String mappedCO ,String cognitiveLevel);
-    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel")
-    Page<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(String subjectName ,String mappedCO ,String cognitiveLevel,Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.createdBy.department=:department")
+    List<Question> findBySubjectNameAndMappedCO(@Param("subjectName") String subjectName ,@Param("mappedCO") String mappedCO,@Param("department") String department);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.createdBy.department=:department")
+    Page<Question> findBySubjectNameAndMappedCO(@Param("subjectName") String subjectName ,@Param("mappedCO") String mappedCO,@Param("department") String department, Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel AND q.createdBy.department=:department")
+    List<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(@Param("subjectName") String subjectName , @Param("mappedCO") String mappedCO,@Param("department") String department,@Param("cognitiveLevel") String cognitiveLevel);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO=:mappedCO AND q.cognitiveLevel =:cognitiveLevel AND q.createdBy.department=:department")
+    Page<Question> findBySubjectNameAndMappedCOAndCognitiveLevel(@Param("subjectName") String subjectName , @Param("mappedCO") String mappedCO,@Param("department") String department,@Param("cognitiveLevel") String cognitiveLevel,Pageable pageable);
 
-    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO IN :mappedCOs")
-    List<Question> findValidQuestionsWithSubjectCode(String subjectCode,String[] mappedCOs);
-    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO IN :mappedCOs")
-    List<Question> findValidQuestionWithSubjectName(String subjectName,String[] mappedCOs);
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO IN :mappedCOs AND q.createdBy.department=:department")
+    List<Question> findValidQuestionsWithSubjectCode(@Param("subjectCode") String subjectCode,@Param("mappedCOs") String[] mappedCOs,@Param("department") String department);
+    @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.mappedCO IN :mappedCOs AND q.createdBy.department=:department")
+    List<Question> findValidQuestionWithSubjectName(@Param("subjectName") String subjectName,@Param("mappedCOs") String[] mappedCOs,@Param("department") String department);
 
     @Query("SELECT q FROM Question q WHERE q.createdBy =:user")
     List<Question> findByCreatedBy(User user);

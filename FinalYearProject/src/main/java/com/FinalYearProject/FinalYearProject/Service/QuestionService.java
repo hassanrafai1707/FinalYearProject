@@ -88,17 +88,19 @@ public class QuestionService {
     }
 
     public List<Question> findBySubjectCode(String subjectCode){
-        List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode);
+        List<Question> tempQuestion=questionRepository.findBySubjectCode(subjectCode,UserUtil.getUserAuthentication().getUser().getDepartment());
         if (!(tempQuestion.isEmpty())){
-            if (QuestionUtil.DepartmentCheck(tempQuestion)) {
-                return tempQuestion;
-            }
+            return tempQuestion;
         }
         throw new QuestionNotFoundException("No questions found with Subject code: "+subjectCode);
     }
 
     public Page<Question> findBySubjectCode(String subjectCode,int pageNo,int size){
-        Page<Question> temp = questionRepository.findBySubjectCode(subjectCode,PageRequest.of(pageNo,size));
+        Page<Question> temp = questionRepository.findBySubjectCode(
+                subjectCode,
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
+                PageRequest.of(pageNo,size)
+        );
         if (!(temp.isEmpty())){
             return temp;
         }
@@ -106,7 +108,11 @@ public class QuestionService {
     }
 
     public List<Question> findBySubjectCodeMappedCO(String subjectCode , String mappedCO){
-        List<Question> tempQuestion=questionRepository.findBySubjectCodeAndMappedCO(subjectCode,mappedCO);
+        List<Question> tempQuestion=questionRepository.findBySubjectCodeAndMappedCO(
+                subjectCode,
+                mappedCO,
+                UserUtil.getUserAuthentication().getUser().getDepartment()
+        );
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -117,6 +123,7 @@ public class QuestionService {
         Page<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCO(
                 subjectCode,
                 mappedCO,
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
                 PageRequest.of(pageNo,size)
         );
         if (!(tempQuestions.isEmpty())){
@@ -132,7 +139,11 @@ public class QuestionService {
             String mappedCO,
             String cognitiveLevel
     ){
-        List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
+        List<Question> tempQuestions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(
+                subjectCode,
+                mappedCO,
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
+                cognitiveLevel);
         if (!(tempQuestions.isEmpty())){
             return tempQuestions;
         }
@@ -149,6 +160,8 @@ public class QuestionService {
         Page<Question> questions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(
                 subjectCode,
                 mappedCO,
+
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
                 cognitiveLevel,
                 PageRequest.of(pageNo,size)
         );
@@ -159,7 +172,7 @@ public class QuestionService {
     }
 
     public List<Question> findBySubjectName(String subjectName){
-        List<Question> tempQuestion=questionRepository.findBySubjectName(subjectName);
+        List<Question> tempQuestion=questionRepository.findBySubjectName(subjectName,UserUtil.getUserAuthentication().getUser().getDepartment());
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -167,7 +180,11 @@ public class QuestionService {
     }
 
     public Page<Question> findBySubjectName(String subjectName,int pageNo , int size){
-        Page<Question> temp=questionRepository.findBySubjectName(subjectName,PageRequest.of(pageNo,size));
+        Page<Question> temp=questionRepository.findBySubjectName(
+                subjectName,
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
+                PageRequest.of(pageNo,size)
+        );
         if (!(temp.isEmpty())){
             return temp;
         }
@@ -175,7 +192,11 @@ public class QuestionService {
     }
 
     public List<Question> findBySubjectNameMappedCO(String subjectName,String mappedCO){
-        List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(subjectName,mappedCO);
+        List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(
+                subjectName,
+                mappedCO,
+                UserUtil.getUserAuthentication().getUser().getDepartment()
+        );
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -186,6 +207,7 @@ public class QuestionService {
         Page<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCO(
                 subjectName,
                 mappedCO,
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
                 PageRequest.of(pageNo,size)
         );
         if (!(tempQuestion.isEmpty())){
@@ -201,7 +223,12 @@ public class QuestionService {
             String mappedCO,
             String cognitiveLevel
     ){
-        List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(subjectName, mappedCO, cognitiveLevel);
+        List<Question> tempQuestion=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(
+                subjectName,
+                mappedCO,
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
+                cognitiveLevel
+        );
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -218,6 +245,7 @@ public class QuestionService {
         Page<Question> questions=questionRepository.findBySubjectNameAndMappedCOAndCognitiveLevel(
                 subjectName,
                 mappedCO,
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
                 cognitiveLevel,
                 PageRequest.of(pageNo,size)
         );
@@ -229,7 +257,11 @@ public class QuestionService {
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public List<Question> findByCreatedByUsingEmail(String email){
-        List<Question> tempQuestion=questionRepository.findByCreatedBy(userService.findByEmail(email));
+        User user=userService.findByEmail(email);
+        if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
+            throw new DepartmentMissMatchException("You are not allowed to access as you are not from the same Department as user with email:"+email);
+        }
+        List<Question> tempQuestion=questionRepository.findByCreatedBy(user);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -240,9 +272,13 @@ public class QuestionService {
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public Page<Question> findByCreatedByUsingEmail(String email, int pageNo,int size){
+        User user=userService.findByEmail(email);
+        if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
+            throw new DepartmentMissMatchException("You are not allowed to access as you are not from the same Department as user with email:"+email);
+        }
         Page<Question> tempQuestion=questionRepository.findByCreatedBy(
-                userService.findByEmail(email),
-                PageRequest.of(pageNo,size)
+              user,
+              PageRequest.of(pageNo,size)
         );
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
@@ -254,7 +290,11 @@ public class QuestionService {
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public List<Question> findByCreatedByUsingId(Long Id){
-        List<Question> tempQuestion=questionRepository.findByCreatedBy(userService.findUserById(Id));
+        User user=userService.findUserById(Id);
+        if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
+            throw new DepartmentMissMatchException("You are not allowed to access as you are not from the same Department as user with Id:"+Id);
+        }
+        List<Question> tempQuestion=questionRepository.findByCreatedBy(user);
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
         }
@@ -265,8 +305,12 @@ public class QuestionService {
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public Page<Question> findByCreatedByUsingId(Long Id,int pageNo,int size){
+        User user=userService.findUserById(Id);
+        if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
+            throw new DepartmentMissMatchException("You are not allowed to access as you are not from the same Department as user with Id:"+Id);
+        }
         Page<Question> tempQuestion=questionRepository.findByCreatedBy(
-                userService.findUserById(Id),
+                user,
                 PageRequest.of(pageNo,size)
         );
         if (!(tempQuestion.isEmpty())){
@@ -421,7 +465,11 @@ public class QuestionService {
             int maxNumberOf4Marks
     ) {
         List<Question> output=new ArrayList<>();
-        List<Question> allowed=questionRepository.findValidQuestionsWithSubjectCode(subjectCode,mappedCOs);
+        List<Question> allowed=questionRepository.findValidQuestionsWithSubjectCode(
+                subjectCode,
+                mappedCOs,
+                UserUtil.getUserAuthentication().getUser().getDepartment()
+        );
         if(allowed.isEmpty()){
             throw new QuestionNotFoundException("No questions found for selected subject  code + CO");
         }
@@ -520,7 +568,11 @@ public class QuestionService {
             int maxNumberOf2Marks,
             int maxNumberOf4Marks
     ) {
-        List<Question> allowed = questionRepository.findValidQuestionWithSubjectName(subjectName, mappedCOs);
+        List<Question> allowed = questionRepository.findValidQuestionWithSubjectName(
+                subjectName,
+                mappedCOs,
+                UserUtil.getUserAuthentication().getUser().getDepartment()
+        );
         List<Question> output = new ArrayList<>();
         if(allowed.isEmpty()){
             throw new QuestionNotFoundException("No questions found for selected subject + CO");

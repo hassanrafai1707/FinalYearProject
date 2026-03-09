@@ -113,12 +113,17 @@ public class GlobalExceptionHandler  {
 
     //internal exceptions
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<?> handleBadRequestException(BadRequestException e , HttpServletRequest request){
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e , HttpServletRequest request){
         return buildResponse(e,HttpStatus.BAD_REQUEST,request);
     }
 
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<ErrorResponse> handleLockedException(LockedException e, HttpServletRequest request){
         return buildResponse(e,HttpStatus.LOCKED,request);
+    }
+
+    @ExceptionHandler(DepartmentMissMatchException.class)
+    public ResponseEntity<ErrorResponse> handleDepartmentMissMatchException(DepartmentMissMatchException e,HttpServletRequest request){
+        return buildResponse(e,HttpStatus.UNAUTHORIZED,request);
     }
 }
