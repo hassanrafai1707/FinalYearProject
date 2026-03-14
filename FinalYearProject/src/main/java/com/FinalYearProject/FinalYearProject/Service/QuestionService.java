@@ -76,7 +76,10 @@ public class QuestionService {
         throw new DepartmentMissMatchException("you are not allowed to access this as it is not from your department");
     }
 
+    //todo remove this
+    @SneakyThrows
     public List<Question> getQuestionByIds(List<Long> Ids){
+        if (Ids.size()>50) throw new BadRequestException(" you are question for too many question at the same time ");
         List<Question> temp =questionRepository.findAllById(Ids);
         if (temp.isEmpty()){
             throw new QuestionNotFoundException("question with the given ids not found");
