@@ -85,6 +85,10 @@ public class QuestionPaper {
     private Set<Question> listOfQuestion;
 
 
+    public String getDepartment(){
+        return generatedBy.getDepartment();
+    }
+
     public String getComment() {
         return comment;
     }

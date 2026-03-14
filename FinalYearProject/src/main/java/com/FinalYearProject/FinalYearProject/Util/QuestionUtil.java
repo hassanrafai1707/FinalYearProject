@@ -57,15 +57,14 @@ public class QuestionUtil {
         }
     }
 
-    public static Boolean DepartmentCheck(List<Question> questions){
-        for (String dep :questions.stream()
-                .map(Question::getDepartment)
-                .distinct()
-                .toArray(String[]::new)
-        ){
-            if (!dep.equals(UserUtil.getUserAuthentication().getUser().getDepartment())) continue;
+    public static Boolean DepartmentCheck(List<Question> questions) {
+        List<String> dep=questions.stream().map(Question::getDepartment).distinct().toList();
+        if (dep.size()==1&&dep.getFirst().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
+            return true;
         }
-        return true;
+        else {
+            return false;
+        }
     }
 
     public static Boolean DepartmentCheck(Question question){
