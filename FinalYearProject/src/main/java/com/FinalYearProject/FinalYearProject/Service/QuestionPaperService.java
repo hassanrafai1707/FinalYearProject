@@ -53,7 +53,7 @@ public class QuestionPaperService {
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public List<QuestionPaper> getAllQuestionPapers(){
-        List<QuestionPaper> questionPapers=questionPaperRepository.findAll();
+        List<QuestionPaper> questionPapers=questionPaperRepository.findByDepartment(UserUtil.getUserAuthentication().getUser().getDepartment());
         if (questionPapers.isEmpty()){
             throw new QuestionPaperNotFoundException("no question paper in db");
         }
@@ -64,7 +64,10 @@ public class QuestionPaperService {
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public Page<QuestionPaper> getAllQuestionPapers(int pageNo , int size){
-        Page<QuestionPaper> questionPaperPage=questionPaperRepository.findAll(PageRequest.of(pageNo,size));
+        Page<QuestionPaper> questionPaperPage=questionPaperRepository.findByDepartment(
+                UserUtil.getUserAuthentication().getUser().getDepartment(),
+                PageRequest.of(pageNo,size)
+        );
         if (!(questionPaperPage.isEmpty())){
             return questionPaperPage;
         }
