@@ -90,8 +90,7 @@ public class UserService {
             log.debug(redisService.get(conformation.getToken(),Conformation.class).toString());
             System.out.println("user saved success");
         }
-        userRepository.save(user);
-        return user;
+        return userRepository.save(user);
     }
 
     //  READ (all users)
@@ -124,11 +123,7 @@ public class UserService {
     //  UPDATE
 
     public User updateUserEmail(String NewEmail) {
-        String email=UserUtil.getUserAuthentication().getUsername();
-        if(email.isEmpty()){
-            throw new RuntimeException("Some thing went wrong on user in security context holder ");
-        }
-        User existingUser = findByEmail(email);
+        User existingUser = findByEmail(UserUtil.getUserAuthentication().getUsername());
         existingUser.setEmail(NewEmail);
         existingUser.setIs_enable(false);
         existingUser.setPassword(encoder.encode(existingUser.getPassword()));
@@ -150,19 +145,14 @@ public class UserService {
     }
 
     public User updateUserPassword(String newPassword){
-        String email= UserUtil.getUserAuthentication().getUsername();
-        if(email.isEmpty()){
-            throw new RuntimeException("Some thing went wrong on user in security context holder ");
-        }
-        User existingUser=findByEmail(email);
+        User existingUser=findByEmail(UserUtil.getUserAuthentication().getUsername());
         existingUser.setPassword(encoder.encode(newPassword));
         return userRepository.save(existingUser);
     }
 
     @PreAuthorize("ROLE_ADMIN")
     public User updateUserPasswordByEmail(String email,String password,String adminPassword){
-        @NonNull UserPrincipal adminUser=UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
         }
         User user=findByEmail(email);
@@ -172,8 +162,7 @@ public class UserService {
 
     @PreAuthorize("ROLE_ADMIN")
     public User updateUserPasswordById(Long id,String password,String adminPassword){
-        @NonNull UserPrincipal adminUser=UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
         }
         User user=findUserById(id);
@@ -183,8 +172,7 @@ public class UserService {
 
     @PreAuthorize("ROLE_ADMIN")
     public User updateUserRoleById(String role,Long id,String password){
-        @NonNull UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
-        if (!(encoder.matches(password,userPrincipal.getPassword()))){
+        if (!(matchPasswords(password,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
         }
         switch (role){
@@ -220,8 +208,7 @@ public class UserService {
 
     @PreAuthorize("ROLE_ADMIN")
     public User updateUserRoleByEmail(String email,String role,String password){
-        @NonNull UserPrincipal userPrincipal=UserUtil.getUserAuthentication();
-        if (!(encoder.matches(password,userPrincipal.getPassword()))){
+        if (!(matchPasswords(password,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
         }
         switch (role){
@@ -249,8 +236,7 @@ public class UserService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public void deleteUserByEmail(String email,String adminPassword) {
-        @NonNull UserPrincipal adminUser=UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
         }
         else {
@@ -262,8 +248,7 @@ public class UserService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public void deleteUserById(Long id , String adminPassword) {
-        @NonNull UserPrincipal adminUser = UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword, adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword, UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password try again");
         }
         else {
@@ -274,8 +259,7 @@ public class UserService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public void deleteUserInBatchById(List<Long> ids , String adminPassword) {
-        @NonNull UserPrincipal adminUser= UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
         }
         else {
@@ -294,8 +278,7 @@ public class UserService {
     @Transactional
     @PreAuthorize("ROLE_ADMIN")
     public void deleteUserInBatchEmail(List<String> emails , String adminPassword){
-        @NonNull UserPrincipal adminUser= UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
         }
         else {
@@ -306,8 +289,7 @@ public class UserService {
     //  Suspend User
     @PreAuthorize("ROLE_ADMIN")
     public User suspendUserById(Long id , String adminPassword) {
-        @NonNull UserPrincipal adminUser= UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
         }
         else {
@@ -321,8 +303,7 @@ public class UserService {
 
     @PreAuthorize("ROLE_ADMIN")
     public User unsuspendUserById(Long id,String adminPassword){
-        @NonNull UserPrincipal adminUser= UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
         }
         else {
@@ -336,8 +317,7 @@ public class UserService {
 
     @PreAuthorize("ROLE_ADMIN")
     public User suspendUserByEmail(String email, String adminPassword){
-        @NonNull UserPrincipal adminUser= UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
         }
         else {
@@ -351,8 +331,7 @@ public class UserService {
 
     @PreAuthorize("ROLE_ADMIN")
     public User unsuspendUserByEmail(String email,String adminPassword){
-        @NonNull UserPrincipal adminUser= UserUtil.getUserAuthentication();
-        if (!(encoder.matches(adminPassword,adminUser.getPassword()))){
+        if (!(encoder.matches(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
         }
         else {
