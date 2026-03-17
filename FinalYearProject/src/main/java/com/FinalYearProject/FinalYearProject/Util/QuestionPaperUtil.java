@@ -1,5 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Util;
 
+import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -39,4 +41,12 @@ public class QuestionPaperUtil {
         }
     }
 
+    public static boolean departmentCheck(QuestionPaper questionPaper){
+        if (
+                questionPaper.getGeneratedBy().getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())
+        ){
+            return true;
+        }
+        return false;
+    }
 }

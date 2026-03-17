@@ -80,7 +80,7 @@ public class QuestionService {
     @SneakyThrows
     public List<Question> getQuestionByIds(List<Long> Ids){
         if (Ids.size()>50) throw new BadRequestException(" you are question for too many question at the same time ");
-        List<Question> temp =questionRepository.findAllById(Ids);
+        List<Question> temp =questionRepository.findAllById(Ids);//use UserUtil.getUserAuthentication().getUser().getDepartment()
         if (temp.isEmpty()){
             throw new QuestionNotFoundException("question with the given ids not found");
         }

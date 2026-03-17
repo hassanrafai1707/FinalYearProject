@@ -28,26 +28,26 @@ import java.util.Optional;
 @Repository
 public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Long> {
 
-    @Query("select q from QuestionPaper q where q.examTitle=:examTitle")
-    Optional<QuestionPaper> findByExamTitle(String examTitle);
+    @Query("select q from QuestionPaper q where q.examTitle=:examTitle and q.generatedBy.department=:department")
+    Optional<QuestionPaper> findByExamTitle(@Param("examTitle") String examTitle,@Param("department") String department);
 
-    @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy")
-    List<QuestionPaper> findByGeneratedBy(User generatedBy);
+    @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy and q.generatedBy.department=:department")
+    List<QuestionPaper> findByGeneratedBy(User generatedBy,@Param("department") String department);
 
-    @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy")
-    Page<QuestionPaper> findByGeneratedBy(User generatedBy,Pageable pageable);
+    @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy and q.generatedBy.department=:department")
+    Page<QuestionPaper> findByGeneratedBy(User generatedBy,@Param("department") String department,Pageable pageable);
 
-    @Query("SELECT q FROM QuestionPaper q WHERE q.approvedBy=:approvedBy")
-    List<QuestionPaper> findByApprovedBy(User approvedBy);
+    @Query("SELECT q FROM QuestionPaper q WHERE q.approvedBy=:approvedBy and q.generatedBy.department=:department")
+    List<QuestionPaper> findByApprovedBy(User approvedBy,@Param("department") String department);
 
-    @Query("SELECT q FROM QuestionPaper q WHERE q.approvedBy=:approvedBy")
-    Page<QuestionPaper> findByApprovedBy(User approvedBy ,Pageable pageable);
+    @Query("SELECT q FROM QuestionPaper q WHERE q.approvedBy=:approvedBy and q.generatedBy.department=:department")
+    Page<QuestionPaper> findByApprovedBy(User approvedBy,@Param("department") String department ,Pageable pageable);
 
-    @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved")
-    List<QuestionPaper> findByApproved(Boolean approved);
+    @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved and q.generatedBy.department=:department")
+    List<QuestionPaper> findByApproved(Boolean approved,@Param("department") String department);
 
-    @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved")
-    Page<QuestionPaper> findByApproved(Boolean approved,Pageable pageable);
+    @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved and q.generatedBy.department=:department")
+    Page<QuestionPaper> findByApproved(Boolean approved,@Param("department") String department,Pageable pageable);
 
     @Query("select q from QuestionPaper q where q.generatedBy.department=:department")
     List<QuestionPaper> findByDepartment(@Param("department") String department);
