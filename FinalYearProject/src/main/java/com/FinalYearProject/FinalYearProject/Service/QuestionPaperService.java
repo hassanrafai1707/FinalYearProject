@@ -40,14 +40,11 @@ import java.util.*;
 public class QuestionPaperService {
     private final QuestionPaperRepository questionPaperRepository;
     private final UserService userService;
-    private final QuestionService questionService;
 
     public QuestionPaperService(
             QuestionPaperRepository questionPaperRepository,
-            UserService userService,
-            QuestionService questionService
+            UserService userService
     ){
-        this.questionService=questionService;
         this.questionPaperRepository=questionPaperRepository;
         this.userService=userService;
     }
@@ -79,12 +76,8 @@ public class QuestionPaperService {
 
     @PreAuthorize("ROLE_SUPERVISOR")
     public QuestionPaper findById(Long Id){
-        QuestionPaper questionPaper=questionPaperRepository.findById(Id)
-                .orElseThrow(()-> new QuestionPaperNotFoundException("no question paper with id"+Id));
-        if (QuestionPaperUtil.departmentCheck(questionPaper)){
-            return questionPaper;
-        }
-        throw new DepartmentMissMatchException("you are not to access this question paper due to difference in Department ");
+        return questionPaperRepository.findById(Id,UserUtil.getUserAuthentication().getUser().getDepartment())
+                .orElseThrow(()-> new QuestionPaperNotFoundException("no question paper with id"+Id+" in your determent "));
     }
 
     @PreAuthorize("ROLE_SUPERVISOR")
@@ -462,29 +455,26 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("ROLE_TEACHER")
-    public QuestionPaper addQuestionPaper(QuestionPaper questionPaper){
-        List<Long>Ids=questionPaper.getListOfQuestion()
+    public QuestionPaper addQuestionPaper(List<Question> questions){
+        List<Long>Ids=questions
                 .stream()
                 .sorted(Comparator.comparing(Question::getId))
                 .map(Question::getId)
                 .toList();
         String questionPaperFingerprint;
-        Set<Question> questions=new HashSet<>(questionService.getQuestionByIds(Ids));
-        if (!(Ids.size()==questions.size())){
-            throw new BadRequestException("there are a few band questions");
-        }
-        else {
+        if (Ids.size()==questions.size()){
             questionPaperFingerprint = QuestionPaperUtil.sha256FingerPrintUsingIds(Ids);
             if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)) {
                 throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
             } else {
-                questionPaper.setListOfQuestion(questions);
+                QuestionPaper questionPaper= new QuestionPaper();
+                questionPaper.setListOfQuestion(new HashSet<>(questions));
                 questionPaper.setGeneratedBy(UserUtil.getUserAuthentication().getUser());
                 questionPaper.setApproved(Boolean.FALSE);
                 questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
                 questionPaperRepository.save(questionPaper);
             }
         }
-        return questionPaper;
+        throw new BadRequestException("there are a few band questions");
     }
 }

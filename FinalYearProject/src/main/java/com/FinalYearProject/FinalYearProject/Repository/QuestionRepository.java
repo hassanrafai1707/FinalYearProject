@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * QuestionPaperRepository - JPA Repository for Exam Paper Data Access
@@ -26,10 +27,15 @@ import java.util.List;
  */
 @Repository
 public interface QuestionRepository extends JpaRepository<Question , Long> {
+    @Query("SELECT q FROM Question q WHERE q.id=:Id AND q.createdBy.department=:department")
+    Optional<Question> findById(@Param("Id") Long Id , @Param("department") String department );
 
-    @Query("SELECT q FROM Question WHERE q.subjectCode=:subjectCode AND q.createdBy.department=:department")
+    @Query("SELECT q FROM Question q WHERE q.id IN:IDs AND q.createdBy.department=:department")
+    List<Question> findAllById(@Param("IDs") List<Long> IDs, @Param("department") String department);
+
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.createdBy.department=:department")
     List<Question> findBySubjectCode( @Param("subjectCode") String subjectCode, @Param("department") String department);
-    @Query("SELECT q FROM Question WHERE q.subjectCode=:subjectCode AND q.createdBy.department=:department")
+    @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.createdBy.department=:department")
     Page<Question> findBySubjectCode(@Param("subjectCode") String subjectCode,@Param("department") String department,Pageable pageable);
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.createdBy.department=:department")
     List<Question> findBySubjectName(@Param("subjectName") String subjectName,@Param("department") String department);

@@ -28,6 +28,8 @@ import java.util.Optional;
 @Repository
 public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Long> {
 
+    @Query("SELECT q FROM QuestionPaper q where q.id=:id AND q.generatedBy.department=:department")
+    Optional<QuestionPaper> findById(@Param("id") Long id,@Param("department") String department);
     @Query("select q from QuestionPaper q where q.examTitle=:examTitle and q.generatedBy.department=:department")
     Optional<QuestionPaper> findByExamTitle(@Param("examTitle") String examTitle,@Param("department") String department);
 

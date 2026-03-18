@@ -68,26 +68,8 @@ public class QuestionService {
     }
 
     public Question getQuestionById(Long id) {
-        Question question=questionRepository.findById(id)
-                .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id));
-        if (QuestionUtil.DepartmentCheck(question)){
-            return question;
-        }
-        throw new DepartmentMissMatchException("you are not allowed to access this as it is not from your department");
-    }
-
-    //todo remove this
-    @SneakyThrows
-    public List<Question> getQuestionByIds(List<Long> Ids){
-        if (Ids.size()>50) throw new BadRequestException(" you are question for too many question at the same time ");
-        List<Question> temp =questionRepository.findAllById(Ids);//use UserUtil.getUserAuthentication().getUser().getDepartment()
-        if (temp.isEmpty()){
-            throw new QuestionNotFoundException("question with the given ids not found");
-        }
-        if (QuestionUtil.DepartmentCheck(temp)){
-            return temp;
-        }
-        throw new DepartmentMissMatchException("you are not allowed to access this as it is not from your department");
+        return questionRepository.findById(id,UserUtil.getUserAuthentication().getUser().getDepartment())
+                .orElseThrow(() -> new QuestionNotFoundException("Question not found with ID: " + id+" might not be in your "));
     }
 
     public List<Question> findBySubjectCode(String subjectCode){
