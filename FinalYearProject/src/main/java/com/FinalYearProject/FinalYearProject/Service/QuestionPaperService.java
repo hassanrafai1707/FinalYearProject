@@ -1,10 +1,8 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
-
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
-import com.FinalYearProject.FinalYearProject.Exceptions.DepartmentMissMatchException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.DuplicateQuestionPaperException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
@@ -49,7 +47,7 @@ public class QuestionPaperService {
         this.userService=userService;
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<QuestionPaper> getAllQuestionPapers(){
         List<QuestionPaper> questionPapers=questionPaperRepository.findByDepartment(UserUtil.getUserAuthentication().getUser().getDepartment());
         if (questionPapers.isEmpty()){
@@ -60,7 +58,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<QuestionPaper> getAllQuestionPapers(int pageNo , int size){
         Page<QuestionPaper> questionPaperPage=questionPaperRepository.findByDepartment(
                 UserUtil.getUserAuthentication().getUser().getDepartment(),
@@ -74,19 +72,19 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper findById(Long Id){
         return questionPaperRepository.findById(Id,UserUtil.getUserAuthentication().getUser().getDepartment())
                 .orElseThrow(()-> new QuestionPaperNotFoundException("no question paper with id"+Id+" in your determent "));
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper findByExamTitle(String examTitle) {
         return questionPaperRepository.findByExamTitle(examTitle,UserUtil.getUserAuthentication().getUser().getDepartment())
                 .orElseThrow(()-> new QuestionPaperNotFoundException("no question paper with exam title"+examTitle));
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<QuestionPaper> findByGeneratedByUsingEmail(String email){
         List<QuestionPaper> questionPapersGeneratedByUser=questionPaperRepository.findByGeneratedBy(
                 userService.findByEmail(email),
@@ -100,7 +98,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<QuestionPaper> findByGeneratedByUsingEmail(String email, int pageNo, int size){
         Page<QuestionPaper> questionPapersGeneratedByUser=questionPaperRepository.findByGeneratedBy(
                 userService.findByEmail(email),
@@ -115,7 +113,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<QuestionPaper> findByGeneratedByUsingId(Long Id){
         List<QuestionPaper> questionPapers=questionPaperRepository.findByGeneratedBy(
                 userService.findUserById(Id),
@@ -129,7 +127,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<QuestionPaper> findByGeneratedByUsingId(Long Id,int pageNo,int size){
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByGeneratedBy(
                 userService.findUserById(Id),
@@ -144,7 +142,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<QuestionPaper> findByApprovedByUsingEmail(String email){
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(
                 userService.findByEmail(email),
@@ -158,7 +156,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public  Page<QuestionPaper> findByApprovedByUsingEmail(String email, int pageNo , int size){
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(
                 userService.findByEmail(email),
@@ -174,7 +172,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<QuestionPaper> findByApprovedByUsingId(Long Id){
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(
                 userService.findUserById(Id),
@@ -188,7 +186,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<QuestionPaper> findByApprovedByUsingId(Long Id,int pageNo,int size){
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApprovedBy(
                 userService.findUserById(Id),
@@ -203,7 +201,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<QuestionPaper> findApproved(){
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(Boolean.TRUE,UserUtil.getUserAuthentication().getUser().getDepartment());
         if (questionPapers.isEmpty()){
@@ -214,7 +212,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<QuestionPaper> findApproved(int pageNo,int size){
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(
                 Boolean.TRUE,
@@ -229,7 +227,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<QuestionPaper> findNotApproved(){
         List<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(Boolean.FALSE,UserUtil.getUserAuthentication().getUser().getDepartment());
         if (questionPapers.isEmpty()){
@@ -240,7 +238,7 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<QuestionPaper> findNotApproved(int pageNo,int size){
         Page<QuestionPaper> questionPapers=questionPaperRepository.findByApproved(
                 Boolean.FALSE,UserUtil.getUserAuthentication().getUser().getDepartment(),PageRequest.of(pageNo,size)
@@ -254,7 +252,7 @@ public class QuestionPaperService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper approveQuestionPaperById(Long id){
         QuestionPaper questionPaper=questionPaperRepository
                 .findById(id)
@@ -273,7 +271,7 @@ public class QuestionPaperService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper notApproveQuestionPaperById(Long id){
         QuestionPaper questionPaper=questionPaperRepository
                 .findById(id)
@@ -281,7 +279,7 @@ public class QuestionPaperService {
                         ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
                 );
         if (questionPaper.getApproved().equals(Boolean.FALSE)){
-                return questionPaper;
+            return questionPaper;
         }
         else {
             questionPaper.setApproved(Boolean.FALSE);
@@ -292,7 +290,7 @@ public class QuestionPaperService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper approvedQuestionPaperByTile(String examTitle){
         QuestionPaper questionPaper = findByExamTitle(examTitle);
         if (questionPaper.getApproved().equals(Boolean.TRUE)){
@@ -307,7 +305,7 @@ public class QuestionPaperService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper notApprovedQuestionPaperByTile(String examTitle){
         QuestionPaper questionPaper = findByExamTitle(examTitle);
         if (questionPaper.getApproved().equals(Boolean.FALSE)){
@@ -323,16 +321,16 @@ public class QuestionPaperService {
 
     @SneakyThrows
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateGeneratedByUsingEmail(String replaceEmail,String originalEmail,String password){
         if(
                 replaceEmail.isEmpty()||
-                originalEmail.isEmpty()||
-                password.isEmpty()||
-                !(
-                        userService.existsByEmail(replaceEmail)&&
-                        userService.existsByEmail(originalEmail)
-               )
+                        originalEmail.isEmpty()||
+                        password.isEmpty()||
+                        !(
+                                userService.existsByEmail(replaceEmail)&&
+                                        userService.existsByEmail(originalEmail)
+                        )
         ){
             throw new BadRequestException("this request is invalid because one of the given parameter is empty");
         }
@@ -357,12 +355,12 @@ public class QuestionPaperService {
 
     @SneakyThrows
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateGeneratedByUsingId(Long replaceID,Long originalID,String password){
         if (
                 !(
                         userService.existsById(replaceID) &&
-                        userService.existsById(originalID)
+                                userService.existsById(originalID)
                 )
         ){
             throw new BadRequestException("the ids given is not valid");
@@ -388,16 +386,16 @@ public class QuestionPaperService {
 
     @SneakyThrows
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateApprovedByUsingEmail(String replaceEmail,String originalEmail,String password){
         if(
                 replaceEmail.isEmpty()||
-                originalEmail.isEmpty()||
-                password.isEmpty()||
-                !(
-                       userService.existsByEmail(replaceEmail)&&
-                       userService.existsByEmail(originalEmail)
-                )
+                        originalEmail.isEmpty()||
+                        password.isEmpty()||
+                        !(
+                                userService.existsByEmail(replaceEmail)&&
+                                        userService.existsByEmail(originalEmail)
+                        )
         ){
             throw new BadRequestException("this request is invalid because one of the given parameter is empty");
         }
@@ -422,13 +420,13 @@ public class QuestionPaperService {
 
     @SneakyThrows
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateApprovedByUsingId(Long replaceID,Long originalID,String password){
 
         if (
                 !(
-                    userService.existsById(replaceID) &&
-                    userService.existsById(originalID)
+                        userService.existsById(replaceID) &&
+                                userService.existsById(originalID)
                 )
         ){
             throw new BadRequestException("the ids given is not valid");
@@ -440,7 +438,7 @@ public class QuestionPaperService {
         if(userService.matchPasswords(password,UserUtil.getUserAuthentication().getPassword())){//the userUtil is admin user
             List<QuestionPaper> result=new ArrayList<>();
             for (QuestionPaper questionPaper:findByGeneratedByUsingId(
-                   originalID
+                    originalID
             )){
                 questionPaper.setApprovedBy(replaceUser);
                 result.add(questionPaper);
@@ -454,7 +452,7 @@ public class QuestionPaperService {
 
     @SneakyThrows
     @Transactional
-    @PreAuthorize("ROLE_TEACHER")
+    @PreAuthorize("hasRole('TEACHER')")
     public QuestionPaper addQuestionPaper(List<Question> questions){
         List<Long>Ids=questions
                 .stream()

@@ -28,8 +28,7 @@
   <div id="message"></div>
 </div>
 
-<script src="/js/api.js"></script>
-<!--<script src="/js/auth.js"></script>-->
+<script th:src="@{/js/api.js}"></script>
 
 <script>
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -55,19 +54,19 @@
       // Extract role from JWT
       const role = AuthAPI.getRole();
 
-      // Redirect by role
+      // Redirect by role - use simple window.location redirects
       switch (role) {
         case "ROLE_ADMIN":
-          await AdminAPI.redirectToPage();
+          window.location.href = "/admin-dashboard";
           break;
         case "ROLE_TEACHER":
-          await TeacherAPI.redirectToPage();
+          window.location.href = "/teacher-dashboard";
           break;
         case "ROLE_STUDENT":
-          await StudentAPI.redirectToPage();
+          window.location.href = "/student-dashboard";
           break;
         case "ROLE_SUPERVISOR":
-          await SupervisorAPI.redirectToPage();
+          window.location.href = "/supervisor-dashboard";
           break;
         default:
           window.location.href = "/";
@@ -81,24 +80,25 @@
     }
   });
 
-  // Auto-redirect if already logged in
-<!--  if (Auth.isAuthenticated()) {-->
-<!--    const role = Auth.getRole();-->
-<!--    switch (role) {-->
-<!--      case "ROLE_ADMIN":-->
-<!--        window.location.href = "/admin-dashboard";-->
-<!--        break;-->
-<!--      case "ROLE_TEACHER":-->
-<!--        window.location.href = "/teacher-dashboard";-->
-<!--        break;-->
-<!--      case "ROLE_STUDENT":-->
-<!--        window.location.href = "/student-dashboard";-->
-<!--        break;-->
-<!--      case "ROLE_SUPERVISOR":-->
-<!--        window.location.href = "/supervisor-dashboard";-->
-<!--        break;-->
-<!--    }-->
-<!--  }-->
+  // Auto-redirect if already logged in - FIX THIS SECTION
+  // Check if AuthAPI exists and has the required methods
+  if (typeof AuthAPI !== 'undefined' && AuthAPI.isAuthenticated && AuthAPI.isAuthenticated()) {
+    const role = AuthAPI.getRole();
+    switch (role) {
+      case "ROLE_ADMIN":
+        window.location.href = "/admin-dashboard";
+        break;
+      case "ROLE_TEACHER":
+        window.location.href = "/teacher-dashboard";
+        break;
+      case "ROLE_STUDENT":
+        window.location.href = "/student-dashboard";
+        break;
+      case "ROLE_SUPERVISOR":
+        window.location.href = "/supervisor-dashboard";
+        break;
+    }
+  }
 </script>
 
 </body>

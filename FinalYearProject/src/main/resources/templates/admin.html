@@ -20,6 +20,7 @@
 
 <div class="dashboard">
     <!-- Sidebar -->
+    <!-- Sidebar - Updated with individual menu items -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>Admin Panel</h2>
@@ -91,6 +92,36 @@
             <li><a href="#" onclick="showSection('batchDeleteByEmail')">
                 <i class="fas fa-trash-restore-alt"></i>
                 <span>Batch Delete by Emails</span>
+            </a></li>
+
+            <!-- Question Paper Management -->
+            <div class="menu-category">Question Paper Management</div>
+            <li><a href="#" onclick="showSection('updateGeneratedByEmail')">
+                <i class="fas fa-envelope"></i>
+                <span>Update GeneratedBy (Email)</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('updateGeneratedById')">
+                <i class="fas fa-id-card"></i>
+                <span>Update GeneratedBy (ID)</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('updateApprovedByEmail')">
+                <i class="fas fa-envelope"></i>
+                <span>Update ApprovedBy (Email)</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('updateApprovedById')">
+                <i class="fas fa-id-card"></i>
+                <span>Update ApprovedBy (ID)</span>
+            </a></li>
+
+            <!-- Question Management -->
+            <div class="menu-category">Question Management</div>
+            <li><a href="#" onclick="showSection('updateCreatedByEmail')">
+                <i class="fas fa-envelope"></i>
+                <span>Update CreatedBy (Email)</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('updateCreatedById')">
+                <i class="fas fa-id-card"></i>
+                <span>Update CreatedBy (ID)</span>
             </a></li>
 
             <!-- Account Settings -->
@@ -457,8 +488,141 @@
                 <div id="updateAdminPasswordResult" style="margin-top: 20px;"></div>
             </div>
         </div>
+        <div id="updateGeneratedByEmail" class="section">
+            <h1>Update GeneratedBy (Email)</h1>
+            <div class="card">
+                <h2><i class="fas fa-file-alt"></i> Update GeneratedBy using Email</h2>
+                <div class="form-group">
+                    <label>Replace Email *</label>
+                    <input type="email" id="replaceEmail" placeholder="newuser@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Original Email *</label>
+                    <input type="email" id="originalEmail" placeholder="olduser@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateGenByEmailPass" placeholder="Enter admin password">
+                </div>
+                <button onclick="updateGeneratedByEmail()"><i class="fas fa-sync"></i> Update GeneratedBy</button>
+                <div id="updateGeneratedByEmailResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Update GeneratedBy using ID -->
+        <div id="updateGeneratedById" class="section">
+            <h1>Update GeneratedBy (ID)</h1>
+            <div class="card">
+                <h2><i class="fas fa-file-alt"></i> Update GeneratedBy using ID</h2>
+                <div class="form-group">
+                    <label>Replace ID *</label>
+                    <input type="number" id="replaceId" placeholder="Enter new user ID">
+                </div>
+                <div class="form-group">
+                    <label>Original ID *</label>
+                    <input type="number" id="originalId" placeholder="Enter old user ID">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateGenByIdPass" placeholder="Enter admin password">
+                </div>
+                <button onclick="updateGeneratedById()"><i class="fas fa-sync"></i> Update GeneratedBy</button>
+                <div id="updateGeneratedByIdResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Update ApprovedBy using Email -->
+        <div id="updateApprovedByEmail" class="section">
+            <h1>Update ApprovedBy (Email)</h1>
+            <div class="card">
+                <h2><i class="fas fa-check-circle"></i> Update ApprovedBy using Email</h2>
+                <div class="form-group">
+                    <label>Replace Email *</label>
+                    <input type="email" id="replaceApprovedEmail" placeholder="newuser@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Original Email *</label>
+                    <input type="email" id="originalApprovedEmail" placeholder="olduser@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateAppByEmailPass" placeholder="Enter admin password">
+                </div>
+                <button onclick="updateApprovedByEmail()"><i class="fas fa-sync"></i> Update ApprovedBy</button>
+                <div id="updateApprovedByEmailResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Update ApprovedBy using ID -->
+        <div id="updateApprovedById" class="section">
+            <h1>Update ApprovedBy (ID)</h1>
+            <div class="card">
+                <h2><i class="fas fa-check-circle"></i> Update ApprovedBy using ID</h2>
+                <div class="form-group">
+                    <label>Replace ID *</label>
+                    <input type="number" id="replaceApprovedId" placeholder="Enter new user ID">
+                </div>
+                <div class="form-group">
+                    <label>Original ID *</label>
+                    <input type="number" id="originalApprovedId" placeholder="Enter old user ID">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateAppByIdPass" placeholder="Enter admin password">
+                </div>
+                <button onclick="updateApprovedById()"><i class="fas fa-sync"></i> Update ApprovedBy</button>
+                <div id="updateApprovedByIdResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Update CreatedBy using Email -->
+        <div id="updateCreatedByEmail" class="section">
+            <h1>Update CreatedBy (Email)</h1>
+            <div class="card">
+                <h2><i class="fas fa-question-circle"></i> Update CreatedBy using Email</h2>
+                <div class="form-group">
+                    <label>Replace Email *</label>
+                    <input type="email" id="replaceCreatedEmail" placeholder="newuser@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Original Email *</label>
+                    <input type="email" id="originalCreatedEmail" placeholder="olduser@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateCreatedByEmailPass" placeholder="Enter admin password">
+                </div>
+                <button onclick="updateCreatedByEmail()"><i class="fas fa-sync"></i> Update CreatedBy</button>
+                <div id="updateCreatedByEmailResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Update CreatedBy using ID -->
+        <div id="updateCreatedById" class="section">
+            <h1>Update CreatedBy (ID)</h1>
+            <div class="card">
+                <h2><i class="fas fa-question-circle"></i> Update CreatedBy using ID</h2>
+                <div class="form-group">
+                    <label>Replace ID *</label>
+                    <input type="number" id="replaceCreatedId" placeholder="Enter new user ID">
+                </div>
+                <div class="form-group">
+                    <label>Original ID *</label>
+                    <input type="number" id="originalCreatedId" placeholder="Enter old user ID">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateCreatedByIdPass" placeholder="Enter admin password">
+                </div>
+                <button onclick="updateCreatedById()"><i class="fas fa-sync"></i> Update CreatedBy</button>
+                <div id="updateCreatedByIdResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
     </div>
 </div>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/admin-dashboard.js}"></script>
 <script th:src="@{/js/common-dashboard.js}"></script>
 </body>
 </html>

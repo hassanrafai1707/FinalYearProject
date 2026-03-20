@@ -141,7 +141,7 @@ public class QuestionService {
             String cognitiveLevel,
             int pageNo,
             int size
-            ){
+    ){
         Page<Question> questions=questionRepository.findBySubjectCodeAndMappedCOAndCognitiveLevel(
                 subjectCode,
                 mappedCO,
@@ -240,7 +240,7 @@ public class QuestionService {
         return questions;
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<Question> findByCreatedByUsingEmail(String email){
         User user=userService.findByEmail(email);
         if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
@@ -255,15 +255,15 @@ public class QuestionService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<Question> findByCreatedByUsingEmail(String email, int pageNo,int size){
         User user=userService.findByEmail(email);
         if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
             throw new DepartmentMissMatchException("You are not allowed to access as you are not from the same Department as user with email:"+email);
         }
         Page<Question> tempQuestion=questionRepository.findByCreatedBy(
-              user,
-              PageRequest.of(pageNo,size)
+                user,
+                PageRequest.of(pageNo,size)
         );
         if (!(tempQuestion.isEmpty())){
             return tempQuestion;
@@ -273,7 +273,7 @@ public class QuestionService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public List<Question> findByCreatedByUsingId(Long Id){
         User user=userService.findUserById(Id);
         if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
@@ -288,7 +288,7 @@ public class QuestionService {
         }
     }
 
-    @PreAuthorize("ROLE_SUPERVISOR")
+    @PreAuthorize("hasRole('SUPERVISOR')")
     public Page<Question> findByCreatedByUsingId(Long Id,int pageNo,int size){
         User user=userService.findUserById(Id);
         if (!user.getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
@@ -306,7 +306,7 @@ public class QuestionService {
         }
     }
 
-    @PreAuthorize("ROLE_TEACHER")
+    @PreAuthorize("hasRole('TEACHER')")
     public List<Question> getAllQuestionsByCurrentUser(){
         List<Question> questions=questionRepository.findByCreatedBy(
                 userService.findByEmail(
@@ -319,7 +319,7 @@ public class QuestionService {
         return questions;
     }
 
-    @PreAuthorize("ROLE_TEACHER")
+    @PreAuthorize("hasRole('TEACHER')")
     public Page<Question> getAllQuestionsByCurrentUser(int pageNo,int size){
         Page<Question> questionPage=questionRepository.findByCreatedBy(
                 userService.findByEmail(
@@ -335,22 +335,22 @@ public class QuestionService {
 
     @SneakyThrows
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateCreatedByUsingEmail(String replaceEmail,String originalEmail,String password){
         if (
                 replaceEmail.isEmpty()||
-                originalEmail.isEmpty()||
-                password.isEmpty()||
-                !(
-                        userService.existsByEmail(replaceEmail)&&userService.existsByEmail(originalEmail)
-                )
+                        originalEmail.isEmpty()||
+                        password.isEmpty()||
+                        !(
+                                userService.existsByEmail(replaceEmail)&&userService.existsByEmail(originalEmail)
+                        )
         ){
-           throw new BadRequestException("this request is invalid because one of the given parameter is empty");
+            throw new BadRequestException("this request is invalid because one of the given parameter is empty");
         }
         if (
                 !userService.matchPasswords(
-                    password,
-                    UserUtil.getUserAuthentication().getPassword()
+                        password,
+                        UserUtil.getUserAuthentication().getPassword()
                 )
         ){
             throw new WrongPasswordException("your password doesn't match");
@@ -371,12 +371,12 @@ public class QuestionService {
 
     @SneakyThrows
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateCreatedByUsingId(Long replaceID,Long originalID, String password){
         if (
                 !(
                         userService.existsById(replaceID) &&
-                        userService.existsById(originalID)
+                                userService.existsById(originalID)
                 )
         ){
             throw new BadRequestException("the ids given is not valid");
@@ -403,14 +403,14 @@ public class QuestionService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_TEACHER")
+    @PreAuthorize("hasRole('TEACHER')")
     public Question addQuestion(Question question) {
         String email= UserUtil.getUserAuthentication().getUsername();
         String questionTitle=QuestionUtil.sha256(question.getQuestionBody());
         User user=userService.findByEmail(email);
         if (
                 question.getQuestionBody().isEmpty()||
-                !QuestionUtil.checkIfQuestionBodyIsAcceptable(question.getQuestionBody())
+                        !QuestionUtil.checkIfQuestionBodyIsAcceptable(question.getQuestionBody())
         ){
             throw new UnacceptableQuestion("Unacceptable Question due to eather no question body or more spaces that words ");
         }
@@ -429,7 +429,7 @@ public class QuestionService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_TEACHER")
+    @PreAuthorize("hasRole('TEACHER')")
     public void deleteQuestionById(Long id){
         if (!questionRepository.existsById(id)){
             throw new QuestionNotFoundException("Question not found with ID: " + id);
@@ -439,7 +439,7 @@ public class QuestionService {
         }
     }
 
-    @PreAuthorize("ROLE_TEACHER")
+    @PreAuthorize("hasRole('TEACHER')")
     public List<Question> generateBySubjectCodeQuestion(
             String subjectCode,
             String[] mappedCOs,
@@ -469,69 +469,69 @@ public class QuestionService {
             else {
                 if (
                         (numberOfCognitiveLevel_A>0||numberOfCognitiveLevel_R>0||numberOfCognitiveLevel_U>0) &&
-                        (maxNumberOf2Marks>0 || maxNumberOf4Marks>0)
+                                (maxNumberOf2Marks>0 || maxNumberOf4Marks>0)
                 ){
-                   switch (question.getCognitiveLevel()){
-                       case "A"->{
-                           if (
-                                   (numberOfCognitiveLevel_A>0) &&
-                                   (
-                                           (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
-                                           (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
-                                   )
-                           ){
-                               if (question.getQuestionMarks()==2){
-                                   maxNumberOf2Marks--;
-                               }
-                               else if (question.getQuestionMarks()==4) {
-                                   maxNumberOf4Marks--;
-                               }
-                               question.setIsInUse(true);
-                               output.add(question);
-                               numberOfCognitiveLevel_A--;
-                           }
-                       }
+                    switch (question.getCognitiveLevel()){
+                        case "A"->{
+                            if (
+                                    (numberOfCognitiveLevel_A>0) &&
+                                            (
+                                                    (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
+                                                            (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
+                                            )
+                            ){
+                                if (question.getQuestionMarks()==2){
+                                    maxNumberOf2Marks--;
+                                }
+                                else if (question.getQuestionMarks()==4) {
+                                    maxNumberOf4Marks--;
+                                }
+                                question.setIsInUse(true);
+                                output.add(question);
+                                numberOfCognitiveLevel_A--;
+                            }
+                        }
 
-                       case "R"->{
-                           if (
-                                   (numberOfCognitiveLevel_R>0) &&
-                                           (
-                                                   (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
-                                                   (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
-                                           )
-                           ){
-                               if (question.getQuestionMarks()==2){
-                                   maxNumberOf2Marks--;
-                               }
-                               else if (question.getQuestionMarks()==4) {
-                                   maxNumberOf4Marks--;
-                               }
-                               question.setIsInUse(true);
-                               output.add(question);
-                               numberOfCognitiveLevel_R--;
-                           }
-                       }
+                        case "R"->{
+                            if (
+                                    (numberOfCognitiveLevel_R>0) &&
+                                            (
+                                                    (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
+                                                            (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
+                                            )
+                            ){
+                                if (question.getQuestionMarks()==2){
+                                    maxNumberOf2Marks--;
+                                }
+                                else if (question.getQuestionMarks()==4) {
+                                    maxNumberOf4Marks--;
+                                }
+                                question.setIsInUse(true);
+                                output.add(question);
+                                numberOfCognitiveLevel_R--;
+                            }
+                        }
 
-                       case "U"->{
-                           if (
-                                   (numberOfCognitiveLevel_U>0) &&
-                                           (
-                                                   (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
-                                                   (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
-                                           )
-                           ){
-                               if (question.getQuestionMarks()==2){
-                                   maxNumberOf2Marks--;
-                               }
-                               else if (question.getQuestionMarks()==4) {
-                                   maxNumberOf4Marks--;
-                               }
-                               question.setIsInUse(true);
-                               output.add(question);
-                               numberOfCognitiveLevel_U--;
-                           }
-                       }
-                   }
+                        case "U"->{
+                            if (
+                                    (numberOfCognitiveLevel_U>0) &&
+                                            (
+                                                    (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
+                                                            (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
+                                            )
+                            ){
+                                if (question.getQuestionMarks()==2){
+                                    maxNumberOf2Marks--;
+                                }
+                                else if (question.getQuestionMarks()==4) {
+                                    maxNumberOf4Marks--;
+                                }
+                                question.setIsInUse(true);
+                                output.add(question);
+                                numberOfCognitiveLevel_U--;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -543,7 +543,7 @@ public class QuestionService {
     }
 
 
-    @PreAuthorize("ROLE_TEACHER")
+    @PreAuthorize("hasRole('TEACHER')")
     public List<Question> generateBySubjectNameQuestion(
             String subjectName,
             String[] mappedCOs,
@@ -573,7 +573,7 @@ public class QuestionService {
             else {
                 if (
                         (numberOfCognitiveLevel_A>0||numberOfCognitiveLevel_R>0||numberOfCognitiveLevel_U>0) &&
-                        (maxNumberOf2Marks>0 || maxNumberOf4Marks>0)
+                                (maxNumberOf2Marks>0 || maxNumberOf4Marks>0)
                 ){
                     switch (question.getCognitiveLevel()){
                         case "A"->{
@@ -581,7 +581,7 @@ public class QuestionService {
                                     (numberOfCognitiveLevel_A>0) &&
                                             (
                                                     (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
-                                                    (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
+                                                            (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
                                             )
                             ){
                                 if (question.getQuestionMarks()==2){
@@ -601,7 +601,7 @@ public class QuestionService {
                                     (numberOfCognitiveLevel_R>0) &&
                                             (
                                                     (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
-                                                    (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
+                                                            (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
                                             )
                             ){
                                 if (question.getQuestionMarks()==2){
@@ -621,7 +621,7 @@ public class QuestionService {
                                     (numberOfCognitiveLevel_U>0) &&
                                             (
                                                     (question.getQuestionMarks()==2 && maxNumberOf2Marks>0)||
-                                                    (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
+                                                            (question.getQuestionMarks()==4 && maxNumberOf4Marks>0)
                                             )
                             ){
                                 if (question.getQuestionMarks()==2){

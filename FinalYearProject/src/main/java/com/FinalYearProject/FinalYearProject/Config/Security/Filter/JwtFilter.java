@@ -85,6 +85,10 @@ public class JwtFilter extends OncePerRequestFilter {
                  path.startsWith(appVersion+"/auth")||
                  path.equals("/login") ||
                  path.equals("/register") ||
+                 path.equals("/admin-dashboard")||
+                 path.equals("/teacher-dashboard")||
+                 path.equals("/supervisor-dashboard")||
+                 path.equals("/student-dashboard")||
                  path.startsWith("/confirm") ||
                  path.equals("/favicon.ico") ||
                  path.startsWith("/css") ||

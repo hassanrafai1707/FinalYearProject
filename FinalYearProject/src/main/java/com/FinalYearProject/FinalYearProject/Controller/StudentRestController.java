@@ -57,7 +57,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/paged")
+    @GetMapping("/questions/pagged")
     public ResponseEntity<?>  getAllQuestionsPaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
@@ -332,7 +332,7 @@ public class StudentRestController {
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
-                        questionService.findBySubjectCodeMappedCO(
+                        questionService.findBySubjectNameMappedCO(
                                 subjectName,
                                 mappedCO,
                                 pageNo,

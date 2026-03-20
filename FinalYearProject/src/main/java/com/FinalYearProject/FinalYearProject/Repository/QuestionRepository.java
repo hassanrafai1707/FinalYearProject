@@ -42,6 +42,7 @@ public interface QuestionRepository extends JpaRepository<Question , Long> {
     @Query("SELECT q FROM Question q WHERE q.subjectName=:subjectName AND q.createdBy.department=:department")
     Page<Question> findBySubjectName(@Param("subjectName") String subjectName,@Param("department") String department,Pageable pageable);
     Boolean existsByQuestionTitle(String question);
+    Optional<Question> findByQuestionTitle(String questionTitle);
 
     @Query("SELECT q FROM Question q WHERE q.subjectCode=:subjectCode AND q.mappedCO=:mappedCO AND q.createdBy.department=:department")
     List<Question> findBySubjectCodeAndMappedCO(@Param("subjectCode") String subjectCode, @Param("mappedCO") String mappedCO,@Param("department") String department);

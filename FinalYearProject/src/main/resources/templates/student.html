@@ -221,13 +221,10 @@
                     <div class="form-group">
                         <label>Cognitive Level *</label>
                         <select id="cognitiveLevelCode">
-                            <option value="">Select Level</option>
-                            <option value="REMEMBER">Remember</option>
-                            <option value="UNDERSTAND">Understand</option>
-                            <option value="APPLY">Apply</option>
-                            <option value="ANALYSIS">Analysis</option>
-                            <option value="EVALUATE">Evaluate</option>
-                            <option value="CREATE">Create</option>
+                                <option value="">Select Cognitive Level</option>
+                                <option value="R">Remember</option>
+                                <option value="U">Understand</option>
+                                <option value="A">Apply</option>
                         </select>
                     </div>
                 </div>
@@ -295,6 +292,7 @@
                     </div>
                 </div>
                 <button onclick="searchBySubjectNameCOPaged()"><i class="fas fa-filter"></i> Apply Filter</button>
+<!--                where is the function being called -->
                 <div id="bySubjectNameCOPagedResult" style="margin-top: 20px;"></div>
                 <div class="pagination" id="subjectNameCOPagination"></div>
             </div>
@@ -316,14 +314,11 @@
                     </div>
                     <div class="form-group">
                         <label>Cognitive Level *</label>
-                        <select id="cognitiveLevelName">
-                            <option value="">Select Level</option>
-                            <option value="REMEMBER">Remember</option>
-                            <option value="UNDERSTAND">Understand</option>
-                            <option value="APPLY">Apply</option>
-                            <option value="ANALYSIS">Analysis</option>
-                            <option value="EVALUATE">Evaluate</option>
-                            <option value="CREATE">Create</option>
+                        <select id="cognitiveLevel" class="form-control">
+                            <option value="">Select Cognitive Level</option>
+                            <option value="R">Remember</option>
+                            <option value="U">Understand</option>
+                            <option value="A">Apply</option>
                         </select>
                     </div>
                 </div>
@@ -365,6 +360,8 @@
         </div>
     </div>
 </div>
-<script src="js/common-dashboard.js"></script>
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/student-dashboard.js}"></script>
+<script th:src="@{/js/common-dashboard.js}"></script>
 </body>
 </html>

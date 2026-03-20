@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"><head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Teacher Dashboard</title>
@@ -35,41 +36,63 @@
                 </a>
             </li>
             <li>
-                <a href="#" onclick="showSection('myQuestions')">
+                <a href="#" onclick="showSection('myQuestionsPaged')">
                     <i class="fas fa-list"></i>
-                    <span>My Questions</span>
+                    <span>My Questions (Paged)</span>
                 </a>
             </li>
             <li>
-                <a href="#" onclick="showSection('allQuestions')">
+                <a href="#" onclick="showSection('allQuestionsPaged')">
                     <i class="fas fa-database"></i>
-                    <span>All Questions</span>
+                    <span>All Questions (Paged)</span>
                 </a>
             </li>
 
-            <div class="menu-category">Search & Filter</div>
+            <div class="menu-category">Search By ID</div>
             <li>
-                <a href="#" onclick="showSection('byId')">
+                <a href="#" onclick="showSection('questionById')">
                     <i class="fas fa-search"></i>
                     <span>Question By ID</span>
                 </a>
             </li>
+
+            <div class="menu-category">Search By Subject Code</div>
             <li>
-                <a href="#" onclick="showSection('bySubjectCode')">
+                <a href="#" onclick="showSection('bySubjectCodePaged')">
                     <i class="fas fa-code"></i>
-                    <span>By Subject Code</span>
+                    <span>By Subject Code (Paged)</span>
                 </a>
             </li>
             <li>
-                <a href="#" onclick="showSection('bySubjectName')">
-                    <i class="fas fa-book"></i>
-                    <span>By Subject Name</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('withFilters')">
+                <a href="#" onclick="showSection('bySubjectCodeCOPaged')">
                     <i class="fas fa-filter"></i>
-                    <span>Advanced Filters</span>
+                    <span>Filter by Code & CO (Paged)</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('bySubjectCodeCOLevel')">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Code, CO & Level</span>
+                </a>
+            </li>
+
+            <div class="menu-category">Search By Subject Name</div>
+            <li>
+                <a href="#" onclick="showSection('bySubjectNamePaged')">
+                    <i class="fas fa-book"></i>
+                    <span>By Subject Name (Paged)</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('bySubjectNameCOPaged')">
+                    <i class="fas fa-filter"></i>
+                    <span>Filter by Name & CO (Paged)</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('bySubjectNameCOLevel')">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Name, CO & Level</span>
                 </a>
             </li>
 
@@ -87,13 +110,21 @@
                 </a>
             </li>
             <li>
-                <a href="#" onclick="showSection('approvePaper')">
+                <a href="#" onclick="showSection('submitForApproval')">
                     <i class="fas fa-check-circle"></i>
-                    <span>Approve Paper</span>
+                    <span>Submit for Approval</span>
                 </a>
             </li>
 
-            <div class="menu-category">Account Management</div>
+            <div class="menu-category">Delete Operations</div>
+            <li>
+                <a href="#" onclick="showSection('deleteById')">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete By ID</span>
+                </a>
+            </li>
+
+            <div class="menu-category">Account Settings</div>
             <li>
                 <a href="#" onclick="showSection('updateEmail')">
                     <i class="fas fa-envelope"></i>
@@ -104,20 +135,6 @@
                 <a href="#" onclick="showSection('updatePassword')">
                     <i class="fas fa-lock"></i>
                     <span>Update Password</span>
-                </a>
-            </li>
-
-            <div class="menu-category">Danger Zone</div>
-            <li>
-                <a href="#" onclick="showSection('deleteById')">
-                    <i class="fas fa-trash"></i>
-                    <span>Delete By ID</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('deleteByBody')">
-                    <i class="fas fa-trash-alt"></i>
-                    <span>Delete By Body</span>
                 </a>
             </li>
 
@@ -132,75 +149,45 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <h1 id="pageTitle">Add Question</h1>
+        <!-- Page Title -->
+        <h1 id="pageTitle">Teacher Dashboard</h1>
 
         <!-- Add Question Section -->
-        <div id="addQuestion" class="section active">
+        <div id="addQuestion" class="section">
+            <h1>Add New Question</h1>
             <div class="card">
                 <h2><i class="fas fa-plus-circle"></i> Add New Question</h2>
                 <form id="addQuestionForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label>Subject Code *</label>
-                            <input
-                                    type="text"
-                                    id="subjectCode"
-                                    placeholder="e.g., CS101"
-                                    required
-                            />
+                            <input type="text" id="subjectCode" placeholder="e.g., CS101" required />
                         </div>
                         <div class="form-group">
                             <label>Subject Name *</label>
-                            <input
-                                    type="text"
-                                    id="subjectName"
-                                    placeholder="e.g., Database Systems"
-                                    required
-                            />
+                            <input type="text" id="subjectName" placeholder="e.g., Database Systems" required />
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Question Body *</label>
-                        <textarea
-                                id="questionBody"
-                                rows="3"
-                                placeholder="Enter your question here..."
-                                required
-                        ></textarea>
+                        <textarea id="questionBody" rows="3" placeholder="Enter your question here..." required></textarea>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label>Mapped Course Outcome (CO) *</label>
-                            <input
-                                    type="text"
-                                    id="mappedCO"
-                                    placeholder="e.g., CO1, CO2, CO3"
-                                    required
-                            />
+                            <input type="text" id="mappedCO" placeholder="e.g., CO1" required />
                         </div>
                         <div class="form-group">
                             <label>Marks *</label>
                             <div class="marks-options">
                                 <div class="mark-option">
-                                    <input
-                                            type="radio"
-                                            id="marks2"
-                                            name="marks"
-                                            value="2"
-                                            required
-                                    />
+                                    <input type="radio" id="marks2" name="marks" value="2" required />
                                     <label for="marks2">2 Marks</label>
                                 </div>
                                 <div class="mark-option">
-                                    <input
-                                            type="radio"
-                                            id="marks4"
-                                            name="marks"
-                                            value="4"
-                                            checked
-                                    />
+                                    <input type="radio" id="marks4" name="marks" value="4" checked />
                                     <label for="marks4">4 Marks</label>
                                 </div>
                             </div>
@@ -211,324 +198,318 @@
                         <label>Cognitive Level *</label>
                         <select id="cognitiveLevel" required>
                             <option value="">Select Level</option>
-                            <option value="REMEMBER">Remember</option>
-                            <option value="UNDERSTAND">Understand</option>
-                            <option value="APPLY">Apply</option>
+                            <option value="R">Remember</option>
+                            <option value="U">Understand</option>
+                            <option value="A">Apply</option>
                         </select>
                     </div>
 
-                    <button type="submit" class="success">
-                        <i class="fas fa-save"></i> Add Question
+                    <button type="submit" class="success" id="submitBtn">
+                        <i class="fas fa-save"></i> <span>Add Question</span>
                     </button>
                 </form>
                 <div id="addQuestionResult"></div>
             </div>
         </div>
 
-        <!-- My Questions Section -->
-        <div id="myQuestions" class="section">
+        <!-- My Questions Paged -->
+        <div id="myQuestionsPaged" class="section">
+            <h1>My Questions (Paginated)</h1>
             <div class="card">
-                <h2><i class="fas fa-list"></i> My Questions</h2>
-                <div class="search-bar">
-                    <input
-                            type="text"
-                            placeholder="Search my questions..."
-                            id="searchMyQuestions"
-                    />
-                    <button onclick="searchMyQuestions()">
-                        <i class="fas fa-search"></i> Search
-                    </button>
+                <h2><i class="fas fa-list"></i> View My Questions with Pagination</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Page Number *</label>
+                        <input type="number" id="myQuestionsPageNo" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Page Size *</label>
+                        <select id="myQuestionsPageSize">
+                            <option value="10">10 per page</option>
+                            <option value="20" selected>20 per page</option>
+                            <option value="50">50 per page</option>
+                            <option value="100">100 per page</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="myQuestionsContainer">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Question</th>
-                            <th>Subject Name</th>
-                            <th>Subject Code</th>
-                            <th>CO</th>
-                            <th>Marks</th>
-                            <th>Cognitive Level</th>
-                        </tr>
-                        </thead>
-                        <tbody id="myQuestionsTable">
-                        <tr>
-                            <td colspan="7" style="text-align: center">
-                                No questions yet. Add your first question!
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <button onclick="loadMyQuestionsPaged()"><i class="fas fa-search"></i> Load My Questions</button>
+                <div id="myQuestionsPagedResult" style="margin-top: 20px;"></div>
                 <div class="pagination" id="myQuestionsPagination"></div>
             </div>
         </div>
 
-        <!-- All Questions Section -->
-        <div id="allQuestions" class="section">
+        <!-- All Questions Paged -->
+        <div id="allQuestionsPaged" class="section">
+            <h1>All Questions (Paginated)</h1>
             <div class="card">
-                <h2><i class="fas fa-database"></i> All Questions</h2>
-                <div class="search-bar">
-                    <input
-                            type="text"
-                            placeholder="Search all questions..."
-                            id="searchAllQuestions"
-                    />
-                    <button onclick="loadAllQuestions()">
-                        <i class="fas fa-search"></i> Load All
-                    </button>
+                <h2><i class="fas fa-database"></i> View All Questions with Pagination</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Page Number *</label>
+                        <input type="number" id="allQuestionsPageNo" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Page Size *</label>
+                        <select id="allQuestionsPageSize">
+                            <option value="10">10 per page</option>
+                            <option value="20" selected>20 per page</option>
+                            <option value="50">50 per page</option>
+                            <option value="100">100 per page</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="allQuestionsContainer">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Question</th>
-                            <th>Subject Name</th>
-                            <th>Subject Code</th>
-                            <th>CO</th>
-                            <th>Marks</th>
-                            <th>Cognitive Level</th>
-                        </tr>
-                        </thead>
-                        <tbody id="allQuestionsTable">
-                        <tr>
-                            <td colspan="7" style="text-align: center">
-                                Click "Load All" to see questions
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <button onclick="loadAllQuestionsPaged()"><i class="fas fa-search"></i> Load Questions</button>
+                <div id="allQuestionsPagedResult" style="margin-top: 20px;"></div>
                 <div class="pagination" id="allQuestionsPagination"></div>
             </div>
         </div>
 
         <!-- Question By ID -->
-        <div id="byId" class="section">
+        <div id="questionById" class="section">
+            <h1>Find Question By ID</h1>
             <div class="card">
-                <h2><i class="fas fa-search"></i> Find Question By ID</h2>
+                <h2><i class="fas fa-search"></i> Search Question by ID</h2>
                 <div class="form-group">
-                    <label>Question ID</label>
-                    <input
-                            type="text"
-                            id="questionIdSearch"
-                            placeholder="Enter question ID"
-                    />
+                    <label>Question ID *</label>
+                    <input type="number" id="questionId" placeholder="Enter question ID">
                 </div>
-                <button onclick="searchById()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <div id="questionByIdResult" style="margin-top: 20px"></div>
+                <button onclick="findQuestionById()"><i class="fas fa-search"></i> Search</button>
+                <div id="questionByIdResult" style="margin-top: 20px;"></div>
             </div>
         </div>
 
-        <!-- By Subject Code -->
-        <div id="bySubjectCode" class="section">
+        <!-- By Subject Code Paged -->
+        <div id="bySubjectCodePaged" class="section">
+            <h1>Questions by Subject Code (Paginated)</h1>
             <div class="card">
-                <h2><i class="fas fa-code"></i> Find By Subject Code</h2>
+                <h2><i class="fas fa-code"></i> Find Questions by Subject Code (Paginated)</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Subject Code *</label>
-                        <input
-                                type="text"
-                                id="searchSubjectCode"
-                                placeholder="e.g., CS101"
-                                required
-                        />
+                        <input type="text" id="subjectCodePaged" placeholder="e.g., CS101">
                     </div>
                     <div class="form-group">
-                        <label>Mapped CO (Optional)</label>
-                        <input
-                                type="text"
-                                id="searchSubjectCodeCO"
-                                placeholder="e.g., CO1"
-                        />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Cognitive Level (Optional)</label>
-                    <select id="searchSubjectCodeLevel">
-                        <option value="">Any Level</option>
-                        <option value="REMEMBER">Remember</option>
-                        <option value="UNDERSTAND">Understand</option>
-                        <option value="APPLY">Apply</option>
-                    </select>
-                </div>
-                <button onclick="searchBySubjectCode()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <div id="subjectCodeResults" style="margin-top: 20px"></div>
-            </div>
-        </div>
-
-        <!-- By Subject Name -->
-        <div id="bySubjectName" class="section">
-            <div class="card">
-                <h2><i class="fas fa-book"></i> Find By Subject Name</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Subject Name *</label>
-                        <input
-                                type="text"
-                                id="searchSubjectName"
-                                placeholder="e.g., Database Systems"
-                                required
-                        />
+                        <label>Page Number</label>
+                        <input type="number" id="subjectCodePageNo" value="1" min="1">
                     </div>
                     <div class="form-group">
-                        <label>Mapped CO (Optional)</label>
-                        <input
-                                type="text"
-                                id="searchSubjectNameCO"
-                                placeholder="e.g., CO1"
-                        />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Cognitive Level (Optional)</label>
-                    <select id="searchSubjectNameLevel">
-                        <option value="">Any Level</option>
-                        <option value="REMEMBER">Remember</option>
-                        <option value="UNDERSTAND">Understand</option>
-                        <option value="APPLY">Apply</option>
-                    </select>
-                </div>
-                <button onclick="searchBySubjectName()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <div id="subjectNameResults" style="margin-top: 20px"></div>
-            </div>
-        </div>
-
-        <!-- Advanced Filters -->
-        <div id="withFilters" class="section">
-            <div class="card">
-                <h2><i class="fas fa-filter"></i> Advanced Search with Filters</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Subject Code (Optional)</label>
-                        <input
-                                type="text"
-                                id="advSubjectCode"
-                                placeholder="e.g., CS101"
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label>Subject Name (Optional)</label>
-                        <input
-                                type="text"
-                                id="advSubjectName"
-                                placeholder="e.g., Database Systems"
-                        />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Mapped CO (Optional)</label>
-                        <input type="text" id="advCO" placeholder="e.g., CO1" />
-                    </div>
-                    <div class="form-group">
-                        <label>Marks</label>
-                        <select id="advMarks">
-                            <option value="">Any Marks</option>
-                            <option value="2">2 Marks</option>
-                            <option value="4">4 Marks</option>
+                        <label>Page Size</label>
+                        <select id="subjectCodePageSize">
+                            <option value="10">10 per page</option>
+                            <option value="20" selected>20 per page</option>
+                            <option value="50">50 per page</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Cognitive Levels (Select multiple)</label>
-                    <div class="cognitive-levels">
-                        <div
-                                class="cognitive-level"
-                                onclick="toggleCognitiveLevel(this)"
-                                data-value="REMEMBER"
-                        >
-                            Remember
-                        </div>
-                        <div
-                                class="cognitive-level"
-                                onclick="toggleCognitiveLevel(this)"
-                                data-value="UNDERSTAND"
-                        >
-                            Understand
-                        </div>
-                        <div
-                                class="cognitive-level"
-                                onclick="toggleCognitiveLevel(this)"
-                                data-value="APPLY"
-                        >
-                            Apply
-                        </div>
-                    </div>
-                </div>
-                <button onclick="advancedSearch()">
-                    <i class="fas fa-search"></i> Advanced Search
-                </button>
-                <div id="advancedResults" style="margin-top: 20px"></div>
+                <button onclick="searchBySubjectCodePaged()"><i class="fas fa-search"></i> Search</button>
+                <div id="bySubjectCodePagedResult" style="margin-top: 20px;"></div>
+                <div class="pagination" id="subjectCodePagination"></div>
             </div>
         </div>
 
-        <!-- Generate By Code -->
+        <!-- By Subject Code with CO Paginated -->
+        <div id="bySubjectCodeCOPaged" class="section">
+            <h1>Filter by Subject Code & CO (Paginated)</h1>
+            <div class="card">
+                <h2><i class="fas fa-filter"></i> Filter by Subject Code and CO (Paginated)</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Code *</label>
+                        <input type="text" id="subjectCodeCOPaged" placeholder="e.g., CS101">
+                    </div>
+                    <div class="form-group">
+                        <label>Mapped CO *</label>
+                        <input type="text" id="mappedCOPaged" placeholder="e.g., CO1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Page Number</label>
+                        <input type="number" id="subjectCodeCOPageNo" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Page Size</label>
+                        <select id="subjectCodeCOPageSize">
+                            <option value="10">10 per page</option>
+                            <option value="20" selected>20 per page</option>
+                            <option value="50">50 per page</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="searchBySubjectCodeCOPaged()"><i class="fas fa-filter"></i> Apply Filter</button>
+                <div id="bySubjectCodeCOPagedResult" style="margin-top: 20px;"></div>
+                <div class="pagination" id="subjectCodeCOPagination"></div>
+            </div>
+        </div>
+
+        <!-- By Subject Code with CO and Cognitive Level -->
+        <div id="bySubjectCodeCOLevel" class="section">
+            <h1>Filter by Code, CO & Cognitive Level</h1>
+            <div class="card">
+                <h2><i class="fas fa-layer-group"></i> Advanced Filter</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Code *</label>
+                        <input type="text" id="subjectCodeCOLevel" placeholder="e.g., CS101">
+                    </div>
+                    <div class="form-group">
+                        <label>Mapped CO *</label>
+                        <input type="text" id="mappedCOLevel" placeholder="e.g., CO1">
+                    </div>
+                    <div class="form-group">
+                        <label>Cognitive Level *</label>
+                        <select id="cognitiveLevelCode">
+                            <option value="">Select Cognitive Level</option>
+                            <option value="R">Remember</option>
+                            <option value="U">Understand</option>
+                            <option value="A">Apply</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="searchBySubjectCodeCOLevel()"><i class="fas fa-search"></i> Search</button>
+                <div id="bySubjectCodeCOLevelResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- By Subject Name Paged -->
+        <div id="bySubjectNamePaged" class="section">
+            <h1>Questions by Subject Name (Paginated)</h1>
+            <div class="card">
+                <h2><i class="fas fa-book"></i> Find Questions by Subject Name (Paginated)</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Name *</label>
+                        <input type="text" id="subjectNamePaged" placeholder="e.g., Database Systems">
+                    </div>
+                    <div class="form-group">
+                        <label>Page Number</label>
+                        <input type="number" id="subjectNamePageNo" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Page Size</label>
+                        <select id="subjectNamePageSize">
+                            <option value="10">10 per page</option>
+                            <option value="20" selected>20 per page</option>
+                            <option value="50">50 per page</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="searchBySubjectNamePaged()"><i class="fas fa-search"></i> Search</button>
+                <div id="bySubjectNamePagedResult" style="margin-top: 20px;"></div>
+                <div class="pagination" id="subjectNamePagination"></div>
+            </div>
+        </div>
+
+        <!-- By Subject Name with CO Paginated -->
+        <div id="bySubjectNameCOPaged" class="section">
+            <h1>Filter by Subject Name & CO (Paginated)</h1>
+            <div class="card">
+                <h2><i class="fas fa-filter"></i> Filter by Subject Name and CO (Paginated)</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Name *</label>
+                        <input type="text" id="subjectNameCOPaged" placeholder="e.g., Database Systems">
+                    </div>
+                    <div class="form-group">
+                        <label>Mapped CO *</label>
+                        <input type="text" id="mappedCONamePaged" placeholder="e.g., CO1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Page Number</label>
+                        <input type="number" id="subjectNameCOPageNo" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Page Size</label>
+                        <select id="subjectNameCOPageSize">
+                            <option value="10">10 per page</option>
+                            <option value="20" selected>20 per page</option>
+                            <option value="50">50 per page</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="searchBySubjectNameCOPaged()"><i class="fas fa-filter"></i> Apply Filter</button>
+                <div id="bySubjectNameCOPagedResult" style="margin-top: 20px;"></div>
+                <div class="pagination" id="subjectNameCOPagination"></div>
+            </div>
+        </div>
+
+        <!-- By Subject Name with CO and Cognitive Level -->
+        <div id="bySubjectNameCOLevel" class="section">
+            <h1>Filter by Name, CO & Cognitive Level</h1>
+            <div class="card">
+                <h2><i class="fas fa-layer-group"></i> Advanced Filter</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Subject Name *</label>
+                        <input type="text" id="subjectNameCOLevel" placeholder="e.g., Database Systems">
+                    </div>
+                    <div class="form-group">
+                        <label>Mapped CO *</label>
+                        <input type="text" id="mappedCONameLevel" placeholder="e.g., CO1">
+                    </div>
+                    <div class="form-group">
+                        <label>Cognitive Level *</label>
+                        <select id="cognitiveLevelName">
+                            <option value="">Select Cognitive Level</option>
+                            <option value="R">Remember</option>
+                            <option value="U">Understand</option>
+                            <option value="A">Apply</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="searchBySubjectNameCOLevel()"><i class="fas fa-search"></i> Search</button>
+                <div id="bySubjectNameCOLevelResult" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Generate By Code - UPDATED with 2-mark and 4-mark counts -->
         <div id="generateByCode" class="section">
+            <h1>Generate Paper By Subject Code</h1>
             <div class="card">
                 <h2><i class="fas fa-cogs"></i> Generate Paper By Subject Code</h2>
                 <div class="form-group">
                     <label>Subject Code *</label>
-                    <input
-                            type="text"
-                            id="genSubjectCode"
-                            placeholder="e.g., CS101"
-                            required
-                    />
+                    <input type="text" id="genSubjectCode" placeholder="e.g., CS101" required />
                 </div>
                 <div class="form-group">
-                    <label>Total Marks *</label>
-                    <input
-                            type="number"
-                            id="genTotalMarks"
-                            min="10"
-                            max="200"
-                            value="100"
-                            required
-                    />
+                    <label>Mapped COs (comma-separated) *</label>
+                    <input type="text" id="genMappedCOs" placeholder="e.g., CO1,CO2,CO3" required />
                 </div>
+
                 <div class="form-group">
-                    <label>Difficulty Distribution *</label>
+                    <label>Question Distribution by Marks *</label>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Easy (%)</label>
-                            <input
-                                    type="number"
-                                    id="genEasy"
-                                    min="0"
-                                    max="100"
-                                    value="30"
-                            />
+                            <label>Number of 2-Mark Questions</label>
+                            <input type="number" id="gen2Marks" min="0" max="50" value="5" required />
                         </div>
                         <div class="form-group">
-                            <label>Medium (%)</label>
-                            <input
-                                    type="number"
-                                    id="genMedium"
-                                    min="0"
-                                    max="100"
-                                    value="50"
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label>Hard (%)</label>
-                            <input
-                                    type="number"
-                                    id="genHard"
-                                    min="0"
-                                    max="100"
-                                    value="20"
-                            />
+                            <label>Number of 4-Mark Questions</label>
+                            <input type="number" id="gen4Marks" min="0" max="50" value="5" required />
                         </div>
                     </div>
+                    <small>Total marks will be: <span id="genTotalMarksDisplay">(2 × 5) + (4 × 5) = 30</span></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Questions by Cognitive Level *</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Apply Level (A) Count</label>
+                            <input type="number" id="genA" min="0" max="50" value="3" />
+                        </div>
+                        <div class="form-group">
+                            <label>Remember Level (R) Count</label>
+                            <input type="number" id="genR" min="0" max="50" value="5" />
+                        </div>
+                        <div class="form-group">
+                            <label>Understand Level (U) Count</label>
+                            <input type="number" id="genU" min="0" max="50" value="2" />
+                        </div>
+                    </div>
+                    <small>Total questions = A + R + U</small>
                 </div>
                 <button onclick="generateByCode()" class="success">
                     <i class="fas fa-cogs"></i> Generate Paper
@@ -537,64 +518,52 @@
             </div>
         </div>
 
-        <!-- Generate By Name -->
+        <!-- Generate By Name - UPDATED with 2-mark and 4-mark counts -->
         <div id="generateByName" class="section">
+            <h1>Generate Paper By Subject Name</h1>
             <div class="card">
                 <h2><i class="fas fa-cogs"></i> Generate Paper By Subject Name</h2>
                 <div class="form-group">
                     <label>Subject Name *</label>
-                    <input
-                            type="text"
-                            id="genSubjectName"
-                            placeholder="e.g., Database Systems"
-                            required
-                    />
+                    <input type="text" id="genSubjectName" placeholder="e.g., Database Systems" required />
                 </div>
                 <div class="form-group">
-                    <label>Total Marks *</label>
-                    <input
-                            type="number"
-                            id="genByNameTotalMarks"
-                            min="10"
-                            max="200"
-                            value="100"
-                            required
-                    />
+                    <label>Mapped COs (comma-separated) *</label>
+                    <input type="text" id="genByNameMappedCOs" placeholder="e.g., CO1,CO2,CO3" required />
                 </div>
+
                 <div class="form-group">
-                    <label>Difficulty Distribution *</label>
+                    <label>Question Distribution by Marks *</label>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Easy (%)</label>
-                            <input
-                                    type="number"
-                                    id="genByNameEasy"
-                                    min="0"
-                                    max="100"
-                                    value="30"
-                            />
+                            <label>Number of 2-Mark Questions</label>
+                            <input type="number" id="genByName2Marks" min="0" max="50" value="5" required />
                         </div>
                         <div class="form-group">
-                            <label>Medium (%)</label>
-                            <input
-                                    type="number"
-                                    id="genByNameMedium"
-                                    min="0"
-                                    max="100"
-                                    value="50"
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label>Hard (%)</label>
-                            <input
-                                    type="number"
-                                    id="genByNameHard"
-                                    min="0"
-                                    max="100"
-                                    value="20"
-                            />
+                            <label>Number of 4-Mark Questions</label>
+                            <input type="number" id="genByName4Marks" min="0" max="50" value="5" required />
                         </div>
                     </div>
+                    <small>Total marks will be: <span id="genByNameTotalMarksDisplay">(2 × 5) + (4 × 5) = 30</span></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Questions by Cognitive Level *</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Apply Level (A) Count</label>
+                            <input type="number" id="genByNameA" min="0" max="50" value="3" />
+                        </div>
+                        <div class="form-group">
+                            <label>Remember Level (R) Count</label>
+                            <input type="number" id="genByNameR" min="0" max="50" value="5" />
+                        </div>
+                        <div class="form-group">
+                            <label>Understand Level (U) Count</label>
+                            <input type="number" id="genByNameU" min="0" max="50" value="2" />
+                        </div>
+                    </div>
+                    <small>Total questions = A + R + U</small>
                 </div>
                 <button onclick="generateByName()" class="success">
                     <i class="fas fa-cogs"></i> Generate Paper
@@ -603,55 +572,46 @@
             </div>
         </div>
 
-        <!-- Approve Paper -->
-        <div id="approvePaper" class="section">
+        <!-- Submit for Approval -->
+        <div id="submitForApproval" class="section">
+            <h1>Submit Paper for Approval</h1>
             <div class="card">
-                <h2><i class="fas fa-check-circle"></i> Approve Generated Paper</h2>
+                <h2><i class="fas fa-check-circle"></i> Submit Generated Paper for Approval</h2>
                 <div class="form-group">
-                    <label>Exam Title *</label>
-                    <input
-                            type="text"
-                            id="examTitle"
-                            placeholder="e.g., Midterm Exam 2024"
-                            required
-                    />
+                    <label>Question IDs (comma-separated) *</label>
+                    <textarea id="approveQuestionIds" rows="3" placeholder="e.g., 1,2,3,4,5" required></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Question Paper ID *</label>
-                    <input
-                            type="text"
-                            id="questionPaperId"
-                            placeholder="Enter paper ID"
-                            required
-                    />
-                </div>
-                <div class="form-group">
-                    <label>Comments</label>
-                    <textarea
-                            id="approveComments"
-                            rows="3"
-                            placeholder="Any comments or notes..."
-                    ></textarea>
-                </div>
-                <button onclick="approvePaper()" class="success">
+                <button onclick="submitForApproval()" class="success">
                     <i class="fas fa-check"></i> Submit for Approval
                 </button>
                 <div id="approvePaperResult" style="margin-top: 20px"></div>
             </div>
         </div>
 
+        <!-- Delete By ID -->
+        <div id="deleteById" class="section">
+            <h1>Delete Question By ID</h1>
+            <div class="card">
+                <h2><i class="fas fa-trash"></i> Delete Question By ID</h2>
+                <div class="form-group">
+                    <label>Question ID to Delete *</label>
+                    <input type="number" id="deleteId" placeholder="Enter question ID" required />
+                </div>
+                <button class="delete" onclick="deleteById()">
+                    <i class="fas fa-trash"></i> Delete Question
+                </button>
+                <div id="deleteByIdResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
         <!-- Update Email -->
         <div id="updateEmail" class="section">
+            <h1>Update Email</h1>
             <div class="card">
-                <h2><i class="fas fa-envelope"></i> Update Email Address</h2>
+                <h2><i class="fas fa-envelope"></i> Update Your Email Address</h2>
                 <div class="form-group">
                     <label>New Email Address *</label>
-                    <input
-                            type="email"
-                            id="newEmail"
-                            placeholder="newteacher@example.com"
-                            required
-                    />
+                    <input type="email" id="newEmail" placeholder="newteacher@example.com" required />
                 </div>
                 <button onclick="updateEmail()">
                     <i class="fas fa-save"></i> Update Email
@@ -662,34 +622,16 @@
 
         <!-- Update Password -->
         <div id="updatePassword" class="section">
+            <h1>Update Password</h1>
             <div class="card">
-                <h2><i class="fas fa-lock"></i> Update Password</h2>
-                <div class="form-group">
-                    <label>Current Password *</label>
-                    <input
-                            type="password"
-                            id="currentPassword"
-                            placeholder="Enter current password"
-                            required
-                    />
-                </div>
+                <h2><i class="fas fa-lock"></i> Update Your Password</h2>
                 <div class="form-group">
                     <label>New Password *</label>
-                    <input
-                            type="password"
-                            id="newPassword"
-                            placeholder="Enter new password"
-                            required
-                    />
+                    <input type="password" id="newPassword" placeholder="Enter new password" required />
                 </div>
                 <div class="form-group">
                     <label>Confirm New Password *</label>
-                    <input
-                            type="password"
-                            id="confirmPassword"
-                            placeholder="Confirm new password"
-                            required
-                    />
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password" required />
                 </div>
                 <button onclick="updatePassword()">
                     <i class="fas fa-save"></i> Update Password
@@ -697,48 +639,51 @@
                 <div id="updatePasswordResult" style="margin-top: 20px"></div>
             </div>
         </div>
-
-        <!-- Delete By ID -->
-        <div id="deleteById" class="section">
-            <div class="card">
-                <h2><i class="fas fa-trash"></i> Delete Question By ID</h2>
-                <div class="form-group">
-                    <label>Question ID to Delete *</label>
-                    <input
-                            type="text"
-                            id="deleteId"
-                            placeholder="Enter question ID"
-                            required
-                    />
-                </div>
-                <button class="delete" onclick="deleteById()">
-                    <i class="fas fa-trash"></i> Delete Question
-                </button>
-                <div id="deleteByIdResult" style="margin-top: 20px"></div>
-            </div>
-        </div>
-
-        <!-- Delete By Body -->
-        <div id="deleteByBody" class="section">
-            <div class="card">
-                <h2><i class="fas fa-trash-alt"></i> Delete Question By Body</h2>
-                <div class="form-group">
-                    <label>Question Text to Delete *</label>
-                    <textarea
-                            id="deleteBody"
-                            rows="3"
-                            placeholder="Enter exact question text"
-                            required
-                    ></textarea>
-                </div>
-                <button class="delete" onclick="deleteByBody()">
-                    <i class="fas fa-trash"></i> Delete Question
-                </button>
-                <div id="deleteByBodyResult" style="margin-top: 20px"></div>
-            </div>
-        </div>
     </div>
 </div>
-<script src="js/common-dashboard.js"></script>
+
+<script>
+    // Add real-time total marks calculation
+    document.addEventListener('DOMContentLoaded', function() {
+        // For Generate By Code
+        const gen2Marks = document.getElementById('gen2Marks');
+        const gen4Marks = document.getElementById('gen4Marks');
+        const genTotalDisplay = document.getElementById('genTotalMarksDisplay');
+
+        if (gen2Marks && gen4Marks && genTotalDisplay) {
+            function updateGenTotal() {
+                const twoMarks = parseInt(gen2Marks.value) || 0;
+                const fourMarks = parseInt(gen4Marks.value) || 0;
+                const total = (twoMarks * 2) + (fourMarks * 4);
+                genTotalDisplay.textContent = `(2 × ${twoMarks}) + (4 × ${fourMarks}) = ${total}`;
+            }
+
+            gen2Marks.addEventListener('input', updateGenTotal);
+            gen4Marks.addEventListener('input', updateGenTotal);
+            updateGenTotal();
+        }
+
+        // For Generate By Name
+        const genByName2Marks = document.getElementById('genByName2Marks');
+        const genByName4Marks = document.getElementById('genByName4Marks');
+        const genByNameTotalDisplay = document.getElementById('genByNameTotalMarksDisplay');
+
+        if (genByName2Marks && genByName4Marks && genByNameTotalDisplay) {
+            function updateGenByNameTotal() {
+                const twoMarks = parseInt(genByName2Marks.value) || 0;
+                const fourMarks = parseInt(genByName4Marks.value) || 0;
+                const total = (twoMarks * 2) + (fourMarks * 4);
+                genByNameTotalDisplay.textContent = `(2 × ${twoMarks}) + (4 × ${fourMarks}) = ${total}`;
+            }
+
+            genByName2Marks.addEventListener('input', updateGenByNameTotal);
+            genByName4Marks.addEventListener('input', updateGenByNameTotal);
+            updateGenByNameTotal();
+        }
+    });
+</script>
+
+<script th:src="@{/js/api.js}"></script>
+<script th:src="@{/js/teacher-dashboard.js}"></script>
 </body>
 </html>

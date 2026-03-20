@@ -74,6 +74,7 @@ public class UserService {
         user.setExpired(true);
         user.setLocked(true);
         Conformation conformation = new Conformation(user);
+        User saveUser=userRepository.save(user);
         redisService.set(
                 conformation.getUser().getEmail(),
                 conformation,
@@ -85,12 +86,7 @@ public class UserService {
                 conformation.getToken(),
                 conformation.getOtp()
         );
-        if(log.isDebugEnabled()){
-            System.out.println(redisService.get(conformation.getToken(),Conformation.class));
-            log.debug(redisService.get(conformation.getToken(),Conformation.class).toString());
-            System.out.println("user saved success");
-        }
-        return userRepository.save(user);
+        return saveUser;
     }
 
     //  READ (all users)
@@ -150,7 +146,7 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User updateUserPasswordByEmail(String email,String password,String adminPassword){
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
@@ -160,7 +156,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User updateUserPasswordById(Long id,String password,String adminPassword){
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
@@ -170,7 +166,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User updateUserRoleById(String role,Long id,String password){
         if (!(matchPasswords(password,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
@@ -206,7 +202,7 @@ public class UserService {
     }
 
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User updateUserRoleByEmail(String email,String role,String password){
         if (!(matchPasswords(password,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("You gave the wrong password");
@@ -234,7 +230,7 @@ public class UserService {
 
     //  DELETE (by email)
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserByEmail(String email,String adminPassword) {
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -246,7 +242,7 @@ public class UserService {
 
     //  DELETE (by ID)
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserById(Long id , String adminPassword) {
         if (!(matchPasswords(adminPassword, UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password try again");
@@ -257,7 +253,7 @@ public class UserService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserInBatchById(List<Long> ids , String adminPassword) {
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -276,7 +272,7 @@ public class UserService {
     }
 
     @Transactional
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteUserInBatchEmail(List<String> emails , String adminPassword){
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -287,7 +283,7 @@ public class UserService {
     }
 
     //  Suspend User
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User suspendUserById(Long id , String adminPassword) {
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -301,7 +297,7 @@ public class UserService {
         }
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User unsuspendUserById(Long id,String adminPassword){
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -315,7 +311,7 @@ public class UserService {
         }
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User suspendUserByEmail(String email, String adminPassword){
         if (!(matchPasswords(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -329,7 +325,7 @@ public class UserService {
         }
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public User unsuspendUserByEmail(String email,String adminPassword){
         if (!(encoder.matches(adminPassword,UserUtil.getUserAuthentication().getPassword()))){
             throw new WrongPasswordException("wrong password");
@@ -385,11 +381,11 @@ public class UserService {
         throw new RuntimeException("Login failed");
     }
 
-   public void logout(){
+    public void logout(){
         User user=UserUtil.getUserAuthentication().getUser();
         user.setExpired(true);
         userRepository.save(user);
-   }
+    }
 
     // VERIFY Token
     public Boolean verifyTokenAndOTP(String email ,String token, int otp) {
@@ -409,12 +405,12 @@ public class UserService {
         }
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<User> listOfUserByRole(String role){
         return userRepository.findByRole(role);
     }
 
-    @PreAuthorize("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<User> listOfUserByRole(String role ,int pageNo, int size){
         return userRepository.findByRole(role,PageRequest.of(pageNo,size));
     }
@@ -436,11 +432,11 @@ public class UserService {
             return Boolean.FALSE;
         }
     }
-//todo use this
+    //todo use this
     public User regenerateOtp(String email){
         User tempUser=findByEmail(email);
         if (
-              tempUser.isIs_enable()||!tempUser.isExpired()||!tempUser.isLocked()
+                tempUser.isIs_enable()||!tempUser.isExpired()||!tempUser.isLocked()
         ){
             return tempUser;
         }
@@ -461,6 +457,6 @@ public class UserService {
                 conformation.getOtp()
         );
         System.out.println("Debug: "+tempUser.getEmail()+" ");
-    return userRepository.save(tempUser);
+        return userRepository.save(tempUser);
     }
 }

@@ -2,7 +2,6 @@ package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
-import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
@@ -37,7 +36,7 @@ public class TeacherRestController {
     private final QuestionService questionService;
     private final QuestionPaperService questionPaperService;
 
-    public TeacherRestController(UserService userService,QuestionService questionService,QuestionPaperService questionPaperService){
+    public TeacherRestController(UserService userService, QuestionService questionService, QuestionPaperService questionPaperService){
         this.userService=userService;
         this.questionService=questionService;
         this.questionPaperService=questionPaperService;
@@ -104,9 +103,9 @@ public class TeacherRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/pagged")
+    @GetMapping("/questions/subjectCode/paged")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectCode(
+    public ResponseEntity<?> findBySubjectCodePaged(
             @RequestParam(value = "pageNo" ,defaultValue = "0") int pageNo,
             @RequestParam(value = "size" , defaultValue = "100") int size,
             @RequestParam("subjectCode") String subjectCode
@@ -144,18 +143,20 @@ public class TeacherRestController {
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionService.findBySubjectCodeMappedCO(
-                        subjectCode,
-                        mappedCO
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectCodeMappedCO(
+                                subjectCode,
+                                mappedCO
+                        )
                 ).toArray(),
                 "questions with subject code and mapped CO "+subjectCode+" "+mappedCO,
                 200
         );
     }
 
-    @GetMapping("/questions/subjectCode/mappedCO/pagged")
+    @GetMapping("/questions/subjectCode/mappedCO/paged")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectCodeMappedCO(
+    public ResponseEntity<?> findBySubjectCodeMappedCOPaged(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestParam("subjectCode") String subjectCode,
@@ -212,9 +213,9 @@ public class TeacherRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel/pagged")
+    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel/paged")
     @SneakyThrows
-    private ResponseEntity<?> findByCognitiveLevel(
+    private ResponseEntity<?> findByCognitiveLevelPaged(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestParam("subjectCode") String subjectCode,
@@ -249,7 +250,7 @@ public class TeacherRestController {
     @GetMapping("/questions/subjectName")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectName(@RequestParam("subjectName") String subjectName){
-        if (!subjectName.isEmpty()){
+        if (subjectName.isEmpty()){
             throw new BadRequestException("the request must contain 'subjectName'");
         }
         return ResponseUtility.responseTemplateForMultipleData(
@@ -264,9 +265,9 @@ public class TeacherRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/pagged")
+    @GetMapping("/questions/subjectName/paged")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectName(
+    public ResponseEntity<?> findBySubjectNamePaged(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size,
             @RequestParam("subjectName") String subjectName
@@ -304,18 +305,20 @@ public class TeacherRestController {
         }
         return ResponseUtility.responseTemplateForMultipleData(
                 "successful",
-                questionService.findBySubjectNameMappedCO(
-                        subjectName,
-                        mappedCO
+                QuestionDtoUtil.listOfQuestionToQuestionDto(
+                        questionService.findBySubjectNameMappedCO(
+                                subjectName,
+                                mappedCO
+                        )
                 ).toArray(),
                 "questions with subject name and mapped Co"+subjectName+" "+mappedCO,
                 200
         );
     }
 
-    @GetMapping("/questions/subjectName/mappedCO/pagged")
+    @GetMapping("/questions/subjectName/mappedCO/paged")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectNameMappedCO(
+    public ResponseEntity<?> findBySubjectNameMappedCOPaged(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
             @RequestParam("subjectName") String subjectName,
@@ -330,7 +333,7 @@ public class TeacherRestController {
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
-                        questionService.findBySubjectCodeMappedCO(
+                        questionService.findBySubjectNameMappedCO(
                                 subjectName,
                                 mappedCO,
                                 pageNo,
@@ -373,9 +376,9 @@ public class TeacherRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel/pagged")
+    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel/paged")
     @SneakyThrows
-    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
+    public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevelPaged(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
             @RequestParam(value = "size" , defaultValue = "100")int size,
             @RequestParam("subjectName") String subjectName,
@@ -414,33 +417,33 @@ public class TeacherRestController {
                 QuestionDtoUtil.QuestionToQuestionDto(
                         questionService.addQuestion(question)
                 ),
-                "Question crated successfully",
+                "Question created successfully",
                 201
         );
     }
 
-    @GetMapping("/generate/question-paper/subjectCode")
+    @PostMapping("/generate/question-paper/subjectCode")
     public ResponseEntity<?> generateBySubjectCodeQuestionPaper(@RequestBody DtoForSubjectCodeAndMappedCOs_ARU_And_2_4_Marks dto){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.listOfQuestionToQuestionDto(
                         questionService.generateBySubjectCodeQuestion(
-                        dto.getSubjectCode(),
-                        dto.getMappedCOs(),
-                        dto.getNumberOfCognitiveLevel_A(),
-                        dto.getNumberOfCognitiveLevel_R(),
-                        dto.getNumberOfCognitiveLevel_U(),
-                        dto.getMaxNumberOf2Marks(),
-                        dto.getMaxNumberOf4Marks()
+                                dto.getSubjectCode(),
+                                dto.getMappedCOs(),
+                                dto.getNumberOfCognitiveLevel_A(),
+                                dto.getNumberOfCognitiveLevel_R(),
+                                dto.getNumberOfCognitiveLevel_U(),
+                                dto.getMaxNumberOf2Marks(),
+                                dto.getMaxNumberOf4Marks()
                         )
                 ),
-                "question paper has been gendered successfully copy all ids and past in ",
+                "question paper has been generated successfully copy all ids and paste in ",
                 200
         );
     }
 
-    @GetMapping("/generate/question-paper/subjectName")
-    public ResponseEntity<?> generateBySubjectAndQuestionPaper(@RequestBody DtoForSubjectNameAndMappedCOs_ARU_And_2_4_Marks dto){
+    @PostMapping("/generate/question-paper/subjectName")
+    public ResponseEntity<?> generateBySubjectNameQuestionPaper(@RequestBody DtoForSubjectNameAndMappedCOs_ARU_And_2_4_Marks dto){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.listOfQuestionToQuestionDto(
@@ -454,7 +457,7 @@ public class TeacherRestController {
                                 dto.getMaxNumberOf4Marks()
                         )
                 ),
-                "question paper has been gendered successfully copy all ids and past in ",
+                "question paper has been generated successfully copy all ids and paste in ",
                 200
         );
     }
@@ -471,8 +474,8 @@ public class TeacherRestController {
         );
     }
 
-    @GetMapping("/my/questions/pagged")
-    public ResponseEntity<?> getYourQuestion(
+    @GetMapping("/my/questions/paged")
+    public ResponseEntity<?> getYourQuestionPaged(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
             @RequestParam(value = "size",defaultValue = "100")int size
     ){
@@ -496,9 +499,9 @@ public class TeacherRestController {
     public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody List<Question> questions){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-               QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
-                       questionPaperService.addQuestionPaper(questions)
-               ),
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
+                        questionPaperService.addQuestionPaper(questions)
+                ),
                 "Question Paper added successfully",
                 200
         );
@@ -509,15 +512,15 @@ public class TeacherRestController {
         questionService.deleteQuestionById(request.get("id"));
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
-                new Question(),
+                new Object(),
                 "selected question has been deleted",
-                401
+                200
         );
     }
 
     @PatchMapping("/update/user/email")
     @SneakyThrows
-    public ResponseEntity<?>updateUserEmailById(@RequestBody Map<String,String> request
+    public ResponseEntity<?> updateUserEmail(@RequestBody Map<String,String> request
     ){
         if(!request.containsKey("email")){
             throw new BadRequestException("the request must contain email");
@@ -534,7 +537,7 @@ public class TeacherRestController {
 
     @PatchMapping("/update/user/password")
     @SneakyThrows
-    public ResponseEntity<?> updateUserPasswordById(@RequestBody Map<String,String> request){
+    public ResponseEntity<?> updateUserPassword(@RequestBody Map<String,String> request){
         if (!request.containsKey("password")){
             throw new BadRequestException("the request must contain password");
         }
@@ -554,7 +557,7 @@ public class TeacherRestController {
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 new Object(),
-                "you have been logout ",
+                "you have been logged out ",
                 200
         );
     }
