@@ -572,19 +572,54 @@
             </div>
         </div>
 
-        <!-- Submit for Approval -->
+        <!-- Submit for Approval - ENHANCED VERSION -->
         <div id="submitForApproval" class="section">
             <h1>Submit Paper for Approval</h1>
             <div class="card">
                 <h2><i class="fas fa-check-circle"></i> Submit Generated Paper for Approval</h2>
-                <div class="form-group">
-                    <label>Question IDs (comma-separated) *</label>
-                    <textarea id="approveQuestionIds" rows="3" placeholder="e.g., 1,2,3,4,5" required></textarea>
+
+                <div class="info-box" style="background:#e3f2fd; padding:15px; border-radius:5px; margin-bottom:20px;">
+                    <p><strong><i class="fas fa-info-circle"></i> You can paste either:</strong></p>
+                    <ul style="margin:10px 0 0 20px;">
+                        <li><strong>Option 1:</strong> Comma-separated IDs (e.g., <code>50,74,12,52,88</code>)</li>
+                        <li><strong>Option 2:</strong> Full JSON data from the "Copy Full Data" button</li>
+                    </ul>
                 </div>
-                <button onclick="submitForApproval()" class="success">
-                    <i class="fas fa-check"></i> Submit for Approval
-                </button>
-                <div id="approvePaperResult" style="margin-top: 20px"></div>
+
+                <div class="form-group">
+                    <label>Question Data *</label>
+                    <textarea id="approveQuestionIds" rows="8"
+                              placeholder='Paste either:
+1. Comma-separated IDs: 50,74,12,52,88
+2. Full JSON data: [
+  {
+    "id": 50,
+    "subjectName": "DMS",
+    "questionMarks": 2,
+    "mappedCO": "CO1",
+    ...
+  }
+]'
+                              style="font-family: monospace; font-size: 14px;"
+                              required></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button onclick="submitForApproval()" class="success" style="flex: 2;">
+                        <i class="fas fa-check-circle"></i> Submit for Approval
+                    </button>
+                    <button onclick="clearApprovalInput()" class="secondary" style="flex: 1;">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+
+                <div id="approvePaperResult" style="margin-top: 20px;"></div>
+
+                <!-- Preview section for pasted data -->
+                <div id="approvalPreview" style="margin-top: 20px; display: none;">
+                    <h3><i class="fas fa-eye"></i> Preview</h3>
+                    <div id="approvalPreviewContent"></div>
+                </div>
             </div>
         </div>
 

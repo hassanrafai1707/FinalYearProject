@@ -436,7 +436,8 @@ public class TeacherRestController {
                                 dto.getMaxNumberOf2Marks(),
                                 dto.getMaxNumberOf4Marks()
                         )
-                ),
+                )//i need to copy this
+                ,
                 "question paper has been generated successfully copy all ids and paste in ",
                 200
         );
@@ -456,7 +457,8 @@ public class TeacherRestController {
                                 dto.getMaxNumberOf2Marks(),
                                 dto.getMaxNumberOf4Marks()
                         )
-                ),
+                ) //i need to copy this
+                ,
                 "question paper has been generated successfully copy all ids and paste in ",
                 200
         );
@@ -496,7 +498,7 @@ public class TeacherRestController {
 
     @SneakyThrows
     @PostMapping("/To-approve/questionPaper")
-    public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody List<Question> questions){
+    public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody List<QuestionDTO> questions){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(

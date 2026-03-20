@@ -27,6 +27,10 @@ import java.util.Optional;
  */
 @Repository
 public interface QuestionRepository extends JpaRepository<Question , Long> {
+
+    @Query("SELECT q.id FROM Question q WHERE q.id IN:Ids AND q.createdBy.department=:department")
+    List<Long> validIDS(@Param("Ids") List<Long> IDS,@Param("department") String department);
+
     @Query("SELECT q FROM Question q WHERE q.id=:Id AND q.createdBy.department=:department")
     Optional<Question> findById(@Param("Id") Long Id , @Param("department") String department );
 

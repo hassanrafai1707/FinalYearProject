@@ -645,4 +645,14 @@ public class QuestionService {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('TEACHER')")
+    @SneakyThrows
+    public List<Question> getQuestionByIDS(List<Long> ids){
+        if (ids.isEmpty()) throw new BadRequestException("ids are reduced");
+        return questionRepository.findAllById(ids,UserUtil.getUserAuthentication().getUser().getDepartment());
+    }
+
+    public List<Long> validIDS(List<Long> IDS){
+        return questionRepository.validIDS(IDS,UserUtil.getUserAuthentication().getUser().getDepartment());
+    }
 }

@@ -1,6 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
-import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.QuestionDTO;
 import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.DuplicateQuestionPaperException;
@@ -38,13 +38,16 @@ import java.util.*;
 public class QuestionPaperService {
     private final QuestionPaperRepository questionPaperRepository;
     private final UserService userService;
+    private final QuestionService questionService;
 
     public QuestionPaperService(
             QuestionPaperRepository questionPaperRepository,
-            UserService userService
+            UserService userService,
+            QuestionService questionService
     ){
         this.questionPaperRepository=questionPaperRepository;
         this.userService=userService;
+        this.questionService=questionService;
     }
 
     @PreAuthorize("hasRole('SUPERVISOR')")
@@ -453,11 +456,11 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("hasRole('TEACHER')")
-    public QuestionPaper addQuestionPaper(List<Question> questions){
+    public QuestionPaper addQuestionPaper(List<QuestionDTO> questions){
         List<Long>Ids=questions
                 .stream()
-                .sorted(Comparator.comparing(Question::getId))
-                .map(Question::getId)
+                .sorted(Comparator.comparing(QuestionDTO::getId))
+                .map(QuestionDTO::getId)
                 .toList();
         String questionPaperFingerprint;
         if (Ids.size()==questions.size()){
@@ -466,7 +469,7 @@ public class QuestionPaperService {
                 throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
             } else {
                 QuestionPaper questionPaper= new QuestionPaper();
-                questionPaper.setListOfQuestion(new HashSet<>(questions));
+                questionPaper.setListOfQuestion(new HashSet<>(questionService.getQuestionByIDS(questionService.validIDS(Ids))));
                 questionPaper.setGeneratedBy(UserUtil.getUserAuthentication().getUser());
                 questionPaper.setApproved(Boolean.FALSE);
                 questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
