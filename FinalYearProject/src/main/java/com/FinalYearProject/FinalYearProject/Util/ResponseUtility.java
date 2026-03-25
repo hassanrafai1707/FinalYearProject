@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 public class ResponseUtility {
-    private ResponseUtility(){};
+    private ResponseUtility(){}
     public static ResponseEntity<?> responseTemplateForSingleData(String status , Object data, String message ,int statusCode){
         return  ResponseEntity
                 .status(statusCode)
@@ -27,6 +27,18 @@ public class ResponseUtility {
                         Map.of(
                                 "status", status,
                                 "data",data,
+                                "message",message,
+                                "time", LocalDateTime.now()
+                        )
+                );
+    }
+
+    public static ResponseEntity<?> responseTemplateForDeletedData(String status,String message ,int statusCode){
+        return ResponseEntity
+                .status(statusCode)
+                .body(
+                        Map.of(
+                                "status", status,
                                 "message",message,
                                 "time", LocalDateTime.now()
                         )

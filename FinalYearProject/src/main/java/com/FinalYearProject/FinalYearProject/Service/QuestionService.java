@@ -1,11 +1,13 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
+import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.DepartmentMissMatchException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.WrongPasswordException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
@@ -435,7 +437,13 @@ public class QuestionService {
             throw new QuestionNotFoundException("Question not found with ID: " + id);
         }
         else {
-            questionRepository.deleteById(id);
+            Question question=getQuestionById(id);
+            if (question.getCreatedBy().getId().equals(UserUtil.getUserAuthentication().getUser().getId())){
+                questionRepository.delete(question);
+            }
+            else {
+                throw new UserNotAuthorizesException("USER is not allowed to delete this question as he did not create it");
+            }
         }
     }
 

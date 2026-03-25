@@ -513,9 +513,8 @@ public class TeacherRestController {
     @DeleteMapping("/question/id")
     public ResponseEntity<?> deleteQuestionById(@RequestBody Map<String,Long> request){
         questionService.deleteQuestionById(request.get("id"));
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new Object(),
                 "selected question has been deleted",
                 200
         );
