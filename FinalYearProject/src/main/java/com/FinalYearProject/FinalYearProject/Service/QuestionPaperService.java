@@ -456,27 +456,30 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("hasRole('TEACHER')")
-    public QuestionPaper addQuestionPaper(List<QuestionDTO> questions,String comment){
-        List<Long>Ids=questions
-                .stream()
+    public QuestionPaper addQuestionPaper(List<QuestionDTO> questions, String examTitle) {
+        List<Long> ids = questions.stream()
                 .sorted(Comparator.comparing(QuestionDTO::getId))
                 .map(QuestionDTO::getId)
                 .toList();
-        String questionPaperFingerprint;
-        if (Ids.size()==questions.size()){
-            questionPaperFingerprint = QuestionPaperUtil.sha256FingerPrintUsingIds(Ids);
-            if (questionPaperRepository.existsByQuestionPaperFingerprint(questionPaperFingerprint)) {
-                throw new DuplicateQuestionPaperException("one more question paper with exact questions exists");
-            } else {
-                QuestionPaper questionPaper= new QuestionPaper();
-                questionPaper.setListOfQuestion(new HashSet<>(questionService.getQuestionByIDS(questionService.validIDS(Ids))));
-                questionPaper.setGeneratedBy(UserUtil.getUserAuthentication().getUser());
-                questionPaper.setApproved(Boolean.FALSE);
-                questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
-                questionPaper.setComment(comment);
-                questionPaperRepository.save(questionPaper);
-            }
+        List<Long> validIds = questionService.validIDS(ids);
+        if (questionPaperRepository.existsByExamTitle(examTitle)){
+            throw new DuplicateQuestionPaperException("Question paper already exists with this examTitle: "+examTitle);
         }
-        throw new BadRequestException("there are a few band questions");
+        if (validIds.size() != ids.size()) {
+            List<Long> invalidIds = new ArrayList<>(ids);
+            invalidIds.removeAll(validIds);
+            throw new BadRequestException("Invalid question IDs: " + invalidIds);
+        }
+        String fingerprint = QuestionPaperUtil.sha256FingerPrintUsingIds(validIds);
+        if (questionPaperRepository.existsByQuestionPaperFingerprint(fingerprint)) {
+            throw new DuplicateQuestionPaperException("Question paper already exists");
+        }
+        QuestionPaper questionPaper = new QuestionPaper();
+        questionPaper.setListOfQuestion(new HashSet<>(questionService.getQuestionByIDS(validIds)));
+        questionPaper.setGeneratedBy(UserUtil.getUserAuthentication().getUser());
+        questionPaper.setApproved(false);
+        questionPaper.setQuestionPaperFingerprint(fingerprint);
+        questionPaper.setExamTitle(examTitle);
+        return questionPaperRepository.save(questionPaper);
     }
 }

@@ -503,7 +503,7 @@ public class TeacherRestController {
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
-                        questionPaperService.addQuestionPaper(q.getQuestionDTOList(), q.getComment())
+                        questionPaperService.addQuestionPaper(q.getQuestionDTOList(), q.getExamTitle())
                 ),
                 "Question Paper added successfully",
                 200

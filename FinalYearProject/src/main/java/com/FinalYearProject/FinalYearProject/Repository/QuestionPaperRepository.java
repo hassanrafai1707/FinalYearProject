@@ -30,6 +30,7 @@ public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Lon
 
     @Query("SELECT q FROM QuestionPaper q where q.id=:id AND q.generatedBy.department=:department")
     Optional<QuestionPaper> findById(@Param("id") Long id,@Param("department") String department);
+
     @Query("select q from QuestionPaper q where q.examTitle=:examTitle and q.generatedBy.department=:department")
     Optional<QuestionPaper> findByExamTitle(@Param("examTitle") String examTitle,@Param("department") String department);
 
@@ -58,5 +59,7 @@ public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Lon
     Page<QuestionPaper> findByDepartment(@Param("department") String department,Pageable pageable);
 
     Boolean existsByQuestionPaperFingerprint(String questionPaperFingerprint);
+
+    Boolean existsByExamTitle(String examTitle);
 
 }

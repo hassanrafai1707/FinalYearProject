@@ -6,14 +6,14 @@ import java.util.List;
 
 public class ToApproveQuestionPaper {
     List<QuestionDTO> questionDTOList;
-    String comment;
+    String examTitle;
 
-    public String getComment() {
-        return comment;
+    public String getExamTitle() {
+        return examTitle;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setExamTitle(String examTitle) {
+        this.examTitle = examTitle;
     }
 
     public List<QuestionDTO> getQuestionDTOList() {

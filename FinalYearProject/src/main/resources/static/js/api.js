@@ -956,11 +956,11 @@ const TeacherAPI = {
     },
 
     // --- Paper Approval (POST with JSON body) ---
-    submitForApproval: async (questions) => {
+    submitForApproval: async (questions, examTitle) => {
         const r = await fetch(`${appVersion}/teacher/To-approve/questionPaper`, {
             method: "POST",
             headers: authHeaders(true),
-            body: JSON.stringify(questions)
+            body: JSON.stringify({ questionDTOList: questions, examTitle: examTitle })
         });
         return handleResponse(r);
     },
