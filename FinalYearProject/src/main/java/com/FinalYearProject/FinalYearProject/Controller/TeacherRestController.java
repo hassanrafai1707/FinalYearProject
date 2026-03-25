@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.*;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionPaperDto.ToApproveQuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
@@ -498,11 +499,11 @@ public class TeacherRestController {
 
     @SneakyThrows
     @PostMapping("/To-approve/questionPaper")
-    public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody List<QuestionDTO> questions){
+    public ResponseEntity<?> approveGeneratedQuestionPaper(@RequestBody ToApproveQuestionPaper q){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
-                        questionPaperService.addQuestionPaper(questions)
+                        questionPaperService.addQuestionPaper(q.getQuestionDTOList(), q.getComment())
                 ),
                 "Question Paper added successfully",
                 200

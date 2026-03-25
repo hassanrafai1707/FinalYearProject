@@ -456,7 +456,7 @@ public class QuestionPaperService {
     @SneakyThrows
     @Transactional
     @PreAuthorize("hasRole('TEACHER')")
-    public QuestionPaper addQuestionPaper(List<QuestionDTO> questions){
+    public QuestionPaper addQuestionPaper(List<QuestionDTO> questions,String comment){
         List<Long>Ids=questions
                 .stream()
                 .sorted(Comparator.comparing(QuestionDTO::getId))
@@ -473,6 +473,7 @@ public class QuestionPaperService {
                 questionPaper.setGeneratedBy(UserUtil.getUserAuthentication().getUser());
                 questionPaper.setApproved(Boolean.FALSE);
                 questionPaper.setQuestionPaperFingerprint(questionPaperFingerprint);
+                questionPaper.setComment(comment);
                 questionPaperRepository.save(questionPaper);
             }
         }
