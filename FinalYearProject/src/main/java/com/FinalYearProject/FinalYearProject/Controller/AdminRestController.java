@@ -1,7 +1,6 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
 import com.FinalYearProject.FinalYearProject.DTO.UserDto.*;
-import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.RoleNotValidException;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
@@ -213,10 +212,8 @@ public class AdminRestController {
                 dto.getEmail(),
                 dto.getAdminPassword()
         );
-        User user=new User();
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                user,
                 "users with email deleted successfully",
                 200
         );
@@ -230,10 +227,8 @@ public class AdminRestController {
                 dto.getId(),
                 dto.getAdminPassword()
         );
-        User user = new User();
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                user,
                 "users with id deleted successfully",
                 200
         );
@@ -247,9 +242,8 @@ public class AdminRestController {
                 dto.getIds(),
                 dto.getAdminPassword()
         );
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new UserDto(),
                 "all users with ids deleted successfully",
                 200
         );
@@ -260,9 +254,8 @@ public class AdminRestController {
             @RequestBody DtoForEmailsAndPasswordInRequest dto
     ){
         userService.deleteUserInBatchEmail(dto.getEmails(),dto.getAdminPassword());
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new UserDto(),
                 "all users with emails have been deleted",
                 200
         );
