@@ -11,10 +11,15 @@ import com.FinalYearProject.FinalYearProject.Util.ResponseUtility;
 import com.FinalYearProject.FinalYearProject.Util.UserDtoUtil;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
@@ -831,6 +836,14 @@ public class SupervisorRestController {
         );
     }
 
+    @GetMapping("/download/questionsPapers/id")
+    public ResponseEntity<InputStreamResource> downloadQuestionPaper(@RequestParam("id") Long id){
+        ByteArrayInputStream file= questionPaperService.downloadQuestionPaper(id);
+
+        HttpHeaders headers=new HttpHeaders();
+        headers.add("Content-Disposition","inline; filename=Question-Paper.pdf");
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(new InputStreamResource(file));
+    }
     @GetMapping("/test")
     public ResponseEntity<?> test(){
         return ResponseEntity.ok(HttpStatus.OK);

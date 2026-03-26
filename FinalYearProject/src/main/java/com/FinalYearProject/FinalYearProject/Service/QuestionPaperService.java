@@ -1,8 +1,10 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.QuestionDTO;
+import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.DuplicateQuestionPaperException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
@@ -12,13 +14,24 @@ import com.FinalYearProject.FinalYearProject.Util.QuestionPaperUtil;
 import com.FinalYearProject.FinalYearProject.Util.UserUtil;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
+import org.openpdf.text.*;
+import org.openpdf.text.Font;
+import org.openpdf.text.pdf.PdfPCell;
+import org.openpdf.text.pdf.PdfPTable;
+import org.openpdf.text.pdf.PdfTable;
+import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * QuestionPaperService - Business Logic Service for Exam Paper Management
@@ -75,7 +88,6 @@ public class QuestionPaperService {
         }
     }
 
-    @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper findById(Long Id){
         return questionPaperRepository.findById(Id,UserUtil.getUserAuthentication().getUser().getDepartment())
                 .orElseThrow(()-> new QuestionPaperNotFoundException("no question paper with id"+Id+" in your determent "));
@@ -257,11 +269,7 @@ public class QuestionPaperService {
     @Transactional
     @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper approveQuestionPaperById(Long id,String comment){
-        QuestionPaper questionPaper=questionPaperRepository
-                .findById(id)
-                .orElseThrow(
-                        ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
-                );
+        QuestionPaper questionPaper=findById(id);
         if (questionPaper.getApproved().equals(Boolean.TRUE)){
             return questionPaper;
         }
@@ -277,11 +285,7 @@ public class QuestionPaperService {
     @Transactional
     @PreAuthorize("hasRole('SUPERVISOR')")
     public QuestionPaper notApproveQuestionPaperById(Long id,String comment){
-        QuestionPaper questionPaper=questionPaperRepository
-                .findById(id)
-                .orElseThrow(
-                        ()-> new QuestionPaperNotFoundException("no Question Paper with id :" +id)
-                );
+        QuestionPaper questionPaper=findById(id);
         if (questionPaper.getApproved().equals(Boolean.FALSE)){
             return questionPaper;
         }
@@ -485,5 +489,127 @@ public class QuestionPaperService {
         questionPaper.setQuestionPaperFingerprint(fingerprint);
         questionPaper.setExamTitle(examTitle);
         return questionPaperRepository.save(questionPaper);
+    }
+
+    public ByteArrayInputStream downloadQuestionPaper(Long id){
+        QuestionPaper questionPaper=findById(id);
+        Document document=new Document();
+        ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+        try {
+            PdfWriter.getInstance(document,outputStream);
+            document.open();
+
+            // Fonts
+            Font titleFont = FontFactory.getFont(FontFactory.TIMES_BOLD,22);
+            Font headerFont = FontFactory.getFont(FontFactory.TIMES_BOLD,12);
+            Font bodyFont = FontFactory.getFont(FontFactory.TIMES_BOLD,10);
+
+            // Title
+            Paragraph paragraph=new Paragraph(questionPaper.getExamTitle(),titleFont );
+            paragraph.setAlignment(Element.ALIGN_CENTER);
+            document.add(paragraph);
+            document.add(Chunk.NEWLINE);
+
+            // Metadata
+            document.addTitle(questionPaper.getExamTitle());
+            document.addAuthor(questionPaper.getGeneratedBy().getEmail());
+            document.addSubject("Question Paper");
+            document.addCreationDate();
+
+            // Page numbers
+            HeaderFooter footer = new HeaderFooter(new Phrase("Page "), new Phrase(""));
+            footer.setAlignment(Element.ALIGN_CENTER);
+            document.setFooter(footer);
+
+            // Create table
+            PdfPTable pdfTable=new PdfPTable(5);
+            float[] columnWidths = {0.5f, 0.8f, 0.8f, 4f, 0.6f};
+            pdfTable.setWidths(columnWidths);
+            pdfTable.setHeaderRows(1);
+
+            Stream.of("ID", "Cognitive Level","CO","Question" ,"Marks").forEach(
+                    hederTitle->{
+                        PdfPCell heder=new PdfPCell();
+                        heder.setBackgroundColor(Color.green);
+                        heder.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        heder.setBorderWidth(2);
+                        heder.setPhrase(new Phrase(hederTitle,headerFont ));
+                        pdfTable.addCell(heder);
+                    }
+            );
+            if (questionPaper.getListOfQuestion().isEmpty()) throw new QuestionNotFoundException("there are not questions in this question paper");
+
+            for (Question question : questionPaper.getListOfQuestion()){
+
+                // ID
+                PdfPCell qId=new PdfPCell(new Phrase(question.getId().toString(),bodyFont));
+                qId.setPadding(4);
+                qId.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                qId.setHorizontalAlignment(Element.ALIGN_CENTER);
+                pdfTable.addCell(qId);
+
+                // Cognitive Level
+                PdfPCell Cognitive=new PdfPCell(new Phrase(question.getCognitiveLevel(),bodyFont));
+                Cognitive.setPadding(4);
+                Cognitive.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                Cognitive.setHorizontalAlignment(Element.ALIGN_CENTER);
+                pdfTable.addCell(Cognitive);
+
+                // CO (Mapped CO)
+                PdfPCell CO=new PdfPCell(new Phrase(question.getMappedCO(),bodyFont));
+                CO.setPadding(4);
+                CO.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                CO.setHorizontalAlignment(Element.ALIGN_CENTER);
+                pdfTable.addCell(CO);
+
+                // Question Body (with wrapping)
+                PdfPCell Question=new PdfPCell(new Phrase(question.getQuestionBody(),bodyFont));
+                Question.setPadding(4);
+                Question.setVerticalAlignment(Element.ALIGN_TOP);
+                Question.setHorizontalAlignment(Element.ALIGN_LEFT);
+                Question.setNoWrap(false);
+                pdfTable.addCell(Question);
+
+                // Marks
+                PdfPCell Marks=new PdfPCell(new Phrase(String.valueOf(question.getQuestionMarks()),bodyFont));
+                Marks.setPadding(4);
+                Marks.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                Marks.setHorizontalAlignment(Element.ALIGN_CENTER);
+                pdfTable.addCell(Marks);
+            }
+
+            // Total marks row
+            PdfPCell totalLabel = new PdfPCell(new Phrase("TOTAL MARKS:", bodyFont));
+            totalLabel.setColspan(4);
+            totalLabel.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            totalLabel.setBackgroundColor(Color.LIGHT_GRAY);
+            totalLabel.setPadding(5);
+            pdfTable.addCell(totalLabel);
+
+            PdfPCell totalValue =
+                    new PdfPCell(
+                    new Phrase(
+                            String.valueOf(
+                                    questionPaper.getListOfQuestion().stream().mapToInt(Question::getQuestionMarks).sum()
+                            ),
+                            bodyFont
+                    )
+                    );
+            totalValue.setHorizontalAlignment(Element.ALIGN_CENTER);
+            totalValue.setBackgroundColor(Color.LIGHT_GRAY);
+            totalValue.setPadding(5);
+            pdfTable.addCell(totalValue);
+
+            document.add(pdfTable);
+        }
+        catch (DocumentException e){
+            throw new RuntimeException(e);//don't change this line will give error code 500
+        }
+        finally {
+            if (document != null && document.isOpen()) {
+                document.close();
+            }
+        }
+        return new ByteArrayInputStream(outputStream.toByteArray());
     }
 }
