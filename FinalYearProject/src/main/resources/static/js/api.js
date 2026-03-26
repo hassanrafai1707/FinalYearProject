@@ -684,6 +684,10 @@ const SupervisorAPI = {
         const r = await fetch(`${appVersion}/supervisor/questionsPapers/id${buildQueryString({id})}`, { method: "GET", headers: authHeaders() });
         return handleResponse(r);
     },
+    downloadQuestionPaper: async (id) =>{
+        const r = await fetch(`${appVersion}/supervisor/download/questionsPapers/id${buildQueryString({id})}`, { method: "GET", headers: authHeaders() });
+        return handleResponse(r);
+    },
     findByExamTitle: async (examTitle) => {
         const r = await fetch(`${appVersion}/supervisor/questionsPapers/examTitle${buildQueryString({examTitle})}`, { method: "GET", headers: authHeaders() });
         return handleResponse(r);
@@ -993,6 +997,17 @@ const TeacherAPI = {
         return handleResponse(r);
     },
 
+    myQuestionPaperPaged: async ()=>{
+        const r=await fetch(`${appVersion}/teacher/my/questionPapers`,{
+            method:"GET",
+            headers:authHeaders(true)
+            });
+        return handleResponse(r);
+    },
+    downloadQuestionPaper: async (id) =>{
+        const r = await fetch(`${appVersion}/teacher/download/questionsPapers/id${buildQueryString({id})}`, { method: "GET", headers: authHeaders() });
+        return handleResponse(r);
+    },
     // --- User Account Management (PATCH with JSON body) ---
     updateUserEmail: async (email) => {
         const r = await fetch(`${appVersion}/teacher/update/user/email`, {

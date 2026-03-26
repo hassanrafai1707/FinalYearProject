@@ -110,6 +110,20 @@
                 </a>
             </li>
 
+            <div class="menu-category">Question Papers</div>
+            <li>
+                <a href="#" onclick="showSection('myQuestionPapers')">
+                    <i class="fas fa-file-alt"></i>
+                    <span>My Question Papers</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="showSection('paperById')">
+                    <i class="fas fa-download"></i>
+                    <span>Download Paper</span>
+                </a>
+            </li>
+
             <div class="menu-category">Delete Operations</div>
             <li>
                 <a href="#" onclick="showSection('deleteById')">
@@ -458,7 +472,7 @@
             </div>
         </div>
 
-        <!-- Generate By Code - UPDATED with 2-mark and 4-mark counts -->
+        <!-- Generate By Code -->
         <div id="generateByCode" class="section">
             <h1>Generate Paper By Subject Code</h1>
             <div class="card">
@@ -512,7 +526,7 @@
             </div>
         </div>
 
-        <!-- Generate By Name - UPDATED with 2-mark and 4-mark counts -->
+        <!-- Generate By Name -->
         <div id="generateByName" class="section">
             <h1>Generate Paper By Subject Name</h1>
             <div class="card">
@@ -566,7 +580,7 @@
             </div>
         </div>
 
-        <!-- Submit for Approval - ENHANCED VERSION -->
+        <!-- Submit for Approval -->
         <div id="submitForApproval" class="section">
             <h1>Submit Paper for Approval</h1>
             <div class="card">
@@ -614,11 +628,38 @@
 
                 <div id="approvePaperResult" style="margin-top: 20px;"></div>
 
-                <!-- Preview section for pasted data -->
                 <div id="approvalPreview" style="margin-top: 20px; display: none;">
                     <h3><i class="fas fa-eye"></i> Preview</h3>
                     <div id="approvalPreviewContent"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- My Question Papers -->
+        <div id="myQuestionPapers" class="section">
+            <h1>My Question Papers</h1>
+            <div class="card">
+                <h2><i class="fas fa-file-alt"></i> View My Question Papers</h2>
+                <button onclick="myQuestionPaper()" class="primary">
+                    <i class="fas fa-search"></i> Load Papers
+                </button>
+                <div id="myQuestionPapersResult" style="margin-top: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Download Paper By ID -->
+        <div id="paperById" class="section">
+            <h1>Download Paper By ID</h1>
+            <div class="card">
+                <h2><i class="fas fa-download"></i> Download Question Paper by ID</h2>
+                <div class="form-group">
+                    <label>Paper ID *</label>
+                    <input type="text" id="paperId" placeholder="Enter paper ID" />
+                </div>
+                <button onclick="downloadQuestionPaperT()" style="background-color: #17a2b8;">
+                    <i class="fas fa-download"></i> Download Paper
+                </button>
+                <div id="paperByIdResult" style="margin-top: 20px"></div>
             </div>
         </div>
 

@@ -35,7 +35,7 @@ function getLevelBadgeClass(level) {
 }
 
 // ==========================================
-// Add Question Form Handler (IMPROVED VERSION)
+// Add Question Form Handler
 // ==========================================
 
 // Function to initialize the add question form
@@ -51,7 +51,7 @@ function initializeAddQuestionForm() {
 
     // Add the event listener
     addQuestionForm.addEventListener('submit', handleAddQuestionSubmit);
-}// teacher-dashboard.js - Replace the handleAddQuestionSubmit function with this
+}
 
 async function handleAddQuestionSubmit(e) {
     e.preventDefault();
@@ -102,8 +102,8 @@ async function handleAddQuestionSubmit(e) {
         subjectName: subjectName,
         questionBody: questionBody,
         mappedCO: mappedCO,
-        questionMarks: marks,  // Try using questionMarks instead of marks
-        marks: marks,          // Keep both for compatibility
+        questionMarks: marks,
+        marks: marks,
         cognitiveLevel: cognitiveLevelValue
     };
 
@@ -149,82 +149,14 @@ async function handleAddQuestionSubmit(e) {
                 errorMessage += 'Unknown error occurred';
             }
 
-            // Add debugging info
-            console.log('Error details:', {
-                message: error.message,
-                response: error.response,
-                request: error.request
-            });
-
             resultDiv.innerHTML = `<div class="alert alert-error">${errorMessage}</div>`;
         }
     }
 }
 
-// Make sure the form is initialized when the DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the add question form
-    initializeAddQuestionForm();
-});
-
-// Also re-initialize when showing the section (in case the DOM was dynamically updated)
-function showSection(sectionId) {
-    // If showing the add question section, re-initialize the form
-    if (sectionId === 'addQuestion') {
-        setTimeout(initializeAddQuestionForm, 100); // Small delay to ensure DOM is updated
-    }
-}
-
-// Override the existing showSection function to include our new functionality
-// Make a backup of the original if it exists
-const originalShowSection = window.showSection;
-
-window.showSection = function(sectionId) {
-    // Call the original function if it exists
-    if (typeof originalShowSection === 'function') {
-        originalShowSection(sectionId);
-    } else {
-        // Fallback to your existing showSection logic
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
-        });
-        const selectedSection = document.getElementById(sectionId);
-        if (selectedSection) {
-            selectedSection.classList.add('active');
-        }
-
-        document.getElementById('pageTitle').textContent = getPageTitle(sectionId);
-    }
-
-    // Initialize the add question form when its section is shown
-    if (sectionId === 'addQuestion') {
-        setTimeout(initializeAddQuestionForm, 100);
-    }
-};
-
-// Helper function to get page title (add this if it doesn't exist)
-function getPageTitle(sectionId) {
-    const titles = {
-        addQuestion: 'Add Question',
-        myQuestionsPaged: 'My Questions',
-        allQuestionsPaged: 'All Questions',
-        questionById: 'Find Question By ID',
-        bySubjectCodePaged: 'Search by Subject Code',
-        bySubjectCodeCOPaged: 'Filter by Code & CO',
-        bySubjectCodeCOLevel: 'Code, CO & Level',
-        bySubjectNamePaged: 'Search by Subject Name',
-        bySubjectNameCOPaged: 'Filter by Name & CO',
-        bySubjectNameCOLevel: 'Name, CO & Level',
-        generateByCode: 'Generate Paper by Code',
-        generateByName: 'Generate Paper by Name',
-        submitForApproval: 'Submit for Approval',
-        updateEmail: 'Update Email',
-        updatePassword: 'Update Password',
-        deleteById: 'Delete by ID',
-        deleteByBody: 'Delete by Body'
-    };
-    return titles[sectionId] || 'Teacher Dashboard';
-}
+// ==========================================
+// Display Functions
+// ==========================================
 
 // Display question table
 function displayQuestionTable(containerId, responseData, paginationId = null) {
@@ -252,9 +184,17 @@ function displayQuestionTable(containerId, responseData, paginationId = null) {
         return;
     }
 
-    let html = `<table class="data-table"><thead><tr>
-        <th>ID</th><th>Question</th><th>Subject Name</th><th>Subject Code</th><th>CO</th><th>Marks</th><th>Cognitive Level</th>
-    </tr></thead><tbody>`;
+    let html = `<table class="data-table"><thead>
+        <tr>
+            <th>ID</th>
+            <th>Question</th>
+            <th>Subject Name</th>
+            <th>Subject Code</th>
+            <th>CO</th>
+            <th>Marks</th>
+            <th>Cognitive Level</th>
+        </tr>
+    </thead><tbody>`;
 
     list.forEach(q => {
         const questionText = q.questionBody || q.body || '-';
@@ -285,6 +225,79 @@ function displayQuestionTable(containerId, responseData, paginationId = null) {
     if (paginationId) {
         createPaginationControls(paginationId, data, containerId);
     }
+}
+
+// Display paper table for teacher
+function displayPaperTable(containerId, responseData) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const data = extractData(responseData);
+
+    // Handle paginated response
+    const papers = data.content || (Array.isArray(data) ? data : []);
+
+    if (papers.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No question papers found.</div>';
+        return;
+    }
+
+    let html = `<table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Exam Title</th>
+                <th>Subject</th>
+                <th>Total Marks</th>
+                <th>Status</th>
+                <th>Comment</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    papers.forEach(paper => {
+        let totalMarks = paper.totalMarks || '-';
+        if (!paper.totalMarks && paper.listOfQuestion && Array.isArray(paper.listOfQuestion)) {
+            totalMarks = paper.listOfQuestion.reduce((sum, q) => sum + (q.questionMarks || 0), 0);
+        }
+
+        const status = paper.approved ?
+            '<span class="badge-success" style="background-color:#28a745; color:white; padding:4px 8px; border-radius:4px;">Approved</span>' :
+            '<span class="badge-warning" style="background-color:#ffc107; color:#333; padding:4px 8px; border-radius:4px;">Pending</span>';
+
+        let subjectInfo = paper.subjectName || paper.subjectCode || '-';
+        if (!subjectInfo && paper.listOfQuestion && paper.listOfQuestion.length > 0) {
+            subjectInfo = paper.listOfQuestion[0].subjectName || paper.listOfQuestion[0].subjectCode || '-';
+        }
+
+        html += `<tr>
+            <td>${paper.id || '-'}</td>
+            <td><strong>${paper.examTitle || '-'}</strong></td>
+            <td>${subjectInfo}</td>
+            <td>${totalMarks}</td>
+            <td>${status}</td>
+            <td>${paper.comment || '-'}</td>
+            <td>
+                <button onclick="downloadPaperById(${paper.id})" style="background-color:#17a2b8; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+
+    // Add pagination info if available
+    if (data.pageNo !== undefined) {
+        const currentPageNum = data.pageNo + 1;
+        const totalPages = data.totalPages || 1;
+        html += `<div class="pagination-info" style="margin-top: 15px; text-align: center;">
+            Page ${currentPageNum} of ${totalPages} (${data.totalElements || papers.length} total papers)
+        </div>`;
+    }
+
+    container.innerHTML = html;
 }
 
 // Create pagination controls
@@ -397,6 +410,14 @@ function showSuccess(elementId, message) {
     }
 }
 
+// Show info
+function showInfo(elementId, message) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = `<div class="alert alert-info">${message}</div>`;
+    }
+}
+
 // ==========================================
 // Navigation Functions
 // ==========================================
@@ -434,6 +455,8 @@ function showSection(sectionId) {
         generateByCode: 'Generate Paper by Code',
         generateByName: 'Generate Paper by Name',
         submitForApproval: 'Submit for Approval',
+        myQuestionPapers: 'My Question Papers',
+        paperById: 'Download Paper',
         updateEmail: 'Update Email',
         updatePassword: 'Update Password',
         deleteById: 'Delete by ID',
@@ -663,8 +686,9 @@ async function searchBySubjectNameCOLevel() {
         showError('bySubjectNameCOLevelResult', 'Search failed: ' + error.message);
     }
 }
+
 // ==========================================
-// Paper Generation - UPDATED for 2-mark and 4-mark counts
+// Paper Generation Functions
 // ==========================================
 
 // Display generated paper and allow copying IDs
@@ -672,10 +696,8 @@ function displayGeneratedPaper(responseData, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    // extractData works for both unwrapped arrays and wrapped responses
     let data = extractData(responseData);
-    
-    // If it's an array directly (because api.js un-wrapped it)
+
     if (Array.isArray(responseData)) {
         data = responseData;
     }
@@ -685,249 +707,7 @@ function displayGeneratedPaper(responseData, containerId) {
         return;
     }
 
-    // Prepare text for clipboard copy
-    const questionIdsStr = data.map(q => q.id).join(',');
-
-    let html = `
-        <div class="card mt-3" style="border: 2px solid #28a745;">
-            <h3><i class="fas fa-check-circle" style="color:#28a745;"></i> Paper Generated Successfully!</h3>
-            <p><strong>Total Questions:</strong> ${data.length}</p>
-            
-            <div class="generated-ids-container" style="background:#f8f9fa; padding:15px; border-radius:5px; margin:15px 0;">
-                <p style="margin-bottom:10px;"><strong>Generated Question IDs:</strong></p>
-                <code id="${containerId}-ids" style="display:block; word-break:break-all; font-size:1.1em; color:#d63384;">${questionIdsStr}</code>
-                <button onclick="copyToClipboard('${containerId}-ids')" class="btn" style="margin-top:10px; background-color:#17a2b8; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">
-                    <i class="fas fa-copy"></i> Copy IDs to Clipboard
-                </button>
-            </div>
-        </div>
-    `;
-
-    html += `<table class="data-table mt-3"><thead><tr>
-        <th>ID</th><th>Question Text</th><th>Marks</th><th>Cognitive Level</th>
-    </tr></thead><tbody>`;
-
-    data.forEach(q => {
-        const questionText = q.questionBody || q.body || '-';
-        const displayText = questionText.length > 80 ? questionText.substring(0, 80) + '...' : questionText;
-
-        html += `<tr>
-            <td><strong>${q.id || '-'}</strong></td>
-            <td title="${questionText}">${displayText}</td>
-            <td>${q.marks || q.questionMarks || '-'}</td>
-            <td><span class="badge ${getLevelBadgeClass(q.cognitiveLevel)}">${q.cognitiveLevel || '-'}</span></td>
-        </tr>`;
-    });
-
-    html += '</tbody></table>';
-    container.innerHTML = html;
-}
-
-// Global copy to clipboard function
-function copyToClipboard(elementId) {
-    const el = document.getElementById(elementId);
-    if (el) {
-        navigator.clipboard.writeText(el.innerText || el.textContent)
-            .then(() => alert('Question IDs copied to clipboard! Paste them in the "Submit for Approval" tab.'))
-            .catch(err => {
-                console.error('Failed to copy text: ', err);
-                alert('Could not copy automatically. Please select the IDs and copy them manually.');
-            });
-    }
-}
-
-async function generateByCode() {
-    const subjectCode = document.getElementById('genSubjectCode').value;
-    const mappedCOsStr = document.getElementById('genMappedCOs').value;
-
-    // Get number of 2-mark and 4-mark questions
-    const numberOf2Marks = parseInt(document.getElementById('gen2Marks').value) || 0;
-    const numberOf4Marks = parseInt(document.getElementById('gen4Marks').value) || 0;
-
-    // Get the numbers of questions for each cognitive level
-    const numberOfA = parseInt(document.getElementById('genA').value) || 0;
-    const numberOfR = parseInt(document.getElementById('genR').value) || 0;
-    const numberOfU = parseInt(document.getElementById('genU').value) || 0;
-
-    if (!subjectCode || !mappedCOsStr) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    // Validate that we have at least some questions
-    if (numberOf2Marks === 0 && numberOf4Marks === 0) {
-        alert('Please enter at least one question (2-mark or 4-mark)');
-        return;
-    }
-
-    // Validate that the total number of questions by cognitive level is reasonable
-    const totalQuestions = numberOfA + numberOfR + numberOfU;
-    if (totalQuestions === 0) {
-        alert('Please enter at least one question for cognitive levels');
-        return;
-    }
-
-    // Validate that total cognitive level questions match total marks questions
-    const totalMarksQuestions = numberOf2Marks + numberOf4Marks;
-    if (totalQuestions !== totalMarksQuestions) {
-        alert(`Total questions by cognitive level (${totalQuestions}) must equal total questions by marks (${totalMarksQuestions})`);
-        return;
-    }
-
-    const mappedCOs = mappedCOsStr.split(',').map(co => co.trim());
-
-    const data = {
-        subjectCode: subjectCode,
-        mappedCOs: mappedCOs,
-        numberOfCognitiveLevel_A: numberOfA,
-        numberOfCognitiveLevel_R: numberOfR,
-        numberOfCognitiveLevel_U: numberOfU,
-        maxNumberOf2Marks: numberOf2Marks,
-        maxNumberOf4Marks: numberOf4Marks
-    };
-
-    // Log the exact data being sent
-    console.log('Sending paper generation request:');
-    console.log('URL: /api/teacher/generate/question-paper/subjectCode');
-    console.log('Data:', JSON.stringify(data, null, 2));
-
-    try {
-        const resultDiv = document.getElementById('generatedPaper');
-        resultDiv.innerHTML = '<div class="alert alert-info">Generating paper...</div>';
-
-        const response = await TeacherAPI.generateBySubjectCode(data);
-        console.log('Generate response:', response);
-
-        // API returns data directly on success or throws error
-        if (response) {
-            displayGeneratedPaper(response, 'generatedPaper');
-        } else {
-            throw new Error('Unknown error occurred');
-        }
-    } catch (error) {
-        console.error('Error generating paper:', error);
-
-        // Detailed error logging
-        if (error.response) {
-            console.error('Error response data:', error.response.data);
-            console.error('Error response status:', error.response.status);
-            showError('generatedPaper', `Server error: ${error.response.data?.message || error.message}`);
-        } else if (error.request) {
-            console.error('Error request:', error.request);
-            showError('generatedPaper', 'No response from server. Please check your connection.');
-        } else {
-            showError('generatedPaper', 'Request failed: ' + error.message);
-        }
-    }
-}
-
-async function generateByName() {
-    const subjectName = document.getElementById('genSubjectName').value;
-    const mappedCOsStr = document.getElementById('genByNameMappedCOs').value;
-
-    // Get number of 2-mark and 4-mark questions
-    const numberOf2Marks = parseInt(document.getElementById('genByName2Marks').value) || 0;
-    const numberOf4Marks = parseInt(document.getElementById('genByName4Marks').value) || 0;
-
-    // Get the numbers of questions for each cognitive level
-    const numberOfA = parseInt(document.getElementById('genByNameA').value) || 0;
-    const numberOfR = parseInt(document.getElementById('genByNameR').value) || 0;
-    const numberOfU = parseInt(document.getElementById('genByNameU').value) || 0;
-
-    if (!subjectName || !mappedCOsStr) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    // Validate that we have at least some questions
-    if (numberOf2Marks === 0 && numberOf4Marks === 0) {
-        alert('Please enter at least one question (2-mark or 4-mark)');
-        return;
-    }
-
-    // Validate that the total number of questions by cognitive level is reasonable
-    const totalQuestions = numberOfA + numberOfR + numberOfU;
-    if (totalQuestions === 0) {
-        alert('Please enter at least one question for cognitive levels');
-        return;
-    }
-
-    // Validate that total cognitive level questions match total marks questions
-    const totalMarksQuestions = numberOf2Marks + numberOf4Marks;
-    if (totalQuestions !== totalMarksQuestions) {
-        alert(`Total questions by cognitive level (${totalQuestions}) must equal total questions by marks (${totalMarksQuestions})`);
-        return;
-    }
-
-    const mappedCOs = mappedCOsStr.split(',').map(co => co.trim());
-
-    const data = {
-        subjectName: subjectName,
-        mappedCOs: mappedCOs,
-        numberOfCognitiveLevel_A: numberOfA,
-        numberOfCognitiveLevel_R: numberOfR,
-        numberOfCognitiveLevel_U: numberOfU,
-        maxNumberOf2Marks: numberOf2Marks,
-        maxNumberOf4Marks: numberOf4Marks
-    };
-
-    // Log the exact data being sent
-    console.log('Sending paper generation request:');
-    console.log('URL: /api/teacher/generate/question-paper/subjectName');
-    console.log('Data:', JSON.stringify(data, null, 2));
-
-    try {
-        const resultDiv = document.getElementById('generatedPaperByName');
-        resultDiv.innerHTML = '<div class="alert alert-info">Generating paper...</div>';
-
-        const response = await TeacherAPI.generateBySubjectName(data);
-        // API returns data directly on success or throws error
-        if (response) {
-            displayGeneratedPaper(response, 'generatedPaperByName');
-        } else {
-            throw new Error('Unknown error occurred');
-        }
-    } catch (error) {
-        console.error('Error generating paper:', error);
-        // Detailed error logging
-        if (error.response) {
-            console.error('Error response data:', error.response.data);
-            console.error('Error response status:', error.response.status);
-            showError('generatedPaperByName', `Server error: ${error.response.data?.message || error.message}`);
-        } else if (error.request) {
-            console.error('Error request:', error.request);
-            showError('generatedPaperByName', 'No response from server. Please check your connection.');
-        } else {
-            showError('generatedPaperByName', 'Request failed: ' + error.message);
-        }
-    }
-}
-
-// ==========================================
-// Approval Functions
-// ==========================================
-// Display generated paper and allow copying full data
-function displayGeneratedPaper(responseData, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    // extractData works for both unwrapped arrays and wrapped responses
-    let data = extractData(responseData);
-
-    // If it's an array directly (because api.js un-wrapped it)
-    if (Array.isArray(responseData)) {
-        data = responseData;
-    }
-
-    if (!data || !Array.isArray(data) || data.length === 0) {
-        container.innerHTML = '<div class="alert alert-warning">No valid questions generated. Please adjust your criteria.</div>';
-        return;
-    }
-
-    // Prepare text for clipboard copy - FULL DATA in JSON format
     const fullDataStr = JSON.stringify(data, null, 2);
-
-    // Also prepare simple format with IDs only (for backward compatibility)
     const questionIdsStr = data.map(q => q.id).join(',');
 
     let html = `
@@ -942,15 +722,15 @@ function displayGeneratedPaper(responseData, containerId) {
                 </div>
                 <div style="display:flex; gap:10px; margin-bottom:15px;">
                     <button onclick="approveGeneratedPaperExtracted('${containerId}')" class="btn" style="background-color:#28a745; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">
-                        <i class="fas fa-paper-plane"></i> TO approve 
+                        <i class="fas fa-paper-plane"></i> Submit for Approval
                     </button>
                 </div>
                 
-                <p style="margin-bottom:5px;"><strong>Full Data Preview (JSON):</strong></p>
-                <pre id="${containerId}-fulldata" style="display:none;">${fullDataStr.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
-                
                 <p style="margin-bottom:5px;"><strong>Question IDs (comma-separated):</strong></p>
                 <code id="${containerId}-ids" style="display:block; word-break:break-all; font-size:1.1em; color:#d63384;">${questionIdsStr}</code>
+                <button onclick="copyToClipboard('${containerId}-ids')" class="btn" style="margin-top:10px; background-color:#17a2b8; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">
+                    <i class="fas fa-copy"></i> Copy IDs to Clipboard
+                </button>
                 
                 <div id="${containerId}-copyresult" style="margin-top:10px; font-style:italic;"></div>
             </div>
@@ -976,53 +756,135 @@ function displayGeneratedPaper(responseData, containerId) {
 
     html += '</tbody></table>';
     container.innerHTML = html;
-
-    // Store the full data as a data attribute for later use
     container.setAttribute('data-full-data', fullDataStr);
 }
 
-// Global copy functions
-function copyIdsToClipboard(containerId) {
-    const idsElement = document.getElementById(`${containerId}-ids`);
-    if (idsElement) {
-        navigator.clipboard.writeText(idsElement.innerText || idsElement.textContent)
-            .then(() => {
-                const resultDiv = document.getElementById(`${containerId}-copyresult`);
-                if (resultDiv) {
-                    resultDiv.innerHTML = '<span style="color:#28a745;">✓ IDs copied to clipboard!</span>';
-                    setTimeout(() => { resultDiv.innerHTML = ''; }, 3000);
-                }
-            })
+// Copy to clipboard function
+function copyToClipboard(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        navigator.clipboard.writeText(el.innerText || el.textContent)
+            .then(() => alert('Copied to clipboard!'))
             .catch(err => {
                 console.error('Failed to copy text: ', err);
-                alert('Could not copy automatically. Please select the IDs and copy them manually.');
+                alert('Could not copy automatically. Please select and copy manually.');
             });
     }
 }
 
-function copyFullDataToClipboard(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+async function generateByCode() {
+    const subjectCode = document.getElementById('genSubjectCode').value;
+    const mappedCOsStr = document.getElementById('genMappedCOs').value;
+    const numberOf2Marks = parseInt(document.getElementById('gen2Marks').value) || 0;
+    const numberOf4Marks = parseInt(document.getElementById('gen4Marks').value) || 0;
+    const numberOfA = parseInt(document.getElementById('genA').value) || 0;
+    const numberOfR = parseInt(document.getElementById('genR').value) || 0;
+    const numberOfU = parseInt(document.getElementById('genU').value) || 0;
 
-    const fullData = container.getAttribute('data-full-data');
+    if (!subjectCode || !mappedCOsStr) {
+        alert('Please fill in all required fields');
+        return;
+    }
 
-    if (fullData) {
-        navigator.clipboard.writeText(fullData)
-            .then(() => {
-                const resultDiv = document.getElementById(`${containerId}-copyresult`);
-                if (resultDiv) {
-                    resultDiv.innerHTML = '<span style="color:#28a745;">✓ Full question data (JSON) copied to clipboard!</span>';
-                    setTimeout(() => { resultDiv.innerHTML = ''; }, 3000);
-                }
-            })
-            .catch(err => {
-                console.error('Failed to copy text: ', err);
-                alert('Could not copy automatically. Please select the data manually.');
-            });
-    } else {
-        alert('Full data not available');
+    if (numberOf2Marks === 0 && numberOf4Marks === 0) {
+        alert('Please enter at least one question (2-mark or 4-mark)');
+        return;
+    }
+
+    const totalQuestions = numberOfA + numberOfR + numberOfU;
+    const totalMarksQuestions = numberOf2Marks + numberOf4Marks;
+
+    if (totalQuestions !== totalMarksQuestions) {
+        alert(`Total questions by cognitive level (${totalQuestions}) must equal total questions by marks (${totalMarksQuestions})`);
+        return;
+    }
+
+    const mappedCOs = mappedCOsStr.split(',').map(co => co.trim());
+
+    const data = {
+        subjectCode: subjectCode,
+        mappedCOs: mappedCOs,
+        numberOfCognitiveLevel_A: numberOfA,
+        numberOfCognitiveLevel_R: numberOfR,
+        numberOfCognitiveLevel_U: numberOfU,
+        maxNumberOf2Marks: numberOf2Marks,
+        maxNumberOf4Marks: numberOf4Marks
+    };
+
+    try {
+        const resultDiv = document.getElementById('generatedPaper');
+        resultDiv.innerHTML = '<div class="alert alert-info">Generating paper...</div>';
+
+        const response = await TeacherAPI.generateBySubjectCode(data);
+        if (response) {
+            displayGeneratedPaper(response, 'generatedPaper');
+        } else {
+            throw new Error('Unknown error occurred');
+        }
+    } catch (error) {
+        console.error('Error generating paper:', error);
+        showError('generatedPaper', 'Request failed: ' + error.message);
     }
 }
+
+async function generateByName() {
+    const subjectName = document.getElementById('genSubjectName').value;
+    const mappedCOsStr = document.getElementById('genByNameMappedCOs').value;
+    const numberOf2Marks = parseInt(document.getElementById('genByName2Marks').value) || 0;
+    const numberOf4Marks = parseInt(document.getElementById('genByName4Marks').value) || 0;
+    const numberOfA = parseInt(document.getElementById('genByNameA').value) || 0;
+    const numberOfR = parseInt(document.getElementById('genByNameR').value) || 0;
+    const numberOfU = parseInt(document.getElementById('genByNameU').value) || 0;
+
+    if (!subjectName || !mappedCOsStr) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    if (numberOf2Marks === 0 && numberOf4Marks === 0) {
+        alert('Please enter at least one question (2-mark or 4-mark)');
+        return;
+    }
+
+    const totalQuestions = numberOfA + numberOfR + numberOfU;
+    const totalMarksQuestions = numberOf2Marks + numberOf4Marks;
+
+    if (totalQuestions !== totalMarksQuestions) {
+        alert(`Total questions by cognitive level (${totalQuestions}) must equal total questions by marks (${totalMarksQuestions})`);
+        return;
+    }
+
+    const mappedCOs = mappedCOsStr.split(',').map(co => co.trim());
+
+    const data = {
+        subjectName: subjectName,
+        mappedCOs: mappedCOs,
+        numberOfCognitiveLevel_A: numberOfA,
+        numberOfCognitiveLevel_R: numberOfR,
+        numberOfCognitiveLevel_U: numberOfU,
+        maxNumberOf2Marks: numberOf2Marks,
+        maxNumberOf4Marks: numberOf4Marks
+    };
+
+    try {
+        const resultDiv = document.getElementById('generatedPaperByName');
+        resultDiv.innerHTML = '<div class="alert alert-info">Generating paper...</div>';
+
+        const response = await TeacherAPI.generateBySubjectName(data);
+        if (response) {
+            displayGeneratedPaper(response, 'generatedPaperByName');
+        } else {
+            throw new Error('Unknown error occurred');
+        }
+    } catch (error) {
+        console.error('Error generating paper:', error);
+        showError('generatedPaperByName', 'Request failed: ' + error.message);
+    }
+}
+
+// ==========================================
+// Approval Functions
+// ==========================================
 
 async function approveGeneratedPaperExtracted(containerId) {
     const container = document.getElementById(containerId);
@@ -1056,7 +918,7 @@ async function approveGeneratedPaperExtracted(containerId) {
         }
 
         const response = await TeacherAPI.submitForApproval(questions, examTitle);
-        
+
         if (resultDiv) {
             resultDiv.innerHTML = '<span style="color:#28a745;">✅ Paper submitted for approval successfully!</span>';
             setTimeout(() => { resultDiv.innerHTML = ''; }, 5000);
@@ -1066,28 +928,204 @@ async function approveGeneratedPaperExtracted(containerId) {
 
     } catch (error) {
         console.error('Error approving paper:', error);
-        const errorMessage = error.message ? error.message : 'Unknown error';
-        alert('Failed to submit for approval: ' + errorMessage);
-        const resultDiv = document.getElementById(`${containerId}-copyresult`);
-        if (resultDiv) {
-            resultDiv.innerHTML = `<span style="color:#dc3545;">❌ Failed to submit: ${errorMessage}</span>`;
-        }
+        alert('Failed to submit for approval: ' + (error.message || 'Unknown error'));
     }
 }
 
-// Optional: Add a function to format the data nicely for display
-function formatQuestionDataForDisplay(data) {
-    return data.map(q => {
-        return {
-            ID: q.id,
-            Question: (q.questionBody || q.body || '').substring(0, 100) + '...',
-            Subject: `${q.subjectName || ''} (${q.subjectCode || ''})`,
-            CO: q.mappedCO || '',
-            Marks: q.marks || q.questionMarks || '',
-            Level: q.cognitiveLevel || ''
-        };
-    });
+// Clear approval input
+function clearApprovalInput() {
+    document.getElementById('approveQuestionIds').value = '';
+    document.getElementById('approvePaperResult').innerHTML = '';
+    const preview = document.getElementById('approvalPreview');
+    if (preview) preview.style.display = 'none';
 }
+
+// Main submit function
+async function submitForApproval() {
+    const input = document.getElementById('approveQuestionIds').value.trim();
+    if (!input) {
+        showError('approvePaperResult', 'Please enter question IDs or paste question data');
+        return;
+    }
+
+    try {
+        let questions = [];
+
+        if (input.trim().startsWith('[') || input.trim().startsWith('{')) {
+            try {
+                const parsed = JSON.parse(input);
+                questions = Array.isArray(parsed) ? parsed : [parsed];
+                console.log('Parsed JSON data:', questions);
+            } catch (jsonError) {
+                console.log('Not valid JSON, trying comma-separated IDs');
+            }
+        }
+
+        if (questions.length === 0) {
+            const ids = input.split(',')
+                .map(id => id.trim())
+                .filter(id => id !== '')
+                .map(id => parseInt(id))
+                .filter(id => !isNaN(id));
+
+            if (ids.length === 0) {
+                showError('approvePaperResult', 'Please enter valid question IDs or valid JSON data');
+                return;
+            }
+
+            showInfo('approvePaperResult', `Fetching ${ids.length} questions...`);
+
+            for (const id of ids) {
+                try {
+                    const response = await TeacherAPI.getQuestionById(id);
+                    const question = extractData(response);
+                    if (question) {
+                        questions.push(question);
+                    }
+                } catch (error) {
+                    showError('approvePaperResult', `Failed to fetch question ${id}: ${error.message}`);
+                    return;
+                }
+            }
+        }
+
+        if (questions.length === 0) {
+            showError('approvePaperResult', 'No valid questions found');
+            return;
+        }
+
+        const examTitleInput = document.getElementById('approveExamTitle');
+        const examTitle = examTitleInput ? examTitleInput.value.trim() : null;
+
+        if (!examTitle) {
+            showError('approvePaperResult', 'Please enter an Exam Title before approving');
+            return;
+        }
+
+        showInfo('approvePaperResult', `Submitting ${questions.length} questions for approval...`);
+
+        const response = await TeacherAPI.submitForApproval(questions, examTitle);
+
+        showSuccess('approvePaperResult', `✅ Paper submitted successfully! Total Questions: ${questions.length}`);
+        document.getElementById('approveQuestionIds').value = '';
+
+        const preview = document.getElementById('approvalPreview');
+        if (preview) preview.style.display = 'none';
+
+    } catch (error) {
+        console.error('Error submitting for approval:', error);
+        showError('approvePaperResult', 'Failed to submit: ' + error.message);
+    }
+}
+
+// ==========================================
+// My Question Papers - FIXED
+// ==========================================
+
+async function myQuestionPaper() {
+    try {
+        const container = document.getElementById('myQuestionPapersResult');
+        if (container) {
+            container.innerHTML = '<div class="alert alert-info">Loading question papers...</div>';
+        }
+
+        const response = await TeacherAPI.myQuestionPaperPaged();
+        console.log('My question papers response:', response);
+
+        displayPaperTable('myQuestionPapersResult', response);
+
+    } catch (error) {
+        console.error('Error loading my question papers:', error);
+        showError('myQuestionPapersResult', 'Failed to load question papers: ' + error.message);
+    }
+}
+
+// ==========================================
+// Download Functions
+// ==========================================
+
+async function downloadPaperById(paperId) {
+    try {
+        if (!paperId) {
+            showError('myQuestionPapersResult', 'Invalid paper ID');
+            return;
+        }
+
+        showInfo('myQuestionPapersResult', `Downloading paper ${paperId}...`);
+
+        const data = await TeacherAPI.downloadQuestionPaper(paperId);
+
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `question_paper_${paperId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        showSuccess('myQuestionPapersResult', `Paper ${paperId} downloaded successfully!`);
+    } catch (e) {
+        console.error('Download error:', e);
+        showError('myQuestionPapersResult', 'Failed to download paper: ' + e.message);
+    }
+}
+
+async function downloadQuestionPaperT() {
+    try {
+        const id = document.getElementById('paperId').value.trim();
+        if (!id) {
+            showError('paperByIdResult', 'Please enter a paper ID.');
+            return;
+        }
+
+        showInfo('paperByIdResult', 'Downloading paper...');
+
+        const data = await TeacherAPI.downloadQuestionPaper(id);
+
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `question_paper_${id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        showSuccess('paperByIdResult', 'Paper downloaded successfully!');
+    } catch (e) {
+        console.error('Download error:', e);
+        showError('paperByIdResult', 'Failed to download paper: ' + e.message);
+    }
+}
+
+// ==========================================
+// Delete Operations
+// ==========================================
+
+async function deleteById() {
+    const id = document.getElementById('deleteId').value;
+    if (!id) {
+        alert('Please enter question ID');
+        return;
+    }
+
+    if (!confirm('Are you sure you want to delete this question?')) {
+        return;
+    }
+
+    try {
+        await TeacherAPI.deleteQuestionById(parseInt(id));
+        showSuccess('deleteByIdResult', 'Question deleted successfully!');
+        document.getElementById('deleteId').value = '';
+    } catch (error) {
+        console.error('Error deleting question:', error);
+        showError('deleteByIdResult', 'Failed to delete question: ' + error.message);
+    }
+}
+
 // ==========================================
 // Account Management
 // ==========================================
@@ -1100,7 +1138,7 @@ async function updateEmail() {
     }
 
     try {
-        const response = await TeacherAPI.updateUserEmail(newEmail);
+        await TeacherAPI.updateUserEmail(newEmail);
         showSuccess('updateEmailResult', 'Email updated successfully!');
         document.getElementById('newEmail').value = '';
     } catch (error) {
@@ -1124,7 +1162,7 @@ async function updatePassword() {
     }
 
     try {
-        const response = await TeacherAPI.updateUserPassword(newPassword);
+        await TeacherAPI.updateUserPassword(newPassword);
         showSuccess('updatePasswordResult', 'Password updated successfully!');
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
@@ -1135,315 +1173,9 @@ async function updatePassword() {
 }
 
 // ==========================================
-// Approval Functions - ENHANCED VERSION
-// ==========================================
-
-// Clear approval input
-function clearApprovalInput() {
-    document.getElementById('approveQuestionIds').value = '';
-    document.getElementById('approvePaperResult').innerHTML = '';
-    const preview = document.getElementById('approvalPreview');
-    if (preview) preview.style.display = 'none';
-}
-
-// Helper function to show info messages
-function showInfo(elementId, message) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = `<div class="alert alert-info">${message}</div>`;
-    }
-}
-
-// Main submit function
-async function submitForApproval() {
-    const input = document.getElementById('approveQuestionIds').value.trim();
-    if (!input) {
-        showError('approvePaperResult', 'Please enter question IDs or paste question data');
-        return;
-    }
-
-    try {
-        let questions = [];
-
-        // Try to parse as JSON first (for full data)
-        if (input.trim().startsWith('[') || input.trim().startsWith('{')) {
-            try {
-                const parsed = JSON.parse(input);
-                // If it's an array, use it directly
-                if (Array.isArray(parsed)) {
-                    questions = parsed;
-                } else {
-                    // If it's a single object, wrap in array
-                    questions = [parsed];
-                }
-                console.log('Parsed JSON data:', questions);
-            } catch (jsonError) {
-                console.log('Not valid JSON, trying comma-separated IDs');
-                // Not JSON, fall through to ID parsing
-            }
-        }
-
-        // If not JSON, treat as comma-separated IDs
-        if (questions.length === 0) {
-            const ids = input.split(',')
-                .map(id => id.trim())
-                .filter(id => id !== '')
-                .map(id => parseInt(id))
-                .filter(id => !isNaN(id));
-
-            if (ids.length === 0) {
-                showError('approvePaperResult', 'Please enter valid question IDs or valid JSON data');
-                return;
-            }
-
-            // Show loading message
-            showInfo('approvePaperResult', `Fetching ${ids.length} questions...`);
-
-            // Fetch each question by ID
-            for (const id of ids) {
-                try {
-                    const response = await TeacherAPI.getQuestionById(id);
-                    const question = extractData(response);
-                    if (question) {
-                        questions.push(question);
-                    } else {
-                        console.warn(`Question with ID ${id} not found`);
-                    }
-                } catch (error) {
-                    console.error(`Error fetching question ${id}:`, error);
-                    showError('approvePaperResult', `Failed to fetch question ${id}: ${error.message}`);
-                    return;
-                }
-            }
-        }
-
-        // Validate we have questions
-        if (questions.length === 0) {
-            showError('approvePaperResult', 'No valid questions found');
-            return;
-        }
-
-        // Validate each question has required fields
-        const invalidQuestions = questions.filter(q => !q.id || !q.questionBody);
-        if (invalidQuestions.length > 0) {
-            showError('approvePaperResult', `Found ${invalidQuestions.length} invalid question(s). Each question must have an id and questionBody.`);
-            console.error('Invalid questions:', invalidQuestions);
-            return;
-        }
-
-        // Show summary
-        showInfo('approvePaperResult', `Submitting ${questions.length} questions for approval...`);
-
-        // Get exam title
-        const examTitleInput = document.getElementById('approveExamTitle');
-        const examTitle = examTitleInput ? examTitleInput.value.trim() : null;
-
-        if (!examTitle) {
-            showError('approvePaperResult', 'Please enter an Exam Title before approving');
-            return;
-        }
-
-        // Submit for approval
-        const response = await TeacherAPI.submitForApproval(questions, examTitle);
-        console.log('Submit response:', response);
-
-        // Calculate marks distribution
-        const marksSummary = questions.reduce((acc, q) => {
-            const marks = q.marks || q.questionMarks || 0;
-            acc[marks] = (acc[marks] || 0) + 1;
-            return acc;
-        }, {});
-
-        const marksText = Object.entries(marksSummary)
-            .map(([marks, count]) => `${count} × ${marks}-mark`)
-            .join(', ');
-
-        // Calculate cognitive level distribution
-        const levelSummary = questions.reduce((acc, q) => {
-            const level = q.cognitiveLevel || 'Unknown';
-            acc[level] = (acc[level] || 0) + 1;
-            return acc;
-        }, {});
-
-        const levelText = Object.entries(levelSummary)
-            .map(([level, count]) => `${count} × ${level}`)
-            .join(', ');
-
-        showSuccess('approvePaperResult',
-            `✅ Paper submitted successfully!\n` +
-            `Total Questions: ${questions.length}\n` +
-            `Marks Distribution: ${marksText}\n` +
-            `Cognitive Levels: ${levelText}\n` +
-            `Status: Pending Approval`
-        );
-
-        // Clear the input
-        document.getElementById('approveQuestionIds').value = '';
-
-        // Hide preview
-        const preview = document.getElementById('approvalPreview');
-        if (preview) preview.style.display = 'none';
-
-    } catch (error) {
-        console.error('Error submitting for approval:', error);
-
-        // Detailed error message
-        let errorMessage = 'Failed to submit: ';
-        if (error.response) {
-            // Try to get error details from response
-            try {
-                const errorData = await error.response.json();
-                errorMessage += errorData.message || errorData.error || error.message;
-            } catch {
-                errorMessage += error.message;
-            }
-        } else if (error.request) {
-            errorMessage += 'No response from server. Please check your connection.';
-        } else {
-            errorMessage += error.message;
-        }
-
-        showError('approvePaperResult', errorMessage);
-    }
-}
-
-// Setup preview functionality
-function setupApprovalPreview() {
-    const input = document.getElementById('approveQuestionIds');
-    const preview = document.getElementById('approvalPreview');
-    const previewContent = document.getElementById('approvalPreviewContent');
-
-    if (!input || !preview || !previewContent) return;
-
-    let timeout;
-    input.addEventListener('input', function() {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-            const value = this.value.trim();
-            if (!value) {
-                preview.style.display = 'none';
-                return;
-            }
-
-            try {
-                let data;
-                let previewHtml = '';
-
-                // Try JSON first
-                if (value.startsWith('[') || value.startsWith('{')) {
-                    const parsed = JSON.parse(value);
-                    data = Array.isArray(parsed) ? parsed : [parsed];
-
-                    previewHtml = `
-                        <div style="background:#f8f9fa; padding:15px; border-radius:5px;">
-                            <p><strong>✅ Valid JSON Detected</strong></p>
-                            <p>Total Questions: ${data.length}</p>
-                            <p>Questions IDs: ${data.map(q => q.id).join(', ')}</p>
-                            <p>Marks: ${data.map(q => q.marks || q.questionMarks).join(', ')}</p>
-                        </div>
-                    `;
-                } else {
-                    // Try comma-separated IDs
-                    const ids = value.split(',')
-                        .map(id => id.trim())
-                        .filter(id => id && !isNaN(parseInt(id)));
-
-                    if (ids.length > 0) {
-                        previewHtml = `
-                            <div style="background:#f8f9fa; padding:15px; border-radius:5px;">
-                                <p><strong>✅ Valid ID List Detected</strong></p>
-                                <p>Total IDs: ${ids.length}</p>
-                                <p>IDs: ${ids.join(', ')}</p>
-                                <p><small>These will be fetched from the server</small></p>
-                            </div>
-                        `;
-                    } else {
-                        previewHtml = `
-                            <div style="background:#f8d7da; padding:15px; border-radius:5px; color:#721c24;">
-                                <p><strong>❌ Invalid Format</strong></p>
-                                <p>Please enter valid JSON or comma-separated IDs</p>
-                            </div>
-                        `;
-                    }
-                }
-
-                preview.style.display = 'block';
-                previewContent.innerHTML = previewHtml;
-
-            } catch (e) {
-                // Not valid JSON, check if it might be IDs
-                const ids = value.split(',')
-                    .map(id => id.trim())
-                    .filter(id => id && !isNaN(parseInt(id)));
-
-                if (ids.length > 0) {
-                    preview.style.display = 'block';
-                    previewContent.innerHTML = `
-                        <div style="background:#f8f9fa; padding:15px; border-radius:5px;">
-                            <p><strong>✅ Valid ID List Detected</strong></p>
-                            <p>Total IDs: ${ids.length}</p>
-                            <p>IDs: ${ids.join(', ')}</p>
-                            <p><small>These will be fetched from the server</small></p>
-                        </div>
-                    `;
-                } else {
-                    preview.style.display = 'none';
-                }
-            }
-        }, 500); // Debounce for 500ms
-    });
-}
-
-// ==========================================
-// Delete Operations
-// ==========================================
-
-async function deleteById() {
-    const id = document.getElementById('deleteId').value;
-    if (!id) {
-        alert('Please enter question ID');
-        return;
-    }
-
-    if (!confirm('Are you sure you want to delete this question?')) {
-        return;
-    }
-
-    try {
-        const response = await TeacherAPI.deleteQuestionById(parseInt(id));
-        showSuccess('deleteByIdResult', 'Question deleted successfully!');
-        document.getElementById('deleteId').value = '';
-    } catch (error) {
-        console.error('Error deleting question:', error);
-        showError('deleteByIdResult', 'Failed to delete question: ' + error.message);
-    }
-}
-
-async function deleteByBody() {
-    const questionBody = document.getElementById('deleteBody').value;
-    if (!questionBody) {
-        alert('Please enter question text');
-        return;
-    }
-
-    if (!confirm('Are you sure you want to delete this question?')) {
-        return;
-    }
-
-    try {
-        const response = await TeacherAPI.deleteQuestionByBody(questionBody);
-        showSuccess('deleteByBodyResult', 'Question deleted successfully!');
-        document.getElementById('deleteBody').value = '';
-    } catch (error) {
-        console.error('Error deleting question by body:', error);
-        showError('deleteByBodyResult', 'Failed to delete question: ' + error.message);
-    }
-}
-
-// ==========================================
 // Logout
 // ==========================================
-// Logout
+
 async function logout() {
     try {
         await TeacherAPI.logout();
@@ -1455,18 +1187,16 @@ async function logout() {
 }
 
 // ==========================================
-// Theme Toggle
+// Theme Toggle and Initialization
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Check authentication
     const token = localStorage.getItem('jwt_token');
     if (!token) {
         window.location.href = '/login.html';
         return;
     }
 
-    // Theme toggle
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
@@ -1482,11 +1212,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Show default section
+    initializeAddQuestionForm();
     showSection('addQuestion');
 });
 
+// ==========================================
 // Make functions globally available
+// ==========================================
+
 window.showSection = showSection;
 window.toggleSidebar = toggleSidebar;
 window.toggleMobileMenu = toggleMobileMenu;
@@ -1505,13 +1238,12 @@ window.submitForApproval = submitForApproval;
 window.updateEmail = updateEmail;
 window.updatePassword = updatePassword;
 window.deleteById = deleteById;
-window.deleteByBody = deleteByBody;
 window.logout = logout;
 window.copyToClipboard = copyToClipboard;
-window.copyIdsToClipboard = copyIdsToClipboard;
-window.copyFullDataToClipboard = copyFullDataToClipboard;
-window.formatQuestionDataForDisplay = formatQuestionDataForDisplay;
 window.clearApprovalInput = clearApprovalInput;
 window.showInfo = showInfo;
-window.setupApprovalPreview = setupApprovalPreview;
 window.approveGeneratedPaperExtracted = approveGeneratedPaperExtracted;
+window.downloadQuestionPaperT = downloadQuestionPaperT;
+window.myQuestionPaper = myQuestionPaper;
+window.displayPaperTable = displayPaperTable;
+window.downloadPaperById = downloadPaperById;

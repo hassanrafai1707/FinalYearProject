@@ -784,7 +784,7 @@ public class SupervisorRestController {
                                 dto.getComment()
                         )
                 ),
-                "the selected question has been not approved with examTitle:"+dto.getComment(),
+                "the selected question has been not approved with examTitle:"+dto.getExamTitle() ,
                 200
         );
     }
@@ -844,6 +844,7 @@ public class SupervisorRestController {
         headers.add("Content-Disposition","inline; filename=Question-Paper.pdf");
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(new InputStreamResource(file));
     }
+
     @GetMapping("/test")
     public ResponseEntity<?> test(){
         return ResponseEntity.ok(HttpStatus.OK);

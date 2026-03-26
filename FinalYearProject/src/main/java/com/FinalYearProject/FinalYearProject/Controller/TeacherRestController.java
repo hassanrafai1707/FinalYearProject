@@ -9,10 +9,14 @@ import com.FinalYearProject.FinalYearProject.Service.UserService;
 import com.FinalYearProject.FinalYearProject.Util.*;
 import lombok.SneakyThrows;
 import org.apache.coyote.BadRequestException;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -510,6 +514,26 @@ public class TeacherRestController {
         );
     }
 
+    @GetMapping("/my/questionPapers")
+    public ResponseEntity<?> myQuestionPapers(
+            @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
+            @RequestParam(value = "size",defaultValue = "100")int size
+    ){
+        return ResponseUtility.responseTemplateForSingleData(
+                "successful",
+                QuestionPaperDtoUtil.questionPaperToQuestionPaperDtoPaged(
+                        questionPaperService.myQuestionPapers(
+                                pageNo,
+                                size
+                        ),
+                        pageNo,
+                        size
+                ),
+                "ALL my question papers ",
+                200
+        );
+    }
+
     @DeleteMapping("/question/id")
     public ResponseEntity<?> deleteQuestionById(@RequestBody Map<String,Long> request){
         questionService.deleteQuestionById(request.get("id"));
@@ -518,6 +542,15 @@ public class TeacherRestController {
                 "selected question has been deleted",
                 200
         );
+    }
+
+    @GetMapping("/download/questionsPapers/id")
+    public ResponseEntity<InputStreamResource> downloadQuestionPaper(@RequestParam("id") Long id){
+        ByteArrayInputStream file= questionPaperService.downloadQuestionPaperTeacher(id);
+
+        HttpHeaders headers=new HttpHeaders();
+        headers.add("Content-Disposition","inline; filename=Question-Paper.pdf");
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(new InputStreamResource(file));
     }
 
     @PatchMapping("/update/user/email")
