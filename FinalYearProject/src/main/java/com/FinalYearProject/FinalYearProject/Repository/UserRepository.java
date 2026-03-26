@@ -49,7 +49,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     void updateIsEnableLockedExpiredToTrue(@Param("email")String email);
     @Transactional
     @Modifying
-    @Query("DELETE User u WHERE u.Id IN:Ids")
+    @Query("DELETE User u WHERE u.id IN :ids")
     void deleteUserInBatchById(@Param("ids") List<Long> Ids);
     @Transactional
     @Modifying
