@@ -702,6 +702,7 @@
         </div>
 
         <!-- Approve/Reject by ID -->
+        <!-- Approve/Reject by ID -->
         <div id="approveById" class="section">
             <h1>Approve/Reject Paper by ID</h1>
             <div class="card">
@@ -710,19 +711,11 @@
                 </h2>
                 <div class="form-group">
                     <label>Paper ID *</label>
-                    <input
-                            type="text"
-                            id="approvePaperId"
-                            placeholder="Enter paper ID"
-                    />
+                    <input type="text" id="approvePaperId" placeholder="Enter paper ID" />
                 </div>
                 <div class="form-group">
                     <label>Comment</label>
-                    <textarea
-                            id="approveComment"
-                            rows="3"
-                            placeholder="Enter approval/rejection comment..."
-                    ></textarea>
+                    <textarea id="approveComment" rows="3" placeholder="Enter approval/rejection comment..."></textarea>
                 </div>
                 <div class="action-buttons">
                     <button class="approve" onclick="approvePaperById()">
@@ -730,6 +723,9 @@
                     </button>
                     <button class="reject" onclick="rejectPaperById()">
                         <i class="fas fa-times"></i> Reject Paper
+                    </button>
+                    <button onclick="checkPaperForApproval()">
+                        <i class="fas fa-search"></i> Check
                     </button>
                 </div>
                 <div id="approveByIdResult" style="margin-top: 20px"></div>
@@ -741,24 +737,15 @@
             <h1>Approve/Reject Paper by Title</h1>
             <div class="card">
                 <h2>
-                    <i class="fas fa-file-signature"></i> Approve or Reject by Exam
-                    Title
+                    <i class="fas fa-file-signature"></i> Approve or Reject by Exam Title
                 </h2>
                 <div class="form-group">
                     <label>Exam Title *</label>
-                    <input
-                            type="text"
-                            id="approveExamTitle"
-                            placeholder="e.g., Midterm Exam 2024"
-                    />
+                    <input type="text" id="approveExamTitle" placeholder="e.g., Midterm Exam 2024" />
                 </div>
                 <div class="form-group">
                     <label>Comment</label>
-                    <textarea
-                            id="approveTitleComment"
-                            rows="3"
-                            placeholder="Enter approval/rejection comment..."
-                    ></textarea>
+                    <textarea id="approveTitleComment" rows="3" placeholder="Enter approval/rejection comment..."></textarea>
                 </div>
                 <div class="action-buttons">
                     <button class="approve" onclick="approvePaperByTitle()">
@@ -766,6 +753,9 @@
                     </button>
                     <button class="reject" onclick="rejectPaperByTitle()">
                         <i class="fas fa-times"></i> Reject by Title
+                    </button>
+                    <button onclick="checkPaperByTitle()">
+                        <i class="fas fa-search"></i> Check
                     </button>
                 </div>
                 <div id="approveByTitleResult" style="margin-top: 20px"></div>

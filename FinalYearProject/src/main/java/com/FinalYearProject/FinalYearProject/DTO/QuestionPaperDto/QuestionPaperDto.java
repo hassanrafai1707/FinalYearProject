@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.DTO.QuestionPaperDto;
 
 import com.FinalYearProject.FinalYearProject.DTO.QuestionDto.QuestionDTO;
+import com.FinalYearProject.FinalYearProject.DTO.UserDto.UserDto;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Util.QuestionDtoUtil;
@@ -17,11 +18,11 @@ public class QuestionPaperDto {
 
     private String examTitle;
 
-    private User generatedBy;
+    private UserDto generatedBy;
 
     private Boolean approved;
 
-    private User approvedBy;
+    private UserDto approvedBy;
 
     private String comment;
 
@@ -39,9 +40,9 @@ public class QuestionPaperDto {
     ){
         this.Id=Id;
         this.examTitle=examTitle;
-        this.generatedBy=generatedBy;
+        this.generatedBy=helper(generatedBy);
         this.approved=approved;
-        this.approvedBy=approvedBy;
+        this.approvedBy=helper(approvedBy);
         this.comment=comment;
         this.listOfQuestion= new HashSet<>(//need to changer the type to question dto to send the info to user ( the reason question dto doesn't have question papers so it can be used )
                 QuestionDtoUtil.listOfQuestionToQuestionDto(
@@ -58,12 +59,12 @@ public class QuestionPaperDto {
         this.listOfQuestion = listOfQuestion;
     }
 
-    public User getApprovedBy() {
+    public UserDto getApprovedBy() {
         return approvedBy;
     }
 
     public void setApprovedBy(User approvedBy) {
-        this.approvedBy = approvedBy;
+        this.approvedBy = helper(approvedBy);
     }
 
     public Boolean getApproved() {
@@ -74,12 +75,12 @@ public class QuestionPaperDto {
         this.approved = approved;
     }
 
-    public User getGeneratedBy() {
+    public UserDto getGeneratedBy() {
         return generatedBy;
     }
 
     public void setGeneratedBy(User generatedBy) {
-        this.generatedBy = generatedBy;
+        this.generatedBy = helper(generatedBy);
     }
 
     public String getExamTitle() {
@@ -96,5 +97,20 @@ public class QuestionPaperDto {
 
     public void setId(Long id) {
         Id = id;
+    }
+
+    public static UserDto helper(User user){
+        if (user!=null){
+            return new UserDto(
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getRole(),
+                    user.isIs_enable(),
+                    user.isLocked(),
+                    user.isExpired()
+            );
+        }
+        return new UserDto();
     }
 }

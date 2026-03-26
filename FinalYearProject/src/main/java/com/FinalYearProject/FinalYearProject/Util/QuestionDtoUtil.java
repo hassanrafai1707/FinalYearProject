@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class QuestionDtoUtil {
 
-    private QuestionDtoUtil() {};
+    private QuestionDtoUtil() {}
     public static QuestionDTO QuestionToQuestionDto(Question question){
         return new QuestionDTO(
                 question.getId(),

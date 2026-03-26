@@ -256,7 +256,7 @@ public class QuestionPaperService {
 
     @Transactional
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public QuestionPaper approveQuestionPaperById(Long id){
+    public QuestionPaper approveQuestionPaperById(Long id,String comment){
         QuestionPaper questionPaper=questionPaperRepository
                 .findById(id)
                 .orElseThrow(
@@ -268,6 +268,7 @@ public class QuestionPaperService {
         else {
             questionPaper.setApproved(Boolean.TRUE);
             questionPaper.setApprovedBy(UserUtil.getUserAuthentication().getUser());
+            questionPaper.setComment(comment);
             questionPaperRepository.save(questionPaper);
             return questionPaper;
         }
@@ -275,7 +276,7 @@ public class QuestionPaperService {
 
     @Transactional
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public QuestionPaper notApproveQuestionPaperById(Long id){
+    public QuestionPaper notApproveQuestionPaperById(Long id,String comment){
         QuestionPaper questionPaper=questionPaperRepository
                 .findById(id)
                 .orElseThrow(
@@ -287,6 +288,7 @@ public class QuestionPaperService {
         else {
             questionPaper.setApproved(Boolean.FALSE);
             questionPaper.setApprovedBy(UserUtil.getUserAuthentication().getUser());
+            questionPaper.setComment(comment);
             questionPaperRepository.save(questionPaper);
             return questionPaper;
         }
@@ -294,7 +296,7 @@ public class QuestionPaperService {
 
     @Transactional
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public QuestionPaper approvedQuestionPaperByTile(String examTitle){
+    public QuestionPaper approvedQuestionPaperByTile(String examTitle,String comment){
         QuestionPaper questionPaper = findByExamTitle(examTitle);
         if (questionPaper.getApproved().equals(Boolean.TRUE)){
             return questionPaper;
@@ -302,6 +304,7 @@ public class QuestionPaperService {
         else {
             questionPaper.setApproved(Boolean.TRUE);
             questionPaper.setApprovedBy(UserUtil.getUserAuthentication().getUser());
+            questionPaper.setComment(comment);
             questionPaperRepository.save(questionPaper);
             return questionPaper;
         }
@@ -309,7 +312,7 @@ public class QuestionPaperService {
 
     @Transactional
     @PreAuthorize("hasRole('SUPERVISOR')")
-    public QuestionPaper notApprovedQuestionPaperByTile(String examTitle){
+    public QuestionPaper notApprovedQuestionPaperByTile(String examTitle,String comment){
         QuestionPaper questionPaper = findByExamTitle(examTitle);
         if (questionPaper.getApproved().equals(Boolean.FALSE)){
             return questionPaper;
@@ -317,6 +320,7 @@ public class QuestionPaperService {
         else {
             questionPaper.setApproved(Boolean.FALSE);
             questionPaper.setApprovedBy(UserUtil.getUserAuthentication().getUser());
+            questionPaper.setComment(comment);
             questionPaperRepository.save(questionPaper);
             return questionPaper;
         }

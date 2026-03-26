@@ -737,35 +737,44 @@ const SupervisorAPI = {
         return handleResponse(r);
     },
 
-    approveQuestionPaperById: async (id) => {
+    approveQuestionPaperById: async (id, comment) => {
         const r = await fetch(`${appVersion}/supervisor/questionsPapers/approv/id`, {
-            method: "PATCH", headers: authHeaders(true),
-            body: JSON.stringify({ id: parseInt(id) })
-        });
-        return handleResponse(r);
-    },
-    notApproveQuestionPaperById: async (id) => {
-        const r = await fetch(`${appVersion}/supervisor/questionsPapers/not-approv/id`, {
-            method: "PATCH", headers: authHeaders(true),
-            body: JSON.stringify({ id: parseInt(id) })
-        });
-        return handleResponse(r);
-    },
-    approveQuestionPaperByTitle: async (examTitle) => {
-        const r = await fetch(`${appVersion}/supervisor/questionsPapers/approv/examTitle`, {
-            method: "PATCH", headers: authHeaders(true),
-            body: JSON.stringify({ examTitle })
-        });
-        return handleResponse(r);
-    },
-    notApproveQuestionPaperByTitle: async (examTitle) => {
-        const r = await fetch(`${appVersion}/supervisor/questionsPapers/not-approv/examTitle`, {
-            method: "PATCH", headers: authHeaders(true),
-            body: JSON.stringify({ examTitle })
+            method: "PATCH",
+            headers: authHeaders(true),
+            body: JSON.stringify({ id: parseInt(id), comment: comment || null })
         });
         return handleResponse(r);
     },
 
+    // ✅ FIXED: Accept comment parameter
+    notApproveQuestionPaperById: async (id, comment) => {
+        const r = await fetch(`${appVersion}/supervisor/questionsPapers/not-approv/id`, {
+            method: "PATCH",
+            headers: authHeaders(true),
+            body: JSON.stringify({ id: parseInt(id), comment: comment || null })
+        });
+        return handleResponse(r);
+    },
+
+    // ✅ FIXED: Accept comment parameter
+    approveQuestionPaperByTitle: async (examTitle, comment) => {
+        const r = await fetch(`${appVersion}/supervisor/questionsPapers/approv/examTitle`, {
+            method: "PATCH",
+            headers: authHeaders(true),
+            body: JSON.stringify({ examTitle: examTitle, comment: comment || null })
+        });
+        return handleResponse(r);
+    },
+
+    // ✅ FIXED: Accept comment parameter
+    notApproveQuestionPaperByTitle: async (examTitle, comment) => {
+        const r = await fetch(`${appVersion}/supervisor/questionsPapers/not-approv/examTitle`, {
+            method: "PATCH",
+            headers: authHeaders(true),
+            body: JSON.stringify({ examTitle: examTitle, comment: comment || null })
+        });
+        return handleResponse(r);
+    },
     updateUserEmail: async (email) => {
         const r = await fetch(`${appVersion}/supervisor/update/user/email`, {
             method: "PATCH", headers: authHeaders(true),

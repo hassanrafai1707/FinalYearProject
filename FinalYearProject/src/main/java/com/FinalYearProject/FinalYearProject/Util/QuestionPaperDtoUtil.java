@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 public class QuestionPaperDtoUtil {
-    private QuestionPaperDtoUtil(){};
+    private QuestionPaperDtoUtil(){}
 
     public static QuestionPaperDto questionPaperToQuestionPaperDto(QuestionPaper questionPaper){
         return new QuestionPaperDto(

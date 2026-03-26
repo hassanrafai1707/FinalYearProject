@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Controller;
 
-import com.FinalYearProject.FinalYearProject.Domain.User;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionPaperDto.ExamTitleAndComment;
+import com.FinalYearProject.FinalYearProject.DTO.QuestionPaperDto.IdAndComment;
 import com.FinalYearProject.FinalYearProject.Service.QuestionPaperService;
 import com.FinalYearProject.FinalYearProject.Service.QuestionService;
 import com.FinalYearProject.FinalYearProject.Service.UserService;
@@ -717,64 +718,68 @@ public class SupervisorRestController {
 
     @PatchMapping("/questionsPapers/approv/id")
     public ResponseEntity<?> approveQuestionPaperById(
-            @RequestBody Map<String,Long> request
-    ){
+            @RequestBody IdAndComment dto
+            ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
                         questionPaperService.approveQuestionPaperById(
-                                        request.get("id")
+                                dto.getId(),
+                                dto.getComment()
                         )
                 ),
-                "the selected question has been approved with id:"+request.get("id"),
+                "the selected question has been approved with id:"+dto.getId(),
                 200
         );
     }
 
     @PatchMapping("/questionsPapers/not-approv/id")
     public ResponseEntity<?> notApproveQuestionPaperById(
-            @RequestBody Map<String,Long> request
+            @RequestBody IdAndComment dto
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
                         questionPaperService.notApproveQuestionPaperById(
-                                request.get("id")
+                                dto.getId(),
+                                dto.getComment()
                         )
                 ),
-                "the selected question has been not approved with id:"+request.get("id"),
+                "the selected question has been not approved with id:"+dto.getId(),
                 200
         );
     }
 
     @PatchMapping("/questionsPapers/approv/examTitle")
     public ResponseEntity<?> approvedQuestionPaperByTile(
-            @RequestBody Map<String,String> request
-    ){
+            @RequestBody ExamTitleAndComment dto
+            ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
                         questionPaperService.approvedQuestionPaperByTile(
-                                request.get("examTitle")
+                                dto.getExamTitle(),
+                                dto.getComment()
                         )
                 ),
-                "the selected question has been approved with examTitle:"+request.get("examTitle"),
+                "the selected question has been approved with examTitle:"+dto.getExamTitle(),
                 200
         );
     }
 
     @PatchMapping("/questionsPapers/not-approv/examTitle")
     public ResponseEntity<?> notApprovedQuestionPaperByTile(
-            @RequestBody Map<String,String> request
+            @RequestBody ExamTitleAndComment dto
     ){
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDto(
                         questionPaperService.notApprovedQuestionPaperByTile(
-                                request.get("examTitle")
+                                dto.getExamTitle(),
+                                dto.getComment()
                         )
                 ),
-                "the selected question has been not approved with examTitle:"+request.get("examTitle"),
+                "the selected question has been not approved with examTitle:"+dto.getComment(),
                 200
         );
     }
