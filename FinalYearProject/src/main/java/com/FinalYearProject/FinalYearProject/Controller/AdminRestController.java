@@ -433,9 +433,8 @@ public class AdminRestController {
                 dto.getOriginalEmail(),
                 dto.getPassword()
         );
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new Object(),
                 "the user on all question has been updated " ,
                 200
         );
@@ -450,9 +449,8 @@ public class AdminRestController {
                 dto.getOriginalID(),
                 dto.getPassword()
         );
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new Object(),
                 "the user on all question has been updated ",
                 200
         );
@@ -467,9 +465,8 @@ public class AdminRestController {
                 dto.getOriginalEmail(),
                 dto.getPassword()
         );
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new Object(),
                 "the user on all question has been updated",
                 200
         );
@@ -484,9 +481,8 @@ public class AdminRestController {
                 dto.getOriginalID(),
                 dto.getPassword()
         );
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new Object(),
                 "the user on all question has been updated",
                 200
         );
