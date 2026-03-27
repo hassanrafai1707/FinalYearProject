@@ -1004,9 +1004,12 @@ const TeacherAPI = {
             });
         return handleResponse(r);
     },
-    downloadQuestionPaper: async (id) =>{
-        const r = await fetch(`${appVersion}/teacher/download/questionsPapers/id${buildQueryString({id})}`, { method: "GET", headers: authHeaders() });
-        return handleResponse(r);
+    downloadQuestionPaper: async (id) => {
+        const response = await fetch(`${appVersion}/teacher/download/questionsPapers/id${buildQueryString({id})}`, {
+            method: "GET",
+            headers: authHeaders(true)
+        });
+        return await response.blob();
     },
     // --- User Account Management (PATCH with JSON body) ---
     updateUserEmail: async (email) => {
