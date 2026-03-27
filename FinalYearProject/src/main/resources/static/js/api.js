@@ -721,7 +721,7 @@ const SupervisorAPI = {
         return handleResponse(r);
     },
     downloadQuestionPaper: async (id) => {
-        const response = await fetch(`${appVersion}/teacher/download/questionsPapers/id${buildQueryString({id})}`, {
+        const response = await fetch(`${appVersion}/supervisor/download/questionsPapers/id${buildQueryString({id})}`, {
             method: "GET",
             headers: authHeaders(true)
         });

@@ -536,11 +536,9 @@ async function rejectPaperByTitle() {
         showResult('approveByTitleResult', e.message, true);
     }
 }
-
 // ==========================================
 // Download Paper Function
 // ==========================================
-
 async function downloadQuestionPaperSupervisor() {
     try {
         const id = document.getElementById('paperId').value.trim();
@@ -551,10 +549,16 @@ async function downloadQuestionPaperSupervisor() {
 
         showResult('paperByIdResult', 'Downloading paper...', false);
 
-        const data = await SupervisorAPI.downloadQuestionPaper(id);
+        // Call the API - now correctly using supervisor endpoint
+        const blob = await SupervisorAPI.downloadQuestionPaper(id);
 
-        // Handle the blob response
-        const blob = new Blob([data], { type: 'application/pdf' });
+        // Verify blob has content
+        if (!blob || blob.size === 0) {
+            showResult('paperByIdResult', 'Downloaded file is empty. The paper might not exist.', true);
+            return;
+        }
+
+        // Create download link
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -564,7 +568,7 @@ async function downloadQuestionPaperSupervisor() {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
 
-        showResult('paperByIdResult', 'Paper downloaded successfully!', false);
+        showResult('paperByIdResult', `Paper downloaded successfully! (${(blob.size / 1024).toFixed(2)} KB)`, false);
     } catch (e) {
         console.error('Download error:', e);
         showResult('paperByIdResult', 'Failed to download paper: ' + e.message, true);
