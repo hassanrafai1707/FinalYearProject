@@ -78,10 +78,10 @@ public class SecurityConfig {
                                         .requestMatchers(appVersion+"/supervisor/**").hasAnyAuthority("ROLE_SUPERVISOR","ROLE_ADMIN")
                                         .requestMatchers(
                                                 // All the below paths are permitted with put being authorised
-                                                appVersion+"/login",
                                                 appVersion+"/auth/**",
                                                 "/login",
                                                 "/register",
+                                                "/confirm",
                                                 "/admin-dashboard",
                                                 "/teacher-dashboard",
                                                 "/supervisor-dashboard",

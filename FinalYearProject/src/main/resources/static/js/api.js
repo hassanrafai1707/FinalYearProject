@@ -100,16 +100,52 @@ const AuthAPI = {
         });
         return handleResponse(response);
     },
-
-    // POST /api/v1/auth/confirm?token=xyz&email=user@example.com  body: {otp: 8908}
+// POST /api/v1/auth/confirm?token=xyz&email=user@example.com  body: {otp: 8908}
     confirm: async (token, email, otp) => {
-        const qs = buildQueryString({ token, email });
-        const response = await fetch(`${appVersion}/auth/confirm${qs}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ otp: parseInt(otp) })
-        });
-        return handleResponse(response);
+        // Debug logging
+        console.log('Confirm called with:', { token, email, otp });
+
+        // Validate inputs
+        if (!token) throw new Error('Token is required');
+        if (!email) throw new Error('Email is required');
+        if (!otp) throw new Error('OTP is required');
+
+        // Build the URL correctly
+        const url = `${appVersion}/auth/confirm?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+        console.log('Request URL:', url); // Debug log
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ otp: parseInt(otp) })
+            });
+
+            console.log('Response status:', response.status); // Debug log
+
+            // Handle non-OK responses
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error response body:', text); // Debug log
+
+                let errorMsg;
+                try {
+                    const errJson = JSON.parse(text);
+                    errorMsg = errJson.message || errJson.error || text;
+                } catch (e) {
+                    errorMsg = text || `HTTP ${response.status}: ${response.statusText}`;
+                }
+                throw new Error(errorMsg);
+            }
+
+            const jsonResponse = await response.json();
+            console.log('Success response:', jsonResponse); // Debug log
+            return jsonResponse.data || jsonResponse;
+
+        } catch (error) {
+            console.error('Confirm API error:', error);
+            throw error;
+        }
     }
 };
 

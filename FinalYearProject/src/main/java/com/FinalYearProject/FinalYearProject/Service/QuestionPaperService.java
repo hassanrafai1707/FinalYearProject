@@ -563,7 +563,7 @@ public class QuestionPaperService {
             );
             if (questionPaper.getListOfQuestion().isEmpty()) throw new QuestionNotFoundException("there are not questions in this question paper");
 
-            for (Question question : questionPaper.getListOfQuestion()){
+            for (Question question : questionPaper.getListOfQuestion().stream().sorted(Comparator.comparing(Question::getQuestionMarks)).toList()){
 
                 // ID
                 PdfPCell qId=new PdfPCell(new Phrase(question.getId().toString(),bodyFont));
@@ -692,7 +692,7 @@ public class QuestionPaperService {
             );
             if (questionPaper.getListOfQuestion().isEmpty()) throw new QuestionNotFoundException("there are not questions in this question paper");
 
-            for (Question question : questionPaper.getListOfQuestion()){
+            for (Question question : questionPaper.getListOfQuestion().stream().sorted(Comparator.comparing(Question::getQuestionMarks)).toList()){
 
                 // ID
                 PdfPCell qId=new PdfPCell(new Phrase(question.getId().toString(),bodyFont));
