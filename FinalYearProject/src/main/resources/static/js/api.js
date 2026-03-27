@@ -684,9 +684,12 @@ const SupervisorAPI = {
         const r = await fetch(`${appVersion}/supervisor/questionsPapers/id${buildQueryString({id})}`, { method: "GET", headers: authHeaders() });
         return handleResponse(r);
     },
-    downloadQuestionPaper: async (id) =>{
-        const r = await fetch(`${appVersion}/supervisor/download/questionsPapers/id${buildQueryString({id})}`, { method: "GET", headers: authHeaders() });
-        return handleResponse(r);
+    downloadQuestionPaper: async (id) => {
+        const response = await fetch(`${appVersion}/teacher/download/questionsPapers/id${buildQueryString({id})}`, {
+            method: "GET",
+            headers: authHeaders(true)
+        });
+        return await response.blob();
     },
     findByExamTitle: async (examTitle) => {
         const r = await fetch(`${appVersion}/supervisor/questionsPapers/examTitle${buildQueryString({examTitle})}`, { method: "GET", headers: authHeaders() });
