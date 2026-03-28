@@ -30,7 +30,7 @@ build/
 /.nb-gradle/
 
 ### VS Code ###
-.vscode/
+../.vscode/
 
 # Ignore the target folder in the current directory
 target/
