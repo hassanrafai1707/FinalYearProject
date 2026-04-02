@@ -37,3 +37,8 @@ target/
 
 # Ignore the IDEA settings in the parent directory
 ../.idea/
+
+# Environment files (DO NOT COMMIT)
+.env
+*.env
+**/.env
