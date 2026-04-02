@@ -48,14 +48,12 @@ public class UserPrincipal implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String role = user.getRole();
-        System.out.println("DEBUG: User role from DB -> " + role);
         if (role == null || role.isBlank()) {
             throw new IllegalArgumentException("User role cannot be null or empty");
         }
         if (!role.startsWith("ROLE_")) {
             role = "ROLE_" + role.toUpperCase();
         }
-        System.out.println("DEBUG: Final GrantedAuthority -> " + role);
         return List.of(new SimpleGrantedAuthority(role));
     }
 

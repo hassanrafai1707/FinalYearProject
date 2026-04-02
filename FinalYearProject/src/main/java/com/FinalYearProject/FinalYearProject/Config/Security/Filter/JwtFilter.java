@@ -78,7 +78,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader =request.getHeader("Authorization");//contain auth heder
         String path = request.getServletPath();
-        System.out.println("\n\nincoming path= "+path);//incoming path for debugging
         if (//All allowed paths without auth
                  path.startsWith(appVersion+"/login") ||
                  path.startsWith(appVersion+"/register") ||
@@ -96,9 +95,7 @@ public class JwtFilter extends OncePerRequestFilter {
                  path.startsWith("/images") ||
                  path.startsWith("/webjars") ||
                  path.equals("/")
-        ) {//todo add the admin , student ,supervisor , teacher paths on the if  ka ()
-            System.out.println("path "+path);//for debuging check path
-            System.out.println("🔓 Skipped JwtFilter for path: " + path);//for debugging
+        ) {
             filterChain.doFilter(request, response);
             return;
         }

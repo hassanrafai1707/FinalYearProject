@@ -456,7 +456,6 @@ public class UserService {
                 conformation.getToken(),
                 conformation.getOtp()
         );
-        System.out.println("Debug: "+tempUser.getEmail()+" ");
         return userRepository.save(tempUser);
     }
 }

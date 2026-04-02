@@ -71,11 +71,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth ->
                                 auth
-                                        //TODO remove ROLE_ADMIN from where it does not belong
                                         .requestMatchers(appVersion+"/admin/**").hasAuthority("ROLE_ADMIN")
-                                        .requestMatchers(appVersion+"/student/**").hasAnyAuthority("ROLE_STUDENT","ROLE_ADMIN")
-                                        .requestMatchers(appVersion+"/teacher/**").hasAnyAuthority("ROLE_TEACHER","ROLE_ADMIN")
-                                        .requestMatchers(appVersion+"/supervisor/**").hasAnyAuthority("ROLE_SUPERVISOR","ROLE_ADMIN")
+                                        .requestMatchers(appVersion+"/student/**").hasAnyAuthority("ROLE_STUDENT")
+                                        .requestMatchers(appVersion+"/teacher/**").hasAnyAuthority("ROLE_TEACHER")
+                                        .requestMatchers(appVersion+"/supervisor/**").hasAnyAuthority("ROLE_SUPERVISOR")
                                         .requestMatchers(
                                                 // All the below paths are permitted with put being authorised
                                                 appVersion+"/auth/**",

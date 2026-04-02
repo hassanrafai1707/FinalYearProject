@@ -30,13 +30,15 @@ import java.util.Map;
  */
 @RequestMapping("${app.version}/auth")
 @RestController
-@AllArgsConstructor
 public class AuthRestController {
-    @Autowired
     private final UserService userService;
-    @Autowired
     private final JwtService jwtService;
-//TODO clean from System.out.println in prod
+
+    public AuthRestController(UserService userService,JwtService jwtService){
+        this.userService=userService;
+        this.jwtService=jwtService;
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> processLoginByEmail(@RequestBody DtoForEmailAnd2PasswordsInRequest dto){
         String temp=userService.verifyLoginByEmail(dto.getEmail(), dto.getPassword());
@@ -71,7 +73,6 @@ public class AuthRestController {
     ){
         int otp=request.get("otp");
         try{
-            System.out.println("your account not verified yet before calling userService.verifyTokenAndOTP");
             Boolean ConformToken= userService.verifyTokenAndOTP(email,token,otp);
             return ResponseEntity.ok(
                     Map.of(

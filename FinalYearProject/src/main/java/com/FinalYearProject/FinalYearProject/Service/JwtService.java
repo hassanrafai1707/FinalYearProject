@@ -43,10 +43,6 @@ public class JwtService  {
         SecretKey sk=keyGenerator.generateKey();
         secretKey= Base64.getEncoder().encodeToString(sk.getEncoded());
         this.userRepository=userRepository;
-        System.out.println("========================================");
-        System.out.println("🧩 New Secret Key Generated at Startup:");
-        System.out.println(secretKey);// every user must reLogin after restart
-        System.out.println("========================================");
     }
     catch (NoSuchAlgorithmException e){
         throw new RuntimeException(e);
