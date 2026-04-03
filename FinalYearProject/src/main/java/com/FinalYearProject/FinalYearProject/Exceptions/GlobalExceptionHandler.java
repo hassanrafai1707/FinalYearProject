@@ -126,4 +126,9 @@ public class GlobalExceptionHandler  {
     public ResponseEntity<ErrorResponse> handleDepartmentMissMatchException(DepartmentMissMatchException e,HttpServletRequest request){
         return buildResponse(e,HttpStatus.UNAUTHORIZED,request);
     }
+
+    @ExceptionHandler(ToManyRequests.class)
+    public ResponseEntity<ErrorResponse> handleToManyRequests(ToManyRequests e,HttpServletRequest request){
+        return buildResponse(e,HttpStatus.TOO_MANY_REQUESTS,request);
+    }
 }

@@ -2,14 +2,17 @@ package com.FinalYearProject.FinalYearProject.Config.Security.Filter;
 
 import com.FinalYearProject.FinalYearProject.Service.JwtService;
 import com.FinalYearProject.FinalYearProject.Service.MyUserDetailsServices;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,58 +21,40 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
-
  JWT Authentication Filter for Spring Security
-
  PURPOSE:
-
  Intercepts HTTP requests to validate JWT tokens and establish authentication context.
-
  Extends OncePerRequestFilter to ensure single execution per request.
-
  WORKFLOW:
-
  PUBLIC PATH CHECK: Skips authentication for login, register, static resources, etc.
-
  TOKEN EXTRACTION: Extracts "Bearer <token>" from Authorization header.
-
  TOKEN VALIDATION: Checks token expiration and signature validity.
-
  USER LOADING: Loads UserDetails if token is valid.
-
  AUTH SETUP: Creates UsernamePasswordAuthenticationToken and sets it in SecurityContext.
-
  KEY BEHAVIOR:
-
  Returns 401 UNAUTHORIZED for expired/invalid tokens
-
  Sets authentication in SecurityContextHolder for valid tokens
-
  Continues filter chain for public paths or after authentication setup
-
  Uses ApplicationContext.getBean() for fresh UserDetailsService instance
-
  SECURITY NOTES:
-
  Never validates tokens for public endpoints (performance/security)
-
  Validates both token expiration and signature
-
  Sets WebAuthenticationDetails with request info (IP, session)
-
  Follows Bearer token standard (RFC 6750)
  */
+@Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
     @Autowired
     private ApplicationContext applicationContext;
-    @Autowired
-    private MyUserDetailsServices myUserDetailsServices;
     @Value("${app.version}")
     private String appVersion;
     String token = null;
@@ -105,8 +90,18 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 jwtService.isTokenExpiredOrThrow(token);
             } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Token Expired — Please Login Again");
+                ObjectMapper objectMapper=new ObjectMapper();
+                Map<String,String> error=new HashMap<>();
+
+                error.put("message","Token Expired — Please Login Again or "+e.getMessage());
+                error.put("path",request.getRequestURI());
+                error.put("timestamp", LocalDateTime.now().toString());
+                error.put("status",String.valueOf(HttpStatus.UNAUTHORIZED.value()));
+
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.getWriter().write(objectMapper.writeValueAsString(error));
+
+                logger.warn("Token Expired — Please Login Again or "+e.getMessage(),e);
                 return;
             }
         }

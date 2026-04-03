@@ -828,9 +828,8 @@ public class SupervisorRestController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(){
         userService.logout();
-        return ResponseUtility.responseTemplateForSingleData(
+        return ResponseUtility.responseTemplateForDeletedData(
                 "successful",
-                new Object(),
                 "you have been logout ",
                 200
         );

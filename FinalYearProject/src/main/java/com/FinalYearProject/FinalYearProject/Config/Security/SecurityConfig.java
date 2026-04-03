@@ -1,8 +1,8 @@
 package com.FinalYearProject.FinalYearProject.Config.Security;
 
 import com.FinalYearProject.FinalYearProject.Config.Security.Filter.JwtFilter;
+import com.FinalYearProject.FinalYearProject.Config.Security.Filter.RateLimiterFilter;
 import com.FinalYearProject.FinalYearProject.Service.MyUserDetailsServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,10 +56,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     @Value("${app.version}")
     private String appVersion;
-    @Autowired
-    private JwtFilter jwtFilter;
-    @Autowired
-    private MyUserDetailsServices myUserDetailsServices;
+    private final JwtFilter jwtFilter;
+    private final MyUserDetailsServices myUserDetailsServices;
+    private final RateLimiterFilter rateLimiterFilter;
+
+    public SecurityConfig(JwtFilter jwtFilter, MyUserDetailsServices myUserDetailsServices, RateLimiterFilter rateLimiterFilter) {
+        this.jwtFilter = jwtFilter;
+        this.myUserDetailsServices = myUserDetailsServices;
+        this.rateLimiterFilter = rateLimiterFilter;
+    }
 
     // this Constructor is used to Customize the Security Filter Chain flow
     @Bean
@@ -99,6 +104,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 //this line adds the jwt custom logic class after the previous set of instruction are completed
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(rateLimiterFilter,JwtFilter.class)
                 .build();
     }
     //better practice to use this way
