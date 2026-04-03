@@ -1,101 +1,61 @@
-// teacher-dashboard.js
-
-let currentPage = {
-    myQuestions: 0,
-    allQuestions: 0,
-    subjectCode: 0,
-    subjectName: 0,
-    subjectCodeCO: 0,
-    subjectNameCO: 0
-};
-
 // ==========================================
-// Helper Functions
+// TEACHER DASHBOARD SPECIFIC FUNCTIONS
 // ==========================================
 
-// Extract data from response - FIXED
-function extractData(response) {
-    if (!response) return null;
-    // If response has status and data structure
-    if (response.status === 'successful' && response.data) {
-        return response.data;
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up add question form handler
+    const addForm = document.getElementById('addQuestionForm');
+    if (addForm) {
+        addForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await addNewQuestion();
+        });
     }
-    // If response is already the data
-    return response;
+
+    // Calculate totals for generation forms
+    updateTotalMarks('gen2Marks', 'gen4Marks', 'genTotalMarksDisplay');
+    updateTotalMarks('genByName2Marks', 'genByName4Marks', 'genByNameTotalMarksDisplay');
+});
+
+// Helper function to update total marks display
+function updateTotalMarks(twoMarksId, fourMarksId, displayId) {
+    const twoMarks = document.getElementById(twoMarksId);
+    const fourMarks = document.getElementById(fourMarksId);
+    const display = document.getElementById(displayId);
+
+    if (twoMarks && fourMarks && display) {
+        function update() {
+            const two = parseInt(twoMarks.value) || 0;
+            const four = parseInt(fourMarks.value) || 0;
+            display.textContent = `Total Marks: ${(two * 2) + (four * 4)}`;
+        }
+        twoMarks.addEventListener('input', update);
+        fourMarks.addEventListener('input', update);
+        update();
+    }
 }
 
-// Get badge class based on cognitive level
-function getLevelBadgeClass(level) {
-    switch(level) {
-        case 'REMEMBER': return 'badge-remember';
-        case 'UNDERSTAND': return 'badge-understand';
-        case 'APPLY': return 'badge-apply';
-        default: return 'badge-default';
-    }
-}
+// ====================
+// QUESTION MANAGEMENT
+// ====================
 
-// ==========================================
-// Add Question Form Handler
-// ==========================================
+// Add new question
+async function addNewQuestion() {
+    const subjectCode = document.getElementById('subjectCode').value.trim();
+    const subjectName = document.getElementById('subjectName').value.trim();
+    const questionBody = document.getElementById('questionBody').value.trim();
+    const mappedCO = document.getElementById('mappedCO').value.trim();
+    const cognitiveLevel = document.getElementById('cognitiveLevel').value;
 
-// Function to initialize the add question form
-function initializeAddQuestionForm() {
-    const addQuestionForm = document.getElementById('addQuestionForm');
-    if (!addQuestionForm) {
-        console.warn('Add question form not found');
+    let marks = '';
+    if (document.getElementById('marks2').checked) marks = '2';
+    else if (document.getElementById('marks4').checked) marks = '4';
+
+    if (!subjectCode || !subjectName || !questionBody || !mappedCO || !marks || !cognitiveLevel) {
+        showAlert('Please fill in all required fields', 'error', 'addQuestionResult');
         return;
     }
-
-    // Remove any existing event listeners to prevent duplicates
-    addQuestionForm.removeEventListener('submit', handleAddQuestionSubmit);
-
-    // Add the event listener
-    addQuestionForm.addEventListener('submit', handleAddQuestionSubmit);
-}
-
-async function handleAddQuestionSubmit(e) {
-    e.preventDefault();
-
-    // Get form values with validation
-    const subjectCode = document.getElementById('subjectCode')?.value.trim();
-    const subjectName = document.getElementById('subjectName')?.value.trim();
-    const questionBody = document.getElementById('questionBody')?.value.trim();
-    const mappedCO = document.getElementById('mappedCO')?.value.trim();
-    const marksElement = document.querySelector('input[name="marks"]:checked');
-    const cognitiveLevel = document.getElementById('cognitiveLevel')?.value;
-
-    // Log the raw values for debugging
-    console.log('Raw form values:', {
-        subjectCode,
-        subjectName,
-        questionBody,
-        mappedCO,
-        marksValue: marksElement?.value,
-        marksType: marksElement ? typeof marksElement.value : 'undefined',
-        cognitiveLevel
-    });
-
-    // Validate all required fields
-    if (!subjectCode || !subjectName || !questionBody || !mappedCO || !marksElement || !cognitiveLevel) {
-        showError('addQuestionResult', 'Please fill in all required fields');
-        return;
-    }
-
-    // Convert marks to integer properly
-    const marks = parseInt(marksElement.value, 10);
-
-    // Validate marks value
-    if (isNaN(marks) || (marks !== 2 && marks !== 4)) {
-        showError('addQuestionResult', 'Marks must be exactly 2 or 4');
-        return;
-    }
-
-    // Map cognitive level to expected format (R, U, A)
-    let cognitiveLevelValue = cognitiveLevel;
-    // If the select is showing full words, map them to single letters
-    if (cognitiveLevel === 'Remember') cognitiveLevelValue = 'R';
-    if (cognitiveLevel === 'Understand') cognitiveLevelValue = 'U';
-    if (cognitiveLevel === 'Apply') cognitiveLevelValue = 'A';
 
     const questionData = {
         subjectCode: subjectCode,
@@ -103,988 +63,370 @@ async function handleAddQuestionSubmit(e) {
         questionBody: questionBody,
         mappedCO: mappedCO,
         questionMarks: marks,
-        marks: marks,
-        cognitiveLevel: cognitiveLevelValue
+        cognitiveLevel: cognitiveLevel
     };
 
-    // Log the exact data being sent
-    console.log('Sending question data:', JSON.stringify(questionData, null, 2));
+    try {
+        const result = await TeacherAPI.addQuestion(questionData);
+        showAlert('Question added successfully!', 'success', 'addQuestionResult');
+        document.getElementById('addQuestionForm').reset();
+        document.getElementById('marks4').checked = true;
+    } catch (error) {
+        showAlert('Error adding question: ' + error.message, 'error', 'addQuestionResult');
+    }
+}
+
+// Load my questions with pagination
+async function loadMyQuestionsPaged() {
+    let pageNo = parseInt(document.getElementById('myQuestionsPageNo').value) || 1;
+    const pageSize = parseInt(document.getElementById('myQuestionsPageSize').value) || 20;
 
     try {
-        const resultDiv = document.getElementById('addQuestionResult');
-        if (resultDiv) {
-            resultDiv.innerHTML = '<div class="alert alert-info">Adding question...</div>';
-        }
-
-        const response = await TeacherAPI.addQuestion(questionData);
-        console.log('Add question response:', response);
-
-        if (resultDiv) {
-            resultDiv.innerHTML = '<div class="alert alert-success">Question added successfully!</div>';
-        }
-
-        // Reset form
-        document.getElementById('addQuestionForm').reset();
-        const defaultMarks = document.querySelector('input[name="marks"][value="4"]');
-        if (defaultMarks) {
-            defaultMarks.checked = true;
-        }
-
-        setTimeout(() => {
-            if (resultDiv) {
-                resultDiv.innerHTML = '';
-            }
-        }, 3000);
-
+        const result = await TeacherAPI.getMyQuestionsPaged(pageNo - 1, pageSize);
+        displayPagedQuestions(result, 'myQuestionsPagedResult', 'myQuestionsPagination', pageNo, 'loadMyQuestionsPaged');
     } catch (error) {
-        console.error('Error adding question:', error);
-
-        const resultDiv = document.getElementById('addQuestionResult');
-        if (resultDiv) {
-            let errorMessage = 'Failed to add question: ';
-
-            if (error.message) {
-                errorMessage += error.message;
-            } else {
-                errorMessage += 'Unknown error occurred';
-            }
-
-            resultDiv.innerHTML = `<div class="alert alert-error">${errorMessage}</div>`;
-        }
+        showAlert('Error loading questions: ' + error.message, 'error', 'myQuestionsPagedResult');
     }
 }
 
-// ==========================================
-// Display Functions
-// ==========================================
+// Load all questions with pagination
+async function loadAllQuestionsPaged() {
+    let pageNo = parseInt(document.getElementById('allQuestionsPageNo').value) || 1;
+    const pageSize = parseInt(document.getElementById('allQuestionsPageSize').value) || 20;
 
-// Display question table
-function displayQuestionTable(containerId, responseData, paginationId = null) {
-    const container = document.getElementById(containerId);
-    if (!container) {
-        console.error('Container not found:', containerId);
-        return;
-    }
-
-    const data = extractData(responseData);
-    if (!data) {
-        container.innerHTML = '<div class="alert alert-warning">No data received.</div>';
-        return;
-    }
-
-    // Handle paginated response
-    const list = data.content || (Array.isArray(data) ? data : []);
-
-    if (list.length === 0) {
-        container.innerHTML = '<div class="alert alert-info">No questions found.</div>';
-        if (paginationId) {
-            const paginationDiv = document.getElementById(paginationId);
-            if (paginationDiv) paginationDiv.innerHTML = '';
-        }
-        return;
-    }
-
-    let html = `<table class="data-table"><thead>
-        <tr>
-            <th>ID</th>
-            <th>Question</th>
-            <th>Subject Name</th>
-            <th>Subject Code</th>
-            <th>CO</th>
-            <th>Marks</th>
-            <th>Cognitive Level</th>
-        </tr>
-    </thead><tbody>`;
-
-    list.forEach(q => {
-        const questionText = q.questionBody || q.body || '-';
-        const displayText = questionText.length > 50 ? questionText.substring(0, 50) + '...' : questionText;
-
-        html += `<tr>
-            <td>${q.id || '-'}</td>
-            <td title="${questionText}">${displayText}</td>
-            <td>${q.subjectName || '-'}</td>
-            <td>${q.subjectCode || '-'}</td>
-            <td>${q.mappedCO || '-'}</td>
-            <td>${q.marks || q.questionMarks || '-'}</td>
-            <td><span class="badge ${getLevelBadgeClass(q.cognitiveLevel)}">${q.cognitiveLevel || '-'}</span></td>
-        </tr>`;
-    });
-
-    html += '</tbody></table>';
-
-    // Add pagination info if available
-    if (data.pageNo !== undefined && paginationId) {
-        const currentPageNum = data.pageNo + 1;
-        const totalPages = data.totalPages || 1;
-        html += `<div class="pagination-info">Page ${currentPageNum} of ${totalPages} (${data.totalElements || list.length} total)</div>`;
-    }
-
-    container.innerHTML = html;
-
-    if (paginationId) {
-        createPaginationControls(paginationId, data, containerId);
+    try {
+        const result = await TeacherAPI.getAllQuestionsPaged(pageNo - 1, pageSize);
+        displayPagedQuestions(result, 'allQuestionsPagedResult', 'allQuestionsPagination', pageNo, 'loadAllQuestionsPaged');
+    } catch (error) {
+        showAlert('Error loading questions: ' + error.message, 'error', 'allQuestionsPagedResult');
     }
 }
 
-// Display paper table for teacher
-function displayPaperTable(containerId, responseData) {
+// Find question by ID
+async function findQuestionById() {
+    const id = document.getElementById('questionId').value;
+    if (!id) {
+        showAlert('Please enter a question ID', 'error', 'questionByIdResult');
+        return;
+    }
+
+    try {
+        const question = await TeacherAPI.getQuestionById(id);
+        displaySingleQuestion(question, 'questionByIdResult');
+    } catch (error) {
+        showAlert('Error finding question: ' + error.message, 'error', 'questionByIdResult');
+    }
+}
+
+// Search by subject code with pagination
+async function searchBySubjectCodePaged() {
+    const subjectCode = document.getElementById('subjectCodePaged').value.trim();
+    let pageNo = parseInt(document.getElementById('subjectCodePageNo').value) || 1;
+    const pageSize = parseInt(document.getElementById('subjectCodePageSize').value) || 20;
+
+    if (!subjectCode) {
+        showAlert('Please enter a subject code', 'error', 'bySubjectCodePagedResult');
+        return;
+    }
+
+    try {
+        const result = await TeacherAPI.findBySubjectCodePaged(subjectCode, pageNo - 1, pageSize);
+        displayPagedQuestions(result, 'bySubjectCodePagedResult', 'subjectCodePagination', pageNo, 'searchBySubjectCodePaged');
+    } catch (error) {
+        showAlert('Error searching questions: ' + error.message, 'error', 'bySubjectCodePagedResult');
+    }
+}
+
+// Search by subject code with CO paginated
+async function searchBySubjectCodeCOPaged() {
+    const subjectCode = document.getElementById('subjectCodeCOPaged').value.trim();
+    const mappedCO = document.getElementById('mappedCOPaged').value.trim();
+    let pageNo = parseInt(document.getElementById('subjectCodeCOPageNo').value) || 1;
+    const pageSize = parseInt(document.getElementById('subjectCodeCOPageSize').value) || 20;
+
+    if (!subjectCode || !mappedCO) {
+        showAlert('Please enter subject code and mapped CO', 'error', 'bySubjectCodeCOPagedResult');
+        return;
+    }
+
+    try {
+        const result = await TeacherAPI.findBySubjectCodeMappedCOPaged(subjectCode, mappedCO, pageNo - 1, pageSize);
+        displayPagedQuestions(result, 'bySubjectCodeCOPagedResult', 'subjectCodeCOPagination', pageNo, 'searchBySubjectCodeCOPaged');
+    } catch (error) {
+        showAlert('Error searching questions: ' + error.message, 'error', 'bySubjectCodeCOPagedResult');
+    }
+}
+
+// Search by subject code with CO and level
+async function searchBySubjectCodeCOLevel() {
+    const subjectCode = document.getElementById('subjectCodeCOLevel').value.trim();
+    const mappedCO = document.getElementById('mappedCOLevel').value.trim();
+    const cognitiveLevel = document.getElementById('cognitiveLevelCode').value;
+
+    if (!subjectCode || !mappedCO || !cognitiveLevel) {
+        showAlert('Please enter subject code, mapped CO, and cognitive level', 'error', 'bySubjectCodeCOLevelResult');
+        return;
+    }
+
+    try {
+        const result = await TeacherAPI.findBySubjectCodeMappedCOCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
+        displayQuestionsList(result, 'bySubjectCodeCOLevelResult');
+    } catch (error) {
+        showAlert('Error searching questions: ' + error.message, 'error', 'bySubjectCodeCOLevelResult');
+    }
+}
+
+// Search by subject name paginated
+async function searchBySubjectNamePaged() {
+    const subjectName = document.getElementById('subjectNamePaged').value.trim();
+    let pageNo = parseInt(document.getElementById('subjectNamePageNo').value) || 1;
+    const pageSize = parseInt(document.getElementById('subjectNamePageSize').value) || 20;
+
+    if (!subjectName) {
+        showAlert('Please enter a subject name', 'error', 'bySubjectNamePagedResult');
+        return;
+    }
+
+    try {
+        const result = await TeacherAPI.findBySubjectNamePaged(subjectName, pageNo - 1, pageSize);
+        displayPagedQuestions(result, 'bySubjectNamePagedResult', 'subjectNamePagination', pageNo, 'searchBySubjectNamePaged');
+    } catch (error) {
+        showAlert('Error searching questions: ' + error.message, 'error', 'bySubjectNamePagedResult');
+    }
+}
+
+// Search by subject name with CO paginated
+async function searchBySubjectNameCOPaged() {
+    const subjectName = document.getElementById('subjectNameCOPaged').value.trim();
+    const mappedCO = document.getElementById('mappedCONamePaged').value.trim();
+    let pageNo = parseInt(document.getElementById('subjectNameCOPageNo').value) || 1;
+    const pageSize = parseInt(document.getElementById('subjectNameCOPageSize').value) || 20;
+
+    if (!subjectName || !mappedCO) {
+        showAlert('Please enter subject name and mapped CO', 'error', 'bySubjectNameCOPagedResult');
+        return;
+    }
+
+    try {
+        const result = await TeacherAPI.findBySubjectNameMappedCOPaged(subjectName, mappedCO, pageNo - 1, pageSize);
+        displayPagedQuestions(result, 'bySubjectNameCOPagedResult', 'subjectNameCOPagination', pageNo, 'searchBySubjectNameCOPaged');
+    } catch (error) {
+        showAlert('Error searching questions: ' + error.message, 'error', 'bySubjectNameCOPagedResult');
+    }
+}
+
+// Search by subject name with CO and level
+async function searchBySubjectNameCOLevel() {
+    const subjectName = document.getElementById('subjectNameCOLevel').value.trim();
+    const mappedCO = document.getElementById('mappedCONameLevel').value.trim();
+    const cognitiveLevel = document.getElementById('cognitiveLevelName').value;
+
+    if (!subjectName || !mappedCO || !cognitiveLevel) {
+        showAlert('Please enter subject name, mapped CO, and cognitive level', 'error', 'bySubjectNameCOLevelResult');
+        return;
+    }
+
+    try {
+        const result = await TeacherAPI.findBySubjectNameMappedCOCognitiveLevel(subjectName, mappedCO, cognitiveLevel);
+        displayQuestionsList(result, 'bySubjectNameCOLevelResult');
+    } catch (error) {
+        showAlert('Error searching questions: ' + error.message, 'error', 'bySubjectNameCOLevelResult');
+    }
+}
+
+// ====================
+// PAPER GENERATION
+// ====================
+
+// Generate paper by subject code
+async function generateByCode() {
+    const subjectCode = document.getElementById('genSubjectCode').value.trim();
+    const mappedCOs = document.getElementById('genMappedCOs').value.trim();
+    const twoMarks = parseInt(document.getElementById('gen2Marks').value) || 0;
+    const fourMarks = parseInt(document.getElementById('gen4Marks').value) || 0;
+    const aCount = parseInt(document.getElementById('genA').value) || 0;
+    const rCount = parseInt(document.getElementById('genR').value) || 0;
+    const uCount = parseInt(document.getElementById('genU').value) || 0;
+
+    if (!subjectCode) {
+        showAlert('Please enter a subject code', 'error', 'generatedPaper');
+        return;
+    }
+
+    if (!mappedCOs) {
+        showAlert('Please enter mapped COs (comma-separated)', 'error', 'generatedPaper');
+        return;
+    }
+
+    const cosArray = mappedCOs.split(',').map(co => co.trim()).filter(co => co.length > 0);
+
+    const requestData = {
+        subjectCode: subjectCode,
+        mappedCOs: cosArray,
+        numberOfCognitiveLevel_A: aCount,
+        numberOfCognitiveLevel_R: rCount,
+        numberOfCognitiveLevel_U: uCount,
+        maxNumberOf2Marks: twoMarks,
+        maxNumberOf4Marks: fourMarks
+    };
+
+    try {
+        const result = await TeacherAPI.generateBySubjectCode(requestData);
+
+        if (result && result.length > 0) {
+            const paperData = {
+                questions: result,
+                totalMarks: result.reduce((sum, q) => sum + (parseInt(q.questionMarks) || 0), 0)
+            };
+            displayGeneratedPaper(paperData, 'generatedPaper');
+        } else {
+            showAlert('No questions found matching the criteria', 'error', 'generatedPaper');
+        }
+    } catch (error) {
+        showAlert('Error generating paper: ' + error.message, 'error', 'generatedPaper');
+    }
+}
+
+// Generate paper by subject name
+async function generateByName() {
+    const subjectName = document.getElementById('genSubjectName').value.trim();
+    const mappedCOs = document.getElementById('genByNameMappedCOs').value.trim();
+    const twoMarks = parseInt(document.getElementById('genByName2Marks').value) || 0;
+    const fourMarks = parseInt(document.getElementById('genByName4Marks').value) || 0;
+    const aCount = parseInt(document.getElementById('genByNameA').value) || 0;
+    const rCount = parseInt(document.getElementById('genByNameR').value) || 0;
+    const uCount = parseInt(document.getElementById('genByNameU').value) || 0;
+
+    if (!subjectName) {
+        showAlert('Please enter a subject name', 'error', 'generatedPaperByName');
+        return;
+    }
+
+    if (!mappedCOs) {
+        showAlert('Please enter mapped COs (comma-separated)', 'error', 'generatedPaperByName');
+        return;
+    }
+
+    const cosArray = mappedCOs.split(',').map(co => co.trim()).filter(co => co.length > 0);
+
+    const requestData = {
+        subjectName: subjectName,
+        mappedCOs: cosArray,
+        numberOfCognitiveLevel_A: aCount,
+        numberOfCognitiveLevel_R: rCount,
+        numberOfCognitiveLevel_U: uCount,
+        maxNumberOf2Marks: twoMarks,
+        maxNumberOf4Marks: fourMarks
+    };
+
+    try {
+        const result = await TeacherAPI.generateBySubjectName(requestData);
+
+        if (result && result.length > 0) {
+            const paperData = {
+                questions: result,
+                totalMarks: result.reduce((sum, q) => sum + (parseInt(q.questionMarks) || 0), 0)
+            };
+            displayGeneratedPaper(paperData, 'generatedPaperByName');
+        } else {
+            showAlert('No questions found matching the criteria', 'error', 'generatedPaperByName');
+        }
+    } catch (error) {
+        showAlert('Error generating paper: ' + error.message, 'error', 'generatedPaperByName');
+    }
+}
+
+// ====================
+// QUESTION PAPERS
+// ====================
+
+// Get my question papers
+async function myQuestionPaper() {
+    try {
+        const result = await TeacherAPI.myQuestionPaperPaged();
+        displayQuestionPapers(result, 'myQuestionPapersResult');
+    } catch (error) {
+        showAlert('Error loading papers: ' + error.message, 'error', 'myQuestionPapersResult');
+    }
+}
+
+// Display question papers - Handles paginated response
+function displayQuestionPapers(papers, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const data = extractData(responseData);
+    // Handle paginated response (with content array) or direct array
+    let papersArray = papers;
+    let totalPages = 1;
+    let currentPage = 0;
 
-    // Handle paginated response
-    const papers = data.content || (Array.isArray(data) ? data : []);
+    if (papers && papers.content && Array.isArray(papers.content)) {
+        papersArray = papers.content;
+        totalPages = papers.totalPages || 1;
+        currentPage = (papers.pageNo !== undefined ? papers.pageNo : papers.number || 0) + 1;
+    } else if (papers && Array.isArray(papers)) {
+        papersArray = papers;
+    } else {
+        papersArray = [];
+    }
 
-    if (papers.length === 0) {
-        container.innerHTML = '<div class="alert alert-info">No question papers found.</div>';
+    if (!papersArray || papersArray.length === 0) {
+        container.innerHTML = '<div class="alert info">No question papers found.</div>';
         return;
     }
 
-    let html = `<table class="data-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Exam Title</th>
-                <th>Subject</th>
-                <th>Total Marks</th>
-                <th>Status</th>
-                <th>Comment</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>`;
+    let html = '<div class="table-responsive"><table class="data-table">';
+    html += '<thead><tr>';
+    html += '<th>ID</th><th>Exam Title</th><th>Subject Code</th><th>Subject Name</th><th>Status</th><th>Generated By</th><th>Approved By</th><th>Actions</th>';
+    html += '</tr></thead><tbody>';
 
-    papers.forEach(paper => {
-        let totalMarks = paper.totalMarks || '-';
-        if (!paper.totalMarks && paper.listOfQuestion && Array.isArray(paper.listOfQuestion)) {
-            totalMarks = paper.listOfQuestion.reduce((sum, q) => sum + (q.questionMarks || 0), 0);
-        }
-
-        const status = paper.approved ?
-            '<span class="badge-success" style="background-color:#28a745; color:white; padding:4px 8px; border-radius:4px;">Approved</span>' :
-            '<span class="badge-warning" style="background-color:#ffc107; color:#333; padding:4px 8px; border-radius:4px;">Pending</span>';
-
-        let subjectInfo = paper.subjectName || paper.subjectCode || '-';
-        if (!subjectInfo && paper.listOfQuestion && paper.listOfQuestion.length > 0) {
-            subjectInfo = paper.listOfQuestion[0].subjectName || paper.listOfQuestion[0].subjectCode || '-';
-        }
+    papersArray.forEach(paper => {
+        const isApproved = paper.approved === true;
+        const statusText = isApproved ? 'Approved' : 'Pending';
 
         html += `<tr>
-            <td>${paper.id || '-'}</td>
-            <td><strong>${paper.examTitle || '-'}</strong></td>
-            <td>${subjectInfo}</td>
-            <td>${totalMarks}</td>
-            <td>${status}</td>
-            <td>${paper.comment || '-'}</td>
+            <td>${paper.id || 'N/A'}</td>
+            <td><strong>${paper.examTitle || 'Untitled'}</strong></td>
+            <td><code>${paper.subjectCode || 'N/A'}</code></td>
+            <td>${paper.subjectName || 'N/A'}</td>
+            <td class="status-${isApproved ? 'approved' : 'pending'}">${statusText}</td>
+            <td>${paper.generatedBy || paper.createdBy || 'N/A'}</td>
+            <td>${paper.approvedBy || (isApproved ? 'Approved' : 'Pending approval')}</td>
             <td>
-                <button onclick="downloadPaperById(${paper.id})" style="background-color:#17a2b8; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                <button onclick="downloadQuestionPaperById(${paper.id})" class="small-btn" style="background-color: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
                     <i class="fas fa-download"></i> Download
                 </button>
             </td>
         </tr>`;
     });
 
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
 
-    // Add pagination info if available
-    if (data.pageNo !== undefined) {
-        const currentPageNum = data.pageNo + 1;
-        const totalPages = data.totalPages || 1;
+    // Add pagination info if multiple pages
+    if (totalPages > 1) {
         html += `<div class="pagination-info" style="margin-top: 15px; text-align: center;">
-            Page ${currentPageNum} of ${totalPages} (${data.totalElements || papers.length} total papers)
+            Page ${currentPage} of ${totalPages} | Total: ${papers.totalElements || papersArray.length} papers
         </div>`;
-    }
-
-    container.innerHTML = html;
-}
-
-// Create pagination controls
-function createPaginationControls(containerId, pageData, sourceFunction) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    const currentPageNum = (pageData.pageNo !== undefined ? pageData.pageNo : 0) + 1;
-    const totalPages = pageData.totalPages || 1;
-
-    if (totalPages <= 1) {
-        container.innerHTML = '';
-        return;
-    }
-
-    let html = '<div class="pagination-controls">';
-
-    // Previous button
-    html += `<button class="page-btn" onclick="goToPage('${sourceFunction}', ${currentPageNum - 1})" ${currentPageNum === 1 ? 'disabled' : ''}>
-        <i class="fas fa-chevron-left"></i> Prev
-    </button>`;
-
-    // Page numbers
-    const startPage = Math.max(1, currentPageNum - 2);
-    const endPage = Math.min(totalPages, startPage + 4);
-
-    for (let i = startPage; i <= endPage; i++) {
-        html += `<button class="page-btn ${i === currentPageNum ? 'active' : ''}" 
-            onclick="goToPage('${sourceFunction}', ${i})">${i}</button>`;
-    }
-
-    // Next button
-    html += `<button class="page-btn" onclick="goToPage('${sourceFunction}', ${currentPageNum + 1})" ${currentPageNum === totalPages ? 'disabled' : ''}>
-        Next <i class="fas fa-chevron-right"></i>
-    </button>`;
-
-    html += '</div>';
-    container.innerHTML = html;
-}
-
-// Global page navigation function
-window.goToPage = async function(sourceFunction, page) {
-    switch(sourceFunction) {
-        case 'myQuestionsPagedResult':
-            document.getElementById('myQuestionsPageNo').value = page;
-            await loadMyQuestionsPaged();
-            break;
-        case 'allQuestionsPagedResult':
-            document.getElementById('allQuestionsPageNo').value = page;
-            await loadAllQuestionsPaged();
-            break;
-        case 'bySubjectCodePagedResult':
-            document.getElementById('subjectCodePageNo').value = page;
-            await searchBySubjectCodePaged();
-            break;
-        case 'bySubjectCodeCOPagedResult':
-            document.getElementById('subjectCodeCOPageNo').value = page;
-            await searchBySubjectCodeCOPaged();
-            break;
-        case 'bySubjectNamePagedResult':
-            document.getElementById('subjectNamePageNo').value = page;
-            await searchBySubjectNamePaged();
-            break;
-        case 'bySubjectNameCOPagedResult':
-            document.getElementById('subjectNameCOPageNo').value = page;
-            await searchBySubjectNameCOPaged();
-            break;
-    }
-};
-
-// Display single question
-function displayQuestionCard(containerId, responseData) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    const q = extractData(responseData);
-
-    if (!q) {
-        container.innerHTML = '<div class="alert alert-warning">Question not found.</div>';
-        return;
-    }
-
-    container.innerHTML = `
-        <div class="card" style="margin-top:10px;">
-            <h2><i class="fas fa-question-circle"></i> Question #${q.id || '?'}</h2>
-            <p><strong>Question:</strong> ${q.questionBody || q.body || '-'}</p>
-            <p><strong>Subject:</strong> ${q.subjectName || '-'} (${q.subjectCode || '-'})</p>
-            <p><strong>Mapped CO:</strong> ${q.mappedCO || '-'}</p>
-            <p><strong>Marks:</strong> ${q.marks || q.questionMarks || '-'}</p>
-            <p><strong>Cognitive Level:</strong> <span class="badge ${getLevelBadgeClass(q.cognitiveLevel)}">${q.cognitiveLevel || '-'}</span></p>
-        </div>`;
-}
-
-// Show error
-function showError(elementId, message) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = `<div class="alert alert-error">${message}</div>`;
-    }
-}
-
-// Show success
-function showSuccess(elementId, message) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = `<div class="alert alert-success">${message}</div>`;
-        setTimeout(() => {
-            element.innerHTML = '';
-        }, 3000);
-    }
-}
-
-// Show info
-function showInfo(elementId, message) {
-    const element = document.getElementById(elementId);
-    if (element) {
-        element.innerHTML = `<div class="alert alert-info">${message}</div>`;
-    }
-}
-
-// ==========================================
-// Navigation Functions
-// ==========================================
-
-// Show selected section
-function showSection(sectionId) {
-    // Update active section
-    document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-    });
-    const selectedSection = document.getElementById(sectionId);
-    if (selectedSection) {
-        selectedSection.classList.add('active');
-    }
-
-    // Update active menu item
-    document.querySelectorAll('.sidebar ul li a').forEach(link => {
-        link.classList.remove('active');
-    });
-    const activeLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
-    if (activeLink) activeLink.classList.add('active');
-
-    // Update page title
-    const titles = {
-        addQuestion: 'Add Question',
-        myQuestionsPaged: 'My Questions',
-        allQuestionsPaged: 'All Questions',
-        questionById: 'Find Question By ID',
-        bySubjectCodePaged: 'Search by Subject Code',
-        bySubjectCodeCOPaged: 'Filter by Code & CO',
-        bySubjectCodeCOLevel: 'Code, CO & Level',
-        bySubjectNamePaged: 'Search by Subject Name',
-        bySubjectNameCOPaged: 'Filter by Name & CO',
-        bySubjectNameCOLevel: 'Name, CO & Level',
-        generateByCode: 'Generate Paper by Code',
-        generateByName: 'Generate Paper by Name',
-        submitForApproval: 'Submit for Approval',
-        myQuestionPapers: 'My Question Papers',
-        paperById: 'Download Paper',
-        updateEmail: 'Update Email',
-        updatePassword: 'Update Password',
-        deleteById: 'Delete by ID',
-        deleteByBody: 'Delete by Body'
-    };
-    document.getElementById('pageTitle').textContent = titles[sectionId] || 'Teacher Dashboard';
-}
-
-// Toggle sidebar
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('expanded');
-
-    const toggleBtn = document.getElementById('toggleBtn').querySelector('i');
-    if (sidebar.classList.contains('collapsed')) {
-        toggleBtn.classList.remove('fa-chevron-left');
-        toggleBtn.classList.add('fa-chevron-right');
     } else {
-        toggleBtn.classList.remove('fa-chevron-right');
-        toggleBtn.classList.add('fa-chevron-left');
-    }
-}
-
-// Toggle mobile menu
-function toggleMobileMenu() {
-    document.getElementById('sidebar').classList.toggle('show');
-}
-
-// ==========================================
-// Data Loading Functions
-// ==========================================
-
-// Load My Questions Paged
-async function loadMyQuestionsPaged() {
-    try {
-        const pageNo = parseInt(document.getElementById('myQuestionsPageNo').value) - 1;
-        const size = parseInt(document.getElementById('myQuestionsPageSize').value);
-
-        console.log('Loading my questions:', { pageNo, size });
-        const response = await TeacherAPI.getMyQuestionsPaged(pageNo, size);
-        console.log('My questions response:', response);
-
-        displayQuestionTable('myQuestionsPagedResult', response, 'myQuestionsPagination');
-    } catch (error) {
-        console.error('Error loading my questions:', error);
-        showError('myQuestionsPagedResult', 'Failed to load questions: ' + error.message);
-    }
-}
-
-// Load All Questions Paged
-async function loadAllQuestionsPaged() {
-    try {
-        const pageNo = parseInt(document.getElementById('allQuestionsPageNo').value) - 1;
-        const size = parseInt(document.getElementById('allQuestionsPageSize').value);
-
-        console.log('Loading all questions:', { pageNo, size });
-        const response = await TeacherAPI.getAllQuestionsPaged(pageNo, size);
-        console.log('All questions response:', response);
-
-        displayQuestionTable('allQuestionsPagedResult', response, 'allQuestionsPagination');
-    } catch (error) {
-        console.error('Error loading all questions:', error);
-        showError('allQuestionsPagedResult', 'Failed to load questions: ' + error.message);
-    }
-}
-
-// Find Question By ID
-async function findQuestionById() {
-    const id = document.getElementById('questionId').value;
-    if (!id) {
-        showError('questionByIdResult', 'Please enter question ID');
-        return;
+        html += `<div class="pagination-info" style="margin-top: 15px; text-align: center;">
+            Total: ${papersArray.length} papers
+        </div>`;
     }
 
-    try {
-        console.log('Finding question by ID:', id);
-        const response = await TeacherAPI.getQuestionById(id);
-        console.log('Question by ID response:', response);
-
-        displayQuestionCard('questionByIdResult', response);
-    } catch (error) {
-        console.error('Error finding question:', error);
-        showError('questionByIdResult', 'Question not found: ' + error.message);
-    }
-}
-
-// Search by Subject Code Paged
-async function searchBySubjectCodePaged() {
-    const subjectCode = document.getElementById('subjectCodePaged').value;
-    if (!subjectCode) {
-        showError('bySubjectCodePagedResult', 'Please enter subject code');
-        return;
-    }
-
-    try {
-        const pageNo = parseInt(document.getElementById('subjectCodePageNo').value) - 1;
-        const size = parseInt(document.getElementById('subjectCodePageSize').value);
-
-        console.log('Searching by subject code:', { subjectCode, pageNo, size });
-        const response = await TeacherAPI.findBySubjectCodePaged(subjectCode, pageNo, size);
-        console.log('Subject code response:', response);
-
-        displayQuestionTable('bySubjectCodePagedResult', response, 'subjectCodePagination');
-    } catch (error) {
-        console.error('Error searching by subject code:', error);
-        showError('bySubjectCodePagedResult', 'Search failed: ' + error.message);
-    }
-}
-
-// Search by Subject Code + CO Paged
-async function searchBySubjectCodeCOPaged() {
-    const subjectCode = document.getElementById('subjectCodeCOPaged').value;
-    const mappedCO = document.getElementById('mappedCOPaged').value;
-
-    if (!subjectCode || !mappedCO) {
-        showError('bySubjectCodeCOPagedResult', 'Please enter subject code and CO');
-        return;
-    }
-
-    try {
-        const pageNo = parseInt(document.getElementById('subjectCodeCOPageNo').value) - 1;
-        const size = parseInt(document.getElementById('subjectCodeCOPageSize').value);
-
-        console.log('Searching by subject code + CO:', { subjectCode, mappedCO, pageNo, size });
-        const response = await TeacherAPI.findBySubjectCodeMappedCOPaged(subjectCode, mappedCO, pageNo, size);
-        console.log('Subject code + CO response:', response);
-
-        displayQuestionTable('bySubjectCodeCOPagedResult', response, 'subjectCodeCOPagination');
-    } catch (error) {
-        console.error('Error searching by subject code + CO:', error);
-        showError('bySubjectCodeCOPagedResult', 'Search failed: ' + error.message);
-    }
-}
-
-// Search by Subject Code + CO + Cognitive Level
-async function searchBySubjectCodeCOLevel() {
-    const subjectCode = document.getElementById('subjectCodeCOLevel').value;
-    const mappedCO = document.getElementById('mappedCOLevel').value;
-    const cognitiveLevel = document.getElementById('cognitiveLevelCode').value;
-
-    if (!subjectCode || !mappedCO || !cognitiveLevel) {
-        showError('bySubjectCodeCOLevelResult', 'Please fill all fields');
-        return;
-    }
-
-    try {
-        console.log('Searching by subject code + CO + level:', { subjectCode, mappedCO, cognitiveLevel });
-        const response = await TeacherAPI.findBySubjectCodeMappedCOCognitiveLevel(subjectCode, mappedCO, cognitiveLevel);
-        console.log('Subject code + CO + level response:', response);
-
-        displayQuestionTable('bySubjectCodeCOLevelResult', response);
-    } catch (error) {
-        console.error('Error searching by subject code + CO + level:', error);
-        showError('bySubjectCodeCOLevelResult', 'Search failed: ' + error.message);
-    }
-}
-
-// Search by Subject Name Paged
-async function searchBySubjectNamePaged() {
-    const subjectName = document.getElementById('subjectNamePaged').value;
-    if (!subjectName) {
-        showError('bySubjectNamePagedResult', 'Please enter subject name');
-        return;
-    }
-
-    try {
-        const pageNo = parseInt(document.getElementById('subjectNamePageNo').value) - 1;
-        const size = parseInt(document.getElementById('subjectNamePageSize').value);
-
-        console.log('Searching by subject name:', { subjectName, pageNo, size });
-        const response = await TeacherAPI.findBySubjectNamePaged(subjectName, pageNo, size);
-        console.log('Subject name response:', response);
-
-        displayQuestionTable('bySubjectNamePagedResult', response, 'subjectNamePagination');
-    } catch (error) {
-        console.error('Error searching by subject name:', error);
-        showError('bySubjectNamePagedResult', 'Search failed: ' + error.message);
-    }
-}
-
-// Search by Subject Name + CO Paged
-async function searchBySubjectNameCOPaged() {
-    const subjectName = document.getElementById('subjectNameCOPaged').value;
-    const mappedCO = document.getElementById('mappedCONamePaged').value;
-
-    if (!subjectName || !mappedCO) {
-        showError('bySubjectNameCOPagedResult', 'Please enter subject name and CO');
-        return;
-    }
-
-    try {
-        const pageNo = parseInt(document.getElementById('subjectNameCOPageNo').value) - 1;
-        const size = parseInt(document.getElementById('subjectNameCOPageSize').value);
-
-        console.log('Searching by subject name + CO:', { subjectName, mappedCO, pageNo, size });
-        const response = await TeacherAPI.findBySubjectNameMappedCOPaged(subjectName, mappedCO, pageNo, size);
-        console.log('Subject name + CO response:', response);
-
-        displayQuestionTable('bySubjectNameCOPagedResult', response, 'subjectNameCOPagination');
-    } catch (error) {
-        console.error('Error searching by subject name + CO:', error);
-        showError('bySubjectNameCOPagedResult', 'Search failed: ' + error.message);
-    }
-}
-
-// Search by Subject Name + CO + Cognitive Level
-async function searchBySubjectNameCOLevel() {
-    const subjectName = document.getElementById('subjectNameCOLevel').value;
-    const mappedCO = document.getElementById('mappedCONameLevel').value;
-    const cognitiveLevel = document.getElementById('cognitiveLevelName').value;
-
-    if (!subjectName || !mappedCO || !cognitiveLevel) {
-        showError('bySubjectNameCOLevelResult', 'Please fill all fields');
-        return;
-    }
-
-    try {
-        console.log('Searching by subject name + CO + level:', { subjectName, mappedCO, cognitiveLevel });
-        const response = await TeacherAPI.findBySubjectNameMappedCOCognitiveLevel(subjectName, mappedCO, cognitiveLevel);
-        console.log('Subject name + CO + level response:', response);
-
-        displayQuestionTable('bySubjectNameCOLevelResult', response);
-    } catch (error) {
-        console.error('Error searching by subject name + CO + level:', error);
-        showError('bySubjectNameCOLevelResult', 'Search failed: ' + error.message);
-    }
-}
-
-// ==========================================
-// Paper Generation Functions
-// ==========================================
-
-// Display generated paper and allow copying IDs
-function displayGeneratedPaper(responseData, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    let data = extractData(responseData);
-
-    if (Array.isArray(responseData)) {
-        data = responseData;
-    }
-
-    if (!data || !Array.isArray(data) || data.length === 0) {
-        container.innerHTML = '<div class="alert alert-warning">No valid questions generated. Please adjust your criteria.</div>';
-        return;
-    }
-
-    const fullDataStr = JSON.stringify(data, null, 2);
-    const questionIdsStr = data.map(q => q.id).join(',');
-
-    let html = `
-        <div class="card mt-3" style="border: 2px solid #28a745;">
-            <h3><i class="fas fa-check-circle" style="color:#28a745;"></i> Paper Generated Successfully!</h3>
-            <p><strong>Total Questions:</strong> ${data.length}</p>
-            
-            <div class="generated-ids-container" style="background:#f8f9fa; padding:15px; border-radius:5px; margin:15px 0;">
-                <div style="margin-bottom: 15px;">
-                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Exam Title:</label>
-                    <input type="text" id="${containerId}-examTitle" placeholder="Enter Exam Title..." style="width:100%; padding:8px; border-radius:4px; border:1px solid #ccc; max-width:400px;" required />
-                </div>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <button onclick="approveGeneratedPaperExtracted('${containerId}')" class="btn" style="background-color:#28a745; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">
-                        <i class="fas fa-paper-plane"></i> Submit for Approval
-                    </button>
-                </div>
-                
-                <p style="margin-bottom:5px;"><strong>Question IDs (comma-separated):</strong></p>
-                <code id="${containerId}-ids" style="display:block; word-break:break-all; font-size:1.1em; color:#d63384;">${questionIdsStr}</code>
-                <button onclick="copyToClipboard('${containerId}-ids')" class="btn" style="margin-top:10px; background-color:#17a2b8; color:white; border:none; padding:8px 15px; cursor:pointer; border-radius:4px;">
-                    <i class="fas fa-copy"></i> Copy IDs to Clipboard
-                </button>
-                
-                <div id="${containerId}-copyresult" style="margin-top:10px; font-style:italic;"></div>
-            </div>
-        </div>
-    `;
-
-    html += `<table class="data-table mt-3"><thead><tr>
-        <th>ID</th><th>Question Text</th><th>Marks</th><th>Cognitive Level</th><th>CO</th>
-    </tr></thead><tbody>`;
-
-    data.forEach(q => {
-        const questionText = q.questionBody || q.body || '-';
-        const displayText = questionText.length > 60 ? questionText.substring(0, 60) + '...' : questionText;
-
-        html += `<tr>
-            <td><strong>${q.id || '-'}</strong></td>
-            <td title="${questionText.replace(/"/g, '&quot;')}">${displayText}</td>
-            <td>${q.marks || q.questionMarks || '-'}</td>
-            <td><span class="badge ${getLevelBadgeClass(q.cognitiveLevel)}">${q.cognitiveLevel || '-'}</span></td>
-            <td>${q.mappedCO || '-'}</td>
-        </tr>`;
-    });
-
-    html += '</tbody></table>';
     container.innerHTML = html;
-    container.setAttribute('data-full-data', fullDataStr);
 }
 
-// Copy to clipboard function
-function copyToClipboard(elementId) {
-    const el = document.getElementById(elementId);
-    if (el) {
-        navigator.clipboard.writeText(el.innerText || el.textContent)
-            .then(() => alert('Copied to clipboard!'))
-            .catch(err => {
-                console.error('Failed to copy text: ', err);
-                alert('Could not copy automatically. Please select and copy manually.');
-            });
-    }
-}
-
-async function generateByCode() {
-    const subjectCode = document.getElementById('genSubjectCode').value;
-    const mappedCOsStr = document.getElementById('genMappedCOs').value;
-    const numberOf2Marks = parseInt(document.getElementById('gen2Marks').value) || 0;
-    const numberOf4Marks = parseInt(document.getElementById('gen4Marks').value) || 0;
-    const numberOfA = parseInt(document.getElementById('genA').value) || 0;
-    const numberOfR = parseInt(document.getElementById('genR').value) || 0;
-    const numberOfU = parseInt(document.getElementById('genU').value) || 0;
-
-    if (!subjectCode || !mappedCOsStr) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    if (numberOf2Marks === 0 && numberOf4Marks === 0) {
-        alert('Please enter at least one question (2-mark or 4-mark)');
-        return;
-    }
-
-    const totalQuestions = numberOfA + numberOfR + numberOfU;
-    const totalMarksQuestions = numberOf2Marks + numberOf4Marks;
-
-    if (totalQuestions !== totalMarksQuestions) {
-        alert(`Total questions by cognitive level (${totalQuestions}) must equal total questions by marks (${totalMarksQuestions})`);
-        return;
-    }
-
-    const mappedCOs = mappedCOsStr.split(',').map(co => co.trim());
-
-    const data = {
-        subjectCode: subjectCode,
-        mappedCOs: mappedCOs,
-        numberOfCognitiveLevel_A: numberOfA,
-        numberOfCognitiveLevel_R: numberOfR,
-        numberOfCognitiveLevel_U: numberOfU,
-        maxNumberOf2Marks: numberOf2Marks,
-        maxNumberOf4Marks: numberOf4Marks
-    };
-
+// Download question paper by ID (for table button)
+async function downloadQuestionPaperById(id) {
     try {
-        const resultDiv = document.getElementById('generatedPaper');
-        resultDiv.innerHTML = '<div class="alert alert-info">Generating paper...</div>';
-
-        const response = await TeacherAPI.generateBySubjectCode(data);
-        if (response) {
-            displayGeneratedPaper(response, 'generatedPaper');
-        } else {
-            throw new Error('Unknown error occurred');
-        }
-    } catch (error) {
-        console.error('Error generating paper:', error);
-        showError('generatedPaper', 'Request failed: ' + error.message);
-    }
-}
-
-async function generateByName() {
-    const subjectName = document.getElementById('genSubjectName').value;
-    const mappedCOsStr = document.getElementById('genByNameMappedCOs').value;
-    const numberOf2Marks = parseInt(document.getElementById('genByName2Marks').value) || 0;
-    const numberOf4Marks = parseInt(document.getElementById('genByName4Marks').value) || 0;
-    const numberOfA = parseInt(document.getElementById('genByNameA').value) || 0;
-    const numberOfR = parseInt(document.getElementById('genByNameR').value) || 0;
-    const numberOfU = parseInt(document.getElementById('genByNameU').value) || 0;
-
-    if (!subjectName || !mappedCOsStr) {
-        alert('Please fill in all required fields');
-        return;
-    }
-
-    if (numberOf2Marks === 0 && numberOf4Marks === 0) {
-        alert('Please enter at least one question (2-mark or 4-mark)');
-        return;
-    }
-
-    const totalQuestions = numberOfA + numberOfR + numberOfU;
-    const totalMarksQuestions = numberOf2Marks + numberOf4Marks;
-
-    if (totalQuestions !== totalMarksQuestions) {
-        alert(`Total questions by cognitive level (${totalQuestions}) must equal total questions by marks (${totalMarksQuestions})`);
-        return;
-    }
-
-    const mappedCOs = mappedCOsStr.split(',').map(co => co.trim());
-
-    const data = {
-        subjectName: subjectName,
-        mappedCOs: mappedCOs,
-        numberOfCognitiveLevel_A: numberOfA,
-        numberOfCognitiveLevel_R: numberOfR,
-        numberOfCognitiveLevel_U: numberOfU,
-        maxNumberOf2Marks: numberOf2Marks,
-        maxNumberOf4Marks: numberOf4Marks
-    };
-
-    try {
-        const resultDiv = document.getElementById('generatedPaperByName');
-        resultDiv.innerHTML = '<div class="alert alert-info">Generating paper...</div>';
-
-        const response = await TeacherAPI.generateBySubjectName(data);
-        if (response) {
-            displayGeneratedPaper(response, 'generatedPaperByName');
-        } else {
-            throw new Error('Unknown error occurred');
-        }
-    } catch (error) {
-        console.error('Error generating paper:', error);
-        showError('generatedPaperByName', 'Request failed: ' + error.message);
-    }
-}
-
-// ==========================================
-// Approval Functions
-// ==========================================
-
-async function approveGeneratedPaperExtracted(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    const fullDataStr = container.getAttribute('data-full-data');
-    if (!fullDataStr) {
-        alert('Data not available');
-        return;
-    }
-
-    try {
-        const questions = JSON.parse(fullDataStr);
-        if (!questions || questions.length === 0) {
-            alert('No questions found');
-            return;
-        }
-
-        const resultDiv = document.getElementById(`${containerId}-copyresult`);
-        if (resultDiv) {
-            resultDiv.innerHTML = '<span style="color:#17a2b8;">Submitting for approval...</span>';
-        }
-
-        const examTitleInput = document.getElementById(`${containerId}-examTitle`);
-        const examTitle = examTitleInput ? examTitleInput.value.trim() : null;
-
-        if (!examTitle) {
-            alert('Please enter an Exam Title before approving.');
-            if (resultDiv) resultDiv.innerHTML = '';
-            return;
-        }
-
-        const response = await TeacherAPI.submitForApproval(questions, examTitle);
-
-        if (resultDiv) {
-            resultDiv.innerHTML = '<span style="color:#28a745;">✅ Paper submitted for approval successfully!</span>';
-            setTimeout(() => { resultDiv.innerHTML = ''; }, 5000);
-        } else {
-            alert('Paper submitted for approval successfully!');
-        }
-
-    } catch (error) {
-        console.error('Error approving paper:', error);
-        alert('Failed to submit for approval: ' + (error.message || 'Unknown error'));
-    }
-}
-
-// Clear approval input
-function clearApprovalInput() {
-    document.getElementById('approveQuestionIds').value = '';
-    document.getElementById('approvePaperResult').innerHTML = '';
-    const preview = document.getElementById('approvalPreview');
-    if (preview) preview.style.display = 'none';
-}
-
-// Main submit function
-async function submitForApproval() {
-    const input = document.getElementById('approveQuestionIds').value.trim();
-    if (!input) {
-        showError('approvePaperResult', 'Please enter question IDs or paste question data');
-        return;
-    }
-
-    try {
-        let questions = [];
-
-        if (input.trim().startsWith('[') || input.trim().startsWith('{')) {
-            try {
-                const parsed = JSON.parse(input);
-                questions = Array.isArray(parsed) ? parsed : [parsed];
-                console.log('Parsed JSON data:', questions);
-            } catch (jsonError) {
-                console.log('Not valid JSON, trying comma-separated IDs');
-            }
-        }
-
-        if (questions.length === 0) {
-            const ids = input.split(',')
-                .map(id => id.trim())
-                .filter(id => id !== '')
-                .map(id => parseInt(id))
-                .filter(id => !isNaN(id));
-
-            if (ids.length === 0) {
-                showError('approvePaperResult', 'Please enter valid question IDs or valid JSON data');
-                return;
-            }
-
-            showInfo('approvePaperResult', `Fetching ${ids.length} questions...`);
-
-            for (const id of ids) {
-                try {
-                    const response = await TeacherAPI.getQuestionById(id);
-                    const question = extractData(response);
-                    if (question) {
-                        questions.push(question);
-                    }
-                } catch (error) {
-                    showError('approvePaperResult', `Failed to fetch question ${id}: ${error.message}`);
-                    return;
-                }
-            }
-        }
-
-        if (questions.length === 0) {
-            showError('approvePaperResult', 'No valid questions found');
-            return;
-        }
-
-        const examTitleInput = document.getElementById('approveExamTitle');
-        const examTitle = examTitleInput ? examTitleInput.value.trim() : null;
-
-        if (!examTitle) {
-            showError('approvePaperResult', 'Please enter an Exam Title before approving');
-            return;
-        }
-
-        showInfo('approvePaperResult', `Submitting ${questions.length} questions for approval...`);
-
-        const response = await TeacherAPI.submitForApproval(questions, examTitle);
-
-        showSuccess('approvePaperResult', `✅ Paper submitted successfully! Total Questions: ${questions.length}`);
-        document.getElementById('approveQuestionIds').value = '';
-
-        const preview = document.getElementById('approvalPreview');
-        if (preview) preview.style.display = 'none';
-
-    } catch (error) {
-        console.error('Error submitting for approval:', error);
-        showError('approvePaperResult', 'Failed to submit: ' + error.message);
-    }
-}
-
-// ==========================================
-// My Question Papers - FIXED
-// ==========================================
-
-async function myQuestionPaper() {
-    try {
-        const container = document.getElementById('myQuestionPapersResult');
-        if (container) {
-            container.innerHTML = '<div class="alert alert-info">Loading question papers...</div>';
-        }
-
-        const response = await TeacherAPI.myQuestionPaperPaged();
-        console.log('My question papers response:', response);
-
-        displayPaperTable('myQuestionPapersResult', response);
-
-    } catch (error) {
-        console.error('Error loading my question papers:', error);
-        showError('myQuestionPapersResult', 'Failed to load question papers: ' + error.message);
-    }
-}
-
-// ==========================================
-// Download Functions
-// ==========================================
-
-async function downloadPaperById(paperId) {
-    try {
-        if (!paperId) {
-            showError('myQuestionPapersResult', 'Invalid paper ID');
-            return;
-        }
-
-        showInfo('myQuestionPapersResult', `Downloading paper ${paperId}...`);
-
-        const data = await TeacherAPI.downloadQuestionPaper(paperId);
-
-        const blob = new Blob([data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `question_paper_${paperId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-
-        showSuccess('myQuestionPapersResult', `Paper ${paperId} downloaded successfully!`);
-    } catch (e) {
-        console.error('Download error:', e);
-        showError('myQuestionPapersResult', 'Failed to download paper: ' + e.message);
-    }
-}
-
-async function downloadQuestionPaperT() {
-    try {
-        const id = document.getElementById('paperId').value.trim();
         if (!id) {
-            showError('paperByIdResult', 'Please enter a paper ID.');
+            showAlert('Invalid paper ID', 'error', 'myQuestionPapersResult');
             return;
         }
 
-        showInfo('paperByIdResult', 'Downloading paper...');
+        showAlert('Downloading paper...', 'info', 'myQuestionPapersResult');
 
-        const data = await TeacherAPI.downloadQuestionPaper(id);
-
-        const blob = new Blob([data], { type: 'application/pdf' });
+        const blob = await TeacherAPI.downloadQuestionPaper(id);
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -1094,21 +436,84 @@ async function downloadQuestionPaperT() {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
 
-        showSuccess('paperByIdResult', 'Paper downloaded successfully!');
-    } catch (e) {
-        console.error('Download error:', e);
-        showError('paperByIdResult', 'Failed to download paper: ' + e.message);
+        showAlert('Paper downloaded successfully!', 'success', 'myQuestionPapersResult');
+
+        // Auto-clear success message after 3 seconds
+        setTimeout(() => {
+            const resultDiv = document.getElementById('myQuestionPapersResult');
+            if (resultDiv) {
+                const successAlerts = resultDiv.querySelectorAll('.alert.success');
+                successAlerts.forEach(alert => alert.remove());
+            }
+        }, 3000);
+
+    } catch (error) {
+        console.error('Download error:', error);
+        showAlert('Error downloading paper: ' + (error.message || 'Unknown error'), 'error', 'myQuestionPapersResult');
     }
 }
 
-// ==========================================
-// Delete Operations
-// ==========================================
+// Download question paper (from separate form)
+async function downloadQuestionPaper() {
+    const paperId = document.getElementById('paperId').value;
+    if (!paperId) {
+        showAlert('Please enter a paper ID', 'error', 'paperByIdResult');
+        return;
+    }
 
+    try {
+        const blob = await TeacherAPI.downloadQuestionPaper(paperId);
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `question_paper_${paperId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        showAlert('Paper downloaded successfully!', 'success', 'paperByIdResult');
+    } catch (error) {
+        showAlert('Error downloading paper: ' + error.message, 'error', 'paperByIdResult');
+    }
+}
+
+// Submit for approval (from the separate form)
+async function submitForApproval() {
+    const questionIdsText = document.getElementById('approveQuestionIds').value.trim();
+    const examTitle = document.getElementById('approveExamTitle').value.trim();
+
+    if (!questionIdsText || !examTitle) {
+        showAlert('Please enter question IDs and exam title', 'error', 'approvePaperResult');
+        return;
+    }
+
+    const questionIds = questionIdsText.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+
+    if (questionIds.length === 0) {
+        showAlert('Please enter valid question IDs', 'error', 'approvePaperResult');
+        return;
+    }
+
+    try {
+        const questions = await Promise.all(questionIds.map(id => TeacherAPI.getQuestionById(id)));
+        const result = await TeacherAPI.submitForApproval(questions, examTitle);
+        showAlert('Paper submitted for approval successfully!', 'success', 'approvePaperResult');
+        document.getElementById('approveQuestionIds').value = '';
+        document.getElementById('approveExamTitle').value = '';
+    } catch (error) {
+        showAlert('Error submitting for approval: ' + error.message, 'error', 'approvePaperResult');
+    }
+}
+
+// ====================
+// DELETE OPERATIONS
+// ====================
+
+// Delete question by ID
 async function deleteById() {
     const id = document.getElementById('deleteId').value;
     if (!id) {
-        alert('Please enter question ID');
+        showAlert('Please enter a question ID', 'error', 'deleteByIdResult');
         return;
     }
 
@@ -1117,133 +522,422 @@ async function deleteById() {
     }
 
     try {
-        await TeacherAPI.deleteQuestionById(parseInt(id));
-        showSuccess('deleteByIdResult', 'Question deleted successfully!');
+        const result = await TeacherAPI.deleteQuestionById(id);
+        showAlert('Question deleted successfully!', 'success', 'deleteByIdResult');
         document.getElementById('deleteId').value = '';
     } catch (error) {
-        console.error('Error deleting question:', error);
-        showError('deleteByIdResult', 'Failed to delete question: ' + error.message);
+        showAlert('Error deleting question: ' + error.message, 'error', 'deleteByIdResult');
     }
 }
 
-// ==========================================
-// Account Management
-// ==========================================
+// ====================
+// ACCOUNT MANAGEMENT
+// ====================
 
+// Update email
 async function updateEmail() {
-    const newEmail = document.getElementById('newEmail').value;
+    const newEmail = document.getElementById('newEmail').value.trim();
+
     if (!newEmail) {
-        alert('Please enter new email');
+        showAlert('Please enter a new email address', 'error', 'updateEmailResult');
+        return;
+    }
+
+    if (!isValidEmail(newEmail)) {
+        showAlert('Please enter a valid email address', 'error', 'updateEmailResult');
         return;
     }
 
     try {
-        await TeacherAPI.updateUserEmail(newEmail);
-        showSuccess('updateEmailResult', 'Email updated successfully!');
+        const result = await TeacherAPI.updateUserEmail(newEmail);
+        showAlert('Email updated successfully!', 'success', 'updateEmailResult');
         document.getElementById('newEmail').value = '';
     } catch (error) {
-        console.error('Error updating email:', error);
-        showError('updateEmailResult', 'Failed to update email: ' + error.message);
+        showAlert('Error updating email: ' + error.message, 'error', 'updateEmailResult');
     }
 }
 
+// Update password
 async function updatePassword() {
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (!newPassword || !confirmPassword) {
-        alert('Please fill in all fields');
+        showAlert('Please fill in both password fields', 'error', 'updatePasswordResult');
         return;
     }
 
     if (newPassword !== confirmPassword) {
-        alert('Passwords do not match');
+        showAlert('Passwords do not match', 'error', 'updatePasswordResult');
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        showAlert('Password must be at least 6 characters long', 'error', 'updatePasswordResult');
         return;
     }
 
     try {
-        await TeacherAPI.updateUserPassword(newPassword);
-        showSuccess('updatePasswordResult', 'Password updated successfully!');
+        const result = await TeacherAPI.updateUserPassword(newPassword);
+        showAlert('Password updated successfully!', 'success', 'updatePasswordResult');
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
     } catch (error) {
-        console.error('Error updating password:', error);
-        showError('updatePasswordResult', 'Failed to update password: ' + error.message);
+        showAlert('Error updating password: ' + error.message, 'error', 'updatePasswordResult');
     }
 }
 
-// ==========================================
-// Logout
-// ==========================================
+// ====================
+// DISPLAY FUNCTIONS
+// ====================
 
-async function logout() {
-    try {
-        await TeacherAPI.logout();
-    } catch (e) {
-        console.error('Logout error:', e);
-    } finally {
-        AuthAPI.logout();
-    }
-}
+// Display paged questions
+function displayPagedQuestions(result, containerId, paginationId, currentPage, loadFunctionName) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-// ==========================================
-// Theme Toggle and Initialization
-// ==========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    const token = localStorage.getItem('jwt_token');
-    if (!token) {
-        window.location.href = '/login.html';
+    if (!result || !result.content || result.content.length === 0) {
+        container.innerHTML = '<div class="alert info">No questions found.</div>';
+        if (document.getElementById(paginationId)) {
+            document.getElementById(paginationId).innerHTML = '';
+        }
         return;
     }
 
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            const icon = this.querySelector('i');
-            if (document.body.classList.contains('dark-mode')) {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            }
-        });
+    let html = '<div class="table-responsive"><table class="data-table">';
+    html += '<thead><tr>';
+    html += '<th>ID</th><th>Question</th><th>Subject Name</th><th>Subject Code</th><th>CO</th><th>Marks</th><th>Level</th>';
+    html += '</tr></thead><tbody>';
+
+    result.content.forEach(q => {
+        const shortQuestion = q.questionBody.length > 100 ? q.questionBody.substring(0, 100) + '...' : q.questionBody;
+        html += `<tr>
+            <td>${q.id}</td>
+            <td title="${q.questionBody.replace(/"/g, '&quot;')}">${shortQuestion}</td>
+            <td>${q.subjectName}</td>
+            <td><code>${q.subjectCode}</code></td>
+            <td>${q.mappedCO}</td>
+            <td class="mark-${q.questionMarks}">${q.questionMarks} marks</td>
+            <td>${q.cognitiveLevel}</td>
+        </tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    html += `<div class="pagination-info">Page ${result.number + 1} of ${result.totalPages} | Total: ${result.totalElements} questions</div>`;
+
+    container.innerHTML = html;
+
+    if (result.totalPages > 1) {
+        createTeacherPagination(currentPage, result.totalPages, paginationId, loadFunctionName);
+    } else if (document.getElementById(paginationId)) {
+        document.getElementById(paginationId).innerHTML = '';
+    }
+}
+
+// Create pagination for teacher dashboard
+function createTeacherPagination(currentPage, totalPages, containerId, loadFunctionName) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    let html = '<div class="pagination-buttons">';
+
+    if (currentPage > 1) {
+        html += `<button onclick="changeTeacherPage(${currentPage - 1}, '${loadFunctionName}')">&laquo; Previous</button>`;
     }
 
-    initializeAddQuestionForm();
-    showSection('addQuestion');
-});
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
 
-// ==========================================
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button onclick="changeTeacherPage(${i}, '${loadFunctionName}')" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+    }
+
+    if (currentPage < totalPages) {
+        html += `<button onclick="changeTeacherPage(${currentPage + 1}, '${loadFunctionName}')">Next &raquo;</button>`;
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// Change page for teacher dashboard
+function changeTeacherPage(page, loadFunctionName) {
+    if (loadFunctionName === 'loadMyQuestionsPaged') {
+        document.getElementById('myQuestionsPageNo').value = page;
+    } else if (loadFunctionName === 'loadAllQuestionsPaged') {
+        document.getElementById('allQuestionsPageNo').value = page;
+    } else if (loadFunctionName === 'searchBySubjectCodePaged') {
+        document.getElementById('subjectCodePageNo').value = page;
+    } else if (loadFunctionName === 'searchBySubjectCodeCOPaged') {
+        document.getElementById('subjectCodeCOPageNo').value = page;
+    } else if (loadFunctionName === 'searchBySubjectNamePaged') {
+        document.getElementById('subjectNamePageNo').value = page;
+    } else if (loadFunctionName === 'searchBySubjectNameCOPaged') {
+        document.getElementById('subjectNameCOPageNo').value = page;
+    }
+    window[loadFunctionName]();
+}
+
+// Display single question
+function displaySingleQuestion(question, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!question) {
+        container.innerHTML = '<div class="alert info">Question not found.</div>';
+        return;
+    }
+
+    const html = `
+        <div class="question-detail">
+            <h3>Question Details</h3>
+            <table class="detail-table">
+                <tr><th>ID:</th><td>${question.id}</td></tr>
+                <tr><th>Subject Code:</th><td><code>${question.subjectCode}</code></td></tr>
+                <tr><th>Subject Name:</th><td>${question.subjectName}</td></tr>
+                <tr><th>Question:</th><td class="question-body">${question.questionBody}</td></tr>
+                <tr><th>Mapped CO:</th><td>${question.mappedCO}</td></tr>
+                <tr><th>Marks:</th><td class="mark-${question.questionMarks}">${question.questionMarks} marks</td></tr>
+                <tr><th>Cognitive Level:</th><td>${question.cognitiveLevel}</td></tr>
+                ${question.createdBy ? `<tr><th>Created By:</th><td>${question.createdBy}</td></tr>` : ''}
+            </table>
+        </div>
+    `;
+    container.innerHTML = html;
+}
+
+// Display questions list (non-paginated)
+function displayQuestionsList(questions, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!questions || questions.length === 0) {
+        container.innerHTML = '<div class="alert info">No questions found.</div>';
+        return;
+    }
+
+    let html = '<div class="table-responsive"><table class="data-table">';
+    html += '<thead><tr>';
+    html += '<th>ID</th><th>Question</th><th>Subject Name</th><th>Subject Code</th><th>CO</th><th>Marks</th><th>Level</th>';
+    html += '</tr></thead><tbody>';
+
+    questions.forEach(q => {
+        const shortQuestion = q.questionBody.length > 100 ? q.questionBody.substring(0, 100) + '...' : q.questionBody;
+        html += `<tr>
+            <td>${q.id}</td>
+            <td title="${q.questionBody.replace(/"/g, '&quot;')}">${shortQuestion}</td>
+            <td>${q.subjectName}</td>
+            <td><code>${q.subjectCode}</code></td>
+            <td>${q.mappedCO}</td>
+            <td class="mark-${q.questionMarks}">${q.questionMarks} marks</td>
+            <td>${q.cognitiveLevel}</td>
+        </tr>`;
+    });
+
+    html += '</tbody></table></div>';
+    html += `<div class="pagination-info">Total: ${questions.length} questions</div>`;
+    container.innerHTML = html;
+}
+
+// Display generated paper - WITH SUBMIT FOR APPROVAL BUTTON (Dark Mode Compatible)
+function displayGeneratedPaper(paper, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!paper || !paper.questions || paper.questions.length === 0) {
+        container.innerHTML = '<div class="alert warning">No questions found matching the criteria.</div>';
+        return;
+    }
+
+    const questionIds = paper.questions.map(q => q.id).join(',');
+
+    // Check if dark mode is active
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const cardBg = isDarkMode ? '#1e1e1e' : 'white';
+    const headerBg = isDarkMode ? '#2d2d2d' : '#f2f2f2';
+    const summaryBg = isDarkMode ? '#2a2a2a' : '#e9ecef';
+    const borderColor = isDarkMode ? '#444' : '#ddd';
+    const textColor = isDarkMode ? '#e0e0e0' : '#333';
+    const codeBg = isDarkMode ? '#3a3a3a' : '#d4d4d4';
+    const codeColor = isDarkMode ? '#e0e0e0' : '#333';
+
+    let html = `
+        <div class="generated-paper" style="margin-top: 20px; padding: 15px; border: 1px solid ${borderColor}; border-radius: 5px; background: ${cardBg};">
+            <div class="paper-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="margin: 0; color: ${textColor};">
+                    <i class="fas fa-file-alt"></i> Generated Question Paper
+                </h3>
+                <div class="paper-actions" style="display: flex; gap: 10px;">
+                    <button onclick="copyToClipboard('${questionIds}')" class="secondary" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 4px;">
+                        <i class="fas fa-copy"></i> Copy IDs
+                    </button>
+                    <button onclick="showExamTitleModal(${JSON.stringify(paper.questions).replace(/"/g, '&quot;')})" class="success" style="padding: 8px 15px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 4px;">
+                        <i class="fas fa-paper-plane"></i> Submit for Approval
+                    </button>
+                </div>
+            </div>
+            <div class="paper-summary" style="background: ${summaryBg}; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                <p style="margin: 5px 0; color: ${textColor};"><strong>Total Questions:</strong> ${paper.questions.length}</p>
+                <p style="margin: 5px 0; color: ${textColor};"><strong>Total Marks:</strong> ${paper.totalMarks}</p>
+                <p style="margin: 5px 0; color: ${textColor};"><strong>Question IDs:</strong> <code style="background: ${codeBg}; color: ${codeColor}; padding: 2px 5px; border-radius: 3px;">${questionIds}</code></p>
+            </div>
+            <div class="table-responsive" style="overflow-x: auto;">
+                <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid ${borderColor}; padding: 8px; text-align: left; background: ${headerBg}; color: ${textColor};">ID</th>
+                            <th style="border: 1px solid ${borderColor}; padding: 8px; text-align: left; background: ${headerBg}; color: ${textColor};">Question</th>
+                            <th style="border: 1px solid ${borderColor}; padding: 8px; text-align: left; background: ${headerBg}; color: ${textColor};">Subject Name</th>
+                            <th style="border: 1px solid ${borderColor}; padding: 8px; text-align: left; background: ${headerBg}; color: ${textColor};">Subject Code</th>
+                            <th style="border: 1px solid ${borderColor}; padding: 8px; text-align: left; background: ${headerBg}; color: ${textColor};">CO</th>
+                            <th style="border: 1px solid ${borderColor}; padding: 8px; text-align: left; background: ${headerBg}; color: ${textColor};">Marks</th>
+                            <th style="border: 1px solid ${borderColor}; padding: 8px; text-align: left; background: ${headerBg}; color: ${textColor};">Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+
+    paper.questions.forEach(q => {
+        const questionText = q.questionBody ? (q.questionBody.length > 80 ? q.questionBody.substring(0, 80) + '...' : q.questionBody) : 'N/A';
+        html += `
+            <tr>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};"><strong>${q.id || 'N/A'}</strong></td>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};" title="${(q.questionBody || '').replace(/"/g, '&quot;')}">${questionText}</td>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};">${q.subjectName || 'N/A'}</td>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};"><code>${q.subjectCode || 'N/A'}</code></td>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};">${q.mappedCO || 'N/A'}</td>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};" class="mark-${q.questionMarks}">${q.questionMarks || '0'} marks</td>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};">${q.cognitiveLevel || 'N/A'}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    container.innerHTML = html;
+}
+
+// Show modal dialog for exam title instead of prompt
+function showExamTitleModal(questions) {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    `;
+
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    const modalBg = isDarkMode ? '#2d2d2d' : 'white';
+    const textColor = isDarkMode ? '#e0e0e0' : '#333';
+    const borderColor = isDarkMode ? '#555' : '#ddd';
+
+    modal.innerHTML = `
+        <div style="background: ${modalBg}; padding: 25px; border-radius: 8px; width: 400px; max-width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid ${borderColor};">
+            <h3 style="margin-top: 0; color: ${textColor};">
+                <i class="fas fa-paper-plane"></i> Submit for Approval
+            </h3>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: ${textColor}; font-weight: bold;">Exam Title *</label>
+                <input type="text" id="examTitleInput" placeholder="Enter Exam Title" style="width: 100%; padding: 8px; border: 1px solid ${borderColor}; border-radius: 4px; background: ${isDarkMode ? '#1e1e1e' : 'white'}; color: ${textColor};" value="Generated Paper ${new Date().toLocaleDateString()}">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="this.closest('div').parentElement.remove()" style="padding: 8px 15px; cursor: pointer; background: #6c757d; color: white; border: none; border-radius: 4px;">
+                    Cancel
+                </button>
+                <button id="confirmSubmitBtn" style="padding: 8px 15px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 4px;">
+                    Submit
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Focus on input
+    setTimeout(() => {
+        const input = document.getElementById('examTitleInput');
+        if (input) input.focus();
+    }, 100);
+
+    // Handle confirm button click
+    document.getElementById('confirmSubmitBtn').onclick = async () => {
+        const examTitle = document.getElementById('examTitleInput').value.trim();
+        if (!examTitle) {
+            alert('Please enter an exam title');
+            return;
+        }
+        modal.remove();
+        await quickSubmitForApproval(questions, examTitle);
+    };
+
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            modal.remove();
+        }
+    });
+}
+
+// Updated quick submit function with exam title parameter
+async function quickSubmitForApproval(questions, examTitle) {
+    showAlert('Submitting paper for approval...', 'info', null);
+
+    try {
+        const result = await TeacherAPI.submitForApproval(questions, examTitle);
+        showAlert(`Paper "${examTitle}" submitted for approval successfully!`, 'success', null);
+
+        // Find the generated paper div and add success message
+        const generatedPaperDiv = document.querySelector('.generated-paper');
+        if (generatedPaperDiv) {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const successBg = isDarkMode ? '#1a3a1a' : '#d4edda';
+            const successColor = isDarkMode ? '#90ee90' : '#155724';
+
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `background: ${successBg}; color: ${successColor}; padding: 10px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #28a745;`;
+            successDiv.innerHTML = '<i class="fas fa-check-circle"></i> Paper has been submitted for approval!';
+            generatedPaperDiv.insertBefore(successDiv, generatedPaperDiv.firstChild);
+            setTimeout(() => { successDiv.remove(); }, 5000);
+        }
+
+    } catch (error) {
+        console.error('Submission error:', error);
+        showAlert('Error submitting paper for approval: ' + error.message, 'error', null);
+    }
+}
+
+// Helper function to copy to clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showAlert('Question IDs copied to clipboard!', 'success', null);
+    }).catch(() => {
+        showAlert('Failed to copy to clipboard', 'error', null);
+    });
+}
+
+// Clear approval input
+function clearApprovalInput() {
+    document.getElementById('approveQuestionIds').value = '';
+    document.getElementById('approveExamTitle').value = '';
+    showAlert('Form cleared', 'info', 'approvePaperResult');
+    setTimeout(() => {
+        const resultDiv = document.getElementById('approvePaperResult');
+        if (resultDiv) resultDiv.innerHTML = '';
+    }, 2000);
+}
+
 // Make functions globally available
-// ==========================================
-
-window.showSection = showSection;
-window.toggleSidebar = toggleSidebar;
-window.toggleMobileMenu = toggleMobileMenu;
-window.loadMyQuestionsPaged = loadMyQuestionsPaged;
-window.loadAllQuestionsPaged = loadAllQuestionsPaged;
-window.findQuestionById = findQuestionById;
-window.searchBySubjectCodePaged = searchBySubjectCodePaged;
-window.searchBySubjectCodeCOPaged = searchBySubjectCodeCOPaged;
-window.searchBySubjectCodeCOLevel = searchBySubjectCodeCOLevel;
-window.searchBySubjectNamePaged = searchBySubjectNamePaged;
-window.searchBySubjectNameCOPaged = searchBySubjectNameCOPaged;
-window.searchBySubjectNameCOLevel = searchBySubjectNameCOLevel;
-window.generateByCode = generateByCode;
-window.generateByName = generateByName;
-window.submitForApproval = submitForApproval;
-window.updateEmail = updateEmail;
-window.updatePassword = updatePassword;
-window.deleteById = deleteById;
-window.logout = logout;
-window.copyToClipboard = copyToClipboard;
-window.clearApprovalInput = clearApprovalInput;
-window.showInfo = showInfo;
-window.approveGeneratedPaperExtracted = approveGeneratedPaperExtracted;
-window.downloadQuestionPaperT = downloadQuestionPaperT;
-window.myQuestionPaper = myQuestionPaper;
-window.displayPaperTable = displayPaperTable;
-window.downloadPaperById = downloadPaperById;
+window.downloadQuestionPaperById = downloadQuestionPaperById;
+window.displayQuestionPapers = displayQuestionPapers;

@@ -1,14 +1,611 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <title>Redirecting...</title>
-    <script>
-        // Redirect immediately
-        window.location.href = "/login";
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QPGen | Smart Question Paper Generation System</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* dark mode */
+        body.dark {
+            background: #0b1120;
+            color: #e2e8f0;
+        }
+
+        body.dark .card,
+        body.dark .feature-card,
+        body.dark .stat-card,
+        body.dark .endpoint-section,
+        body.dark .footer,
+        body.dark .navbar,
+        body.dark .workflow {
+            background-color: #111827;
+            border-color: #1e293b;
+        }
+
+        body.dark .hero-badge {
+            background: #1e293b;
+            color: #93c5fd;
+        }
+
+        body.dark .tech-badge {
+            background: #1e293b;
+        }
+
+        body.dark .btn-secondary {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* navbar */
+        .navbar {
+            background: white;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #eef2ff;
+        }
+        body.dark .navbar {
+            background: #0f172ad9;
+            backdrop-filter: blur(12px);
+            border-bottom-color: #1e293b;
+        }
+        .nav-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 6px 12px -6px rgba(37,99,235,0.3);
+        }
+        .logo h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        body.dark .logo h1 {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+        }
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #1e293b;
+            transition: 0.2s;
+            padding: 0.4rem 0.8rem;
+        }
+        body.dark .nav-links a {
+            color: #cbd5e1;
+        }
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+        .btn-login {
+            background: transparent;
+            border: 1px solid #2563eb;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #2563eb;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-login:hover {
+            background: #2563eb10;
+        }
+        .btn-register {
+            background: #2563eb;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            transition: 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(37,99,235,0.3);
+        }
+        .btn-register:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+        .theme-toggle-btn {
+            background: #eef2ff;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        body.dark .theme-toggle-btn {
+            background: #1e293b;
+            color: #facc15;
+        }
+
+        /* hero */
+        .hero {
+            padding: 5rem 0 4rem;
+            text-align: center;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: #e0e7ff;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+        }
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        body.dark .hero h1 {
+            background: linear-gradient(135deg, #e2e8f0, #60a5fa);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 1rem auto;
+            color: #334155;
+        }
+        body.dark .hero p {
+            color: #cbd5e1;
+        }
+        .cta-group {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px -2px rgba(37,99,235,0.3);
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* stats */
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 3rem;
+            margin: 3rem 0;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 2rem;
+            padding: 1.2rem 2rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            border: 1px solid #eef2ff;
+        }
+        .stat-number {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #2563eb;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .section-sub {
+            text-align: center;
+            color: #475569;
+            max-width: 680px;
+            margin: 0 auto 3rem auto;
+        }
+
+        /* feature cards - matching dashboard style */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            border: 1px solid #eef2ff;
+            transition: all 0.2s;
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.08);
+        }
+        .feature-icon {
+            background: #eef2ff;
+            width: 56px;
+            height: 56px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #2563eb;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .tech-badge {
+            background: #eef2ff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .workflow {
+            background: linear-gradient(145deg, #f1f5f9, #ffffff);
+            border-radius: 2rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        body.dark .workflow {
+            background: #0f172a;
+        }
+        .flow-steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .step {
+            text-align: center;
+            flex: 1;
+            min-width: 140px;
+        }
+        .step .circle {
+            background: #2563eb;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .endpoint-section {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            margin-top: 2rem;
+        }
+        .endpoint-code {
+            background: #0f172a;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #a5f3fc;
+            overflow-x: auto;
+        }
+
+        .footer {
+            background: white;
+            border-top: 1px solid #eef2ff;
+            margin-top: 5rem;
+            padding: 2.5rem 0;
+            text-align: center;
+        }
+        body.dark .footer {
+            background: #0f172a;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .nav-links { gap: 0.5rem; }
+            .btn-login, .btn-register { padding: 0.4rem 1rem; font-size: 0.9rem; }
+            .stats-grid { gap: 1rem; }
+        }
+        button, .btn-primary, .btn-secondary, .theme-toggle-btn, .btn-login, .btn-register {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<p>Redirecting to login ...</p>
+<nav class="navbar">
+    <div class="container nav-flex">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-file-alt"></i></div>
+            <h1>QPGen</h1>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#tech">Tech Stack</a>
+            <a href="#workflow">Workflow</a>
+            <a href="#api">API</a>
+            <button class="btn-login" id="navLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <button class="btn-register" id="navRegisterBtn"><i class="fas fa-user-plus"></i> Register</button>
+            <button class="theme-toggle-btn" id="darkModeToggle"><i class="fas fa-moon"></i></button>
+        </div>
+    </div>
+</nav>
+
+<main>
+    <div class="container">
+        <div class="hero">
+            <span class="hero-badge"><i class="fas fa-robot"></i> AI-Ready • Automated Paper Generation</span>
+            <h1>Question Paper Generation<br>System for Modern Education</h1>
+            <p>From hours to minutes — QPGen streamlines exam creation with structured banks, cognitive mapping, and digital approval workflows.</p>
+            <div class="cta-group">
+                <button class="btn-primary" id="heroLoginBtn"><i class="fas fa-rocket"></i> Login to Dashboard</button>
+                <button class="btn-secondary" id="heroRegisterBtn"><i class="fas fa-user-graduate"></i> Create Account</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number">119+</div><div>API Endpoints</div></div>
+                <div class="stat-card"><div class="stat-number">18.5k</div><div>Lines of Code</div></div>
+                <div class="stat-card"><div class="stat-number">4</div><div>User Roles</div></div>
+            </div>
+        </div>
+
+        <div id="features">
+            <h2 class="section-title">Powerful Features</h2>
+            <div class="section-sub">Everything you need to create, review and export examination papers with confidence.</div>
+            <div class="features-grid">
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-database"></i></div><h3>Structured Bank</h3><p>Tag questions by Subject, CO (CO1–CO3), Bloom's levels (R/U/A) and marks (2/4/6).</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-magic"></i></div><h3>Auto Generation</h3><p>Generate balanced papers based on cognitive distribution & marks allocation instantly.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-check-double"></i></div><h3>Review Workflow</h3><p>Teacher submits → Supervisor reviews, comments & approves with full audit trail.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-file-pdf"></i></div><h3>PDF Export</h3><p>One-click downloadable, professionally formatted PDFs using OpenPDF.</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>JWT Security</h3><p>Custom authentication filter + role-based access (Admin, Teacher, Supervisor, Student).</p></div>
+                <div class="feature-card"><div class="feature-icon"><i class="fas fa-envelope"></i></div><h3>Email Verification</h3><p>Two-factor account activation with OTP & confirmation link (JavaMailSender + Redis).</p></div>
+            </div>
+        </div>
+
+        <div id="tech">
+            <h2 class="section-title">Technology Stack</h2>
+            <div class="tech-cloud">
+                <span class="tech-badge"><i class="fab fa-java"></i> Java 17</span>
+                <span class="tech-badge"><i class="fas fa-leaf"></i> Spring Boot</span>
+                <span class="tech-badge"><i class="fas fa-database"></i> PostgreSQL</span>
+                <span class="tech-badge"><i class="fas fa-memory"></i> Redis</span>
+                <span class="tech-badge"><i class="fas fa-lock"></i> JWT (JJWT)</span>
+                <span class="tech-badge"><i class="fab fa-html5"></i> HTML5/CSS3/JS</span>
+                <span class="tech-badge"><i class="fab fa-css3-alt"></i> Thymeleaf</span>
+                <span class="tech-badge"><i class="fas fa-file-pdf"></i> OpenPDF</span>
+                <span class="tech-badge"><i class="fab fa-docker"></i> Docker</span>
+            </div>
+            <div class="endpoint-section">
+                <h3 style="margin-bottom: 0.5rem;"><i class="fas fa-server"></i> Backend Excellence</h3>
+                <p>Spring Security, JPA/Hibernate, Maven, RESTful architecture, Global Exception Handling, and Role-based endpoints.</p>
+            </div>
+        </div>
+
+        <div id="workflow">
+            <h2 class="section-title">Complete Workflow</h2>
+            <div class="workflow">
+                <div class="flow-steps">
+                    <div class="step"><div class="circle"><i class="fas fa-plus"></i></div><h4>Create Q's</h4><p>Teacher adds questions with CO & Bloom's level</p></div>
+                    <div class="step"><div class="circle"><i class="fas fa-cogs"></i></div><h4>Generate</h4><p>Auto-select based on subject & marks</p></div>
+                    <div class="step"><div class="circle"><i class="fas fa-paper-plane"></i></div><h4>Submit</h4><p>Send paper for review</p></div>
+                    <div class="step"><div class="circle"><i class="fas fa-eye"></i></div><h4>Review</h4><p>Supervisor comments & approves/rejects</p></div>
+                    <div class="step"><div class="circle"><i class="fas fa-download"></i></div><h4>Export PDF</h4><p>Download approved paper</p></div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem; font-size: 0.9rem;"><i class="fas fa-sync-alt"></i> Full cycle: If rejected, teacher revises and resubmits</div>
+            </div>
+        </div>
+
+        <div id="api">
+            <h2 class="section-title">API Ecosystem</h2>
+            <div class="section-sub">119+ secure endpoints for full control — from user management to paper generation.</div>
+            <div class="endpoint-section">
+                <h3><i class="fas fa-key"></i> Authentication</h3>
+                <div class="endpoint-code">POST /api/v1/auth/register | POST /api/v1/auth/login | POST /api/v1/auth/confirm</div>
+            </div>
+            <div class="endpoint-section">
+                <h3><i class="fas fa-chalkboard-teacher"></i> Teacher Core</h3>
+                <div class="endpoint-code">POST /api/v1/teacher/question | POST /api/v1/teacher/generate/question-paper/subjectCode | POST /api/v1/teacher/To-approve/questionPaper</div>
+            </div>
+            <div class="endpoint-section">
+                <h3><i class="fas fa-user-graduate"></i> Student & Supervisor</h3>
+                <div class="endpoint-code">GET /api/v1/student/questions/paged | PATCH /api/v1/supervisor/questionsPapers/approv/id</div>
+            </div>
+            <div class="endpoint-section">
+                <h3><i class="fas fa-user-shield"></i> Admin Power</h3>
+                <div class="endpoint-code">GET /api/v1/admin/users/paged | DELETE batch users | update roles/suspend</div>
+            </div>
+        </div>
+
+        <div style="margin: 3rem 0; background: #eef2ff30; border-radius: 2rem; padding: 2rem; text-align: center;">
+            <h3><i class="fas fa-users"></i> Four User Roles, One Unified Platform</h3>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 1.5rem;">
+                <div><i class="fas fa-chalkboard-user"></i> <strong>Teacher</strong><br>Create, generate, submit</div>
+                <div><i class="fas fa-clipboard-list"></i> <strong>Supervisor</strong><br>Review, comment, approve</div>
+                <div><i class="fas fa-graduation-cap"></i> <strong>Student</strong><br>Browse papers & questions</div>
+                <div><i class="fas fa-crown"></i> <strong>Admin</strong><br>Full user & audit control</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 3rem 0;">
+            <div style="background: linear-gradient(125deg, #1e293b, #0f172a); padding: 2.5rem; border-radius: 2rem; color: white;">
+                <h3 style="color: white; font-size: 1.8rem;">Ready to transform exam creation?</h3>
+                <p style="margin: 1rem 0; opacity: 0.9;">Join institutions using QPGen to reduce paper creation time from hours to minutes.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn-primary" id="footerLoginBtn" style="background: #3b82f6;">Login</button>
+                    <button class="btn-secondary" id="footerRegisterBtn" style="background: #334155; color: white;">Register</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p>© 2026 QPGen — Question Paper Generation System | Built with <i class="fas fa-heart" style="color: #ef4444;"></i> for Vidyalankar Polytechnic</p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">Project Guide: Prof. Madhavi M | Developer: Hassan Abdul Rahim Patel</p>
+        <p><i class="fab fa-github"></i> FinalYearProject | Spring Boot + PostgreSQL + Redis + JWT</p>
+    </div>
+</footer>
+
+<script th:src="@{/js/api.js}"></script>
+<script>
+    // Dark mode toggle
+    const darkToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    if (localStorage.getItem('qpgen-theme') === 'dark') {
+        body.classList.add('dark');
+        darkToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+    darkToggle.addEventListener('click', () => {
+        body.classList.toggle('dark');
+        const isDark = body.classList.contains('dark');
+        localStorage.setItem('qpgen-theme', isDark ? 'dark' : 'light');
+        darkToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+
+    // Redirect to login/register pages (these will use your existing api.js)
+    const LOGIN_URL = '/login';
+    const REGISTER_URL = '/register';
+
+    const loginBtns = ['navLoginBtn', 'heroLoginBtn', 'footerLoginBtn'];
+    const registerBtns = ['navRegisterBtn', 'heroRegisterBtn', 'footerRegisterBtn'];
+
+    loginBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = LOGIN_URL;
+            });
+        }
+    });
+
+    registerBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = REGISTER_URL;
+            });
+        }
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href && href !== "#") {
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>
