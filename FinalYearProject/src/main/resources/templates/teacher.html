@@ -1,13 +1,359 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Teacher Dashboard - QPGen</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QPGen - Teacher Dashboard | Create & Manage Question Papers</title>
+    <meta name="description" content="Teacher dashboard - Create questions, generate balanced papers, and submit for approval">
+
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/style1.css}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+    <style>
+        /* Additional Teacher Dashboard Specific Styles */
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text h2 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.5rem;
+        }
+
+        .welcome-text p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        .welcome-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-badge .number {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .stat-badge .label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* Quick Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            border-top: 3px solid var(--primary);
+            transition: transform 0.2s;
+        }
+
+        body.dark-mode .stat-card {
+            background: #1e293b;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-number {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .stat-card .stat-label {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        /* Generation Form */
+        .generation-form {
+            background: var(--gray-light);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        body.dark-mode .generation-form {
+            background: #0f172a;
+        }
+
+        /* Generated Paper Card */
+        .generated-paper-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-top: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        body.dark-mode .generated-paper-card {
+            background: #1e293b;
+        }
+
+        .paper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+            border-bottom: 1px solid var(--border);
+        }
+
+        body.dark-mode .paper-header {
+            background: #2d2b3e;
+        }
+
+        .paper-header h3 {
+            margin: 0;
+            color: var(--primary-dark);
+        }
+
+        .paper-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .paper-summary {
+            padding: 1rem 1.5rem;
+            background: var(--gray-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        body.dark-mode .paper-summary {
+            background: #0f172a;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .summary-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-stat .label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+
+        .summary-stat .value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Level Tags */
+        .level-tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .level-R { background: #fef3c7; color: #92400e; }
+        .level-U { background: #dbeafe; color: #1e40af; }
+        .level-A { background: #dcfce7; color: #166534; }
+
+        body.dark-mode .level-R { background: #78350f; color: #fde68a; }
+        body.dark-mode .level-U { background: #1e3a8a; color: #bfdbfe; }
+        body.dark-mode .level-A { background: #14532d; color: #bbf7d0; }
+
+        /* Question Row */
+        .question-row {
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .question-row:hover {
+            background: var(--gray-light);
+        }
+
+        body.dark-mode .question-row:hover {
+            background: #2d2d3d;
+        }
+
+        .question-text {
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+
+        /* Question Detail Card */
+        .question-detail-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-top: 1rem;
+        }
+
+        body.dark-mode .question-detail-card {
+            background: #1e293b;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: var(--primary-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question-body {
+            padding: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.6;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question-meta-grid {
+            padding: 1rem 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Paper Table */
+        .paper-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .paper-status.approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .paper-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        body.dark-mode .paper-status.approved {
+            background: #14532d;
+            color: #bbf7d0;
+        }
+
+        body.dark-mode .paper-status.pending {
+            background: #78350f;
+            color: #fde68a;
+        }
+
+        /* Modal */
+        .modal-container {
+            max-width: 500px;
+        }
+
+        .paper-info-preview {
+            background: var(--gray-light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        body.dark-mode .paper-info-preview {
+            background: #0f172a;
+        }
+
+        .paper-info-preview p {
+            margin: 0.25rem 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .paper-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .summary-stats {
+                justify-content: center;
+            }
+
+            .question-meta-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Update total questions display */
+        #totalQuestionsCount {
+            font-weight: 600;
+            color: var(--primary);
+        }
+    </style>
 </head>
 <body>
+
 <!-- Theme Toggle -->
 <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
     <i class="fas fa-moon"></i>
@@ -22,54 +368,58 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2>Teacher Panel</h2>
+            <h2><i class="fas fa-chalkboard-user"></i> Teacher Panel</h2>
             <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
         <ul>
+            <div class="menu-category">Dashboard</div>
+            <li><a href="#" onclick="showSection('dashboardHome')" class="active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a></li>
+
             <div class="menu-category">Question Management</div>
-            <li><a href="#" onclick="showSection('addQuestion')" class="active">
+            <li><a href="#" onclick="showSection('addQuestion')">
                 <i class="fas fa-plus-circle"></i>
                 <span>Add Question</span>
             </a></li>
             <li><a href="#" onclick="showSection('myQuestionsPaged')">
                 <i class="fas fa-list"></i>
-                <span>My Questions (Paged)</span>
+                <span>My Questions</span>
             </a></li>
             <li><a href="#" onclick="showSection('allQuestionsPaged')">
                 <i class="fas fa-database"></i>
-                <span>All Questions (Paged)</span>
+                <span>All Questions</span>
             </a></li>
-
-            <div class="menu-category">Search By ID</div>
             <li><a href="#" onclick="showSection('questionById')">
                 <i class="fas fa-search"></i>
                 <span>Question By ID</span>
             </a></li>
 
-            <div class="menu-category">Search By Subject Code</div>
+            <div class="menu-category">Search by Subject Code</div>
             <li><a href="#" onclick="showSection('bySubjectCodePaged')">
                 <i class="fas fa-code"></i>
-                <span>By Subject Code (Paged)</span>
+                <span>By Subject Code</span>
             </a></li>
             <li><a href="#" onclick="showSection('bySubjectCodeCOPaged')">
                 <i class="fas fa-filter"></i>
-                <span>Filter by Code & CO (Paged)</span>
+                <span>Code & CO</span>
             </a></li>
             <li><a href="#" onclick="showSection('bySubjectCodeCOLevel')">
                 <i class="fas fa-layer-group"></i>
                 <span>Code, CO & Level</span>
             </a></li>
 
-            <div class="menu-category">Search By Subject Name</div>
+            <div class="menu-category">Search by Subject Name</div>
             <li><a href="#" onclick="showSection('bySubjectNamePaged')">
                 <i class="fas fa-book"></i>
-                <span>By Subject Name (Paged)</span>
+                <span>By Subject Name</span>
             </a></li>
             <li><a href="#" onclick="showSection('bySubjectNameCOPaged')">
                 <i class="fas fa-filter"></i>
-                <span>Filter by Name & CO (Paged)</span>
+                <span>Name & CO</span>
             </a></li>
             <li><a href="#" onclick="showSection('bySubjectNameCOLevel')">
                 <i class="fas fa-layer-group"></i>
@@ -79,17 +429,17 @@
             <div class="menu-category">Paper Generation</div>
             <li><a href="#" onclick="showSection('generateByCode')">
                 <i class="fas fa-cogs"></i>
-                <span>Generate By Code</span>
+                <span>Generate by Code</span>
             </a></li>
             <li><a href="#" onclick="showSection('generateByName')">
                 <i class="fas fa-cogs"></i>
-                <span>Generate By Name</span>
+                <span>Generate by Name</span>
             </a></li>
 
             <div class="menu-category">Question Papers</div>
             <li><a href="#" onclick="showSection('myQuestionPapers')">
                 <i class="fas fa-file-alt"></i>
-                <span>My Question Papers</span>
+                <span>My Papers</span>
             </a></li>
             <li><a href="#" onclick="showSection('paperById')">
                 <i class="fas fa-download"></i>
@@ -99,10 +449,10 @@
             <div class="menu-category">Delete Operations</div>
             <li><a href="#" onclick="showSection('deleteById')">
                 <i class="fas fa-trash"></i>
-                <span>Delete By ID</span>
+                <span>Delete Question</span>
             </a></li>
 
-            <div class="menu-category">Account Settings</div>
+            <div class="menu-category">Account</div>
             <li><a href="#" onclick="showSection('updateEmail')">
                 <i class="fas fa-envelope"></i>
                 <span>Update Email</span>
@@ -112,7 +462,7 @@
                 <span>Update Password</span>
             </a></li>
 
-            <li><a href="#" onclick="logout()" style="color: #e74c3c">
+            <li><a href="#" onclick="logout()" style="color: #ef4444;">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a></li>
@@ -121,54 +471,126 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <!-- Add Question Section -->
-        <div id="addQuestion" class="section active">
-            <h1>Add New Question</h1>
+
+        <!-- ==================== DASHBOARD HOME ==================== -->
+        <div id="dashboardHome" class="section active">
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h2>Welcome, <span id="teacherName">Teacher</span>!</h2>
+                    <p><i class="fas fa-chalkboard"></i> Create questions, generate balanced papers, and submit for approval</p>
+                </div>
+                <div class="welcome-stats">
+                    <div class="stat-badge">
+                        <div class="number" id="myQuestionsCount">-</div>
+                        <div class="label">My Questions</div>
+                    </div>
+                    <div class="stat-badge">
+                        <div class="number" id="myPapersCount">-</div>
+                        <div class="label">My Papers</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-plus-circle"></i></div>
+                    <div class="stat-number" id="totalQuestions">-</div>
+                    <div class="stat-label">Total Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-number" id="pendingPapersCount">-</div>
+                    <div class="stat-label">Pending Papers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-number" id="approvedPapersCount">-</div>
+                    <div class="stat-label">Approved Papers</div>
+                </div>
+            </div>
+
             <div class="card">
-                <h2><i class="fas fa-plus-circle"></i> Add New Question</h2>
+                <h2><i class="fas fa-info-circle"></i> Quick Guide</h2>
+                <p>As a Teacher, you can:</p>
+                <ul style="margin-top: 1rem; margin-left: 1.5rem; line-height: 1.8;">
+                    <li><i class="fas fa-plus-circle"></i> <strong>Add Questions</strong> - Create new questions with subject, CO, marks, and cognitive level</li>
+                    <li><i class="fas fa-list"></i> <strong>My Questions</strong> - View and manage questions you've created</li>
+                    <li><i class="fas fa-search"></i> <strong>Search Questions</strong> - Filter by subject code, name, CO, or cognitive level</li>
+                    <li><i class="fas fa-cogs"></i> <strong>Generate Papers</strong> - Automatically create balanced question papers</li>
+                    <li><i class="fas fa-paper-plane"></i> <strong>Submit for Approval</strong> - Send generated papers to supervisor for review</li>
+                    <li><i class="fas fa-download"></i> <strong>Download Papers</strong> - Download approved papers as PDF</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-rocket"></i> Quick Actions</h2>
+                <div class="action-buttons">
+                    <button onclick="showSection('addQuestion')" class="success">
+                        <i class="fas fa-plus-circle"></i> Add New Question
+                    </button>
+                    <button onclick="showSection('generateByCode')" class="primary">
+                        <i class="fas fa-cogs"></i> Generate Paper
+                    </button>
+                    <button onclick="showSection('myQuestionPapers')" class="secondary">
+                        <i class="fas fa-file-alt"></i> View My Papers
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ADD QUESTION ==================== -->
+        <div id="addQuestion" class="section">
+            <h1><i class="fas fa-plus-circle"></i> Add New Question</h1>
+            <div class="card">
+                <h2><i class="fas fa-question-circle"></i> Question Details</h2>
                 <form id="addQuestionForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label>Subject Code *</label>
-                            <input type="text" id="subjectCode" placeholder="e.g., CS101" required />
+                            <input type="text" id="subjectCode" placeholder="e.g., CS101" required>
                         </div>
                         <div class="form-group">
                             <label>Subject Name *</label>
-                            <input type="text" id="subjectName" placeholder="e.g., Database Systems" required />
+                            <input type="text" id="subjectName" placeholder="e.g., Database Systems" required>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label>Question Body *</label>
-                        <textarea id="questionBody" rows="3" placeholder="Enter your question here..." required></textarea>
+                        <textarea id="questionBody" rows="4" placeholder="Enter your question here..." required></textarea>
                     </div>
+
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Mapped Course Outcome (CO) *</label>
-                            <input type="text" id="mappedCO" placeholder="e.g., CO1" required />
+                            <label>Mapped CO (Course Outcome) *</label>
+                            <input type="text" id="mappedCO" placeholder="e.g., CO1, CO2, CO3" required>
                         </div>
                         <div class="form-group">
-                            <label>Marks *</label>
-                            <div class="marks-options">
-                                <div class="mark-option">
-                                    <input type="radio" id="marks2" name="marks" value="2" />
-                                    <label for="marks2">2 Marks</label>
-                                </div>
-                                <div class="mark-option">
-                                    <input type="radio" id="marks4" name="marks" value="4" checked />
-                                    <label for="marks4">4 Marks</label>
-                                </div>
+                            <label>Cognitive Level *</label>
+                            <select id="cognitiveLevel" required>
+                                <option value="">Select Level</option>
+                                <option value="R">Remember (R)</option>
+                                <option value="U">Understand (U)</option>
+                                <option value="A">Apply (A)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Marks *</label>
+                        <div class="marks-options">
+                            <div class="mark-option">
+                                <input type="radio" id="marks2" name="marks" value="2">
+                                <label for="marks2">2 Marks</label>
+                            </div>
+                            <div class="mark-option">
+                                <input type="radio" id="marks4" name="marks" value="4" checked>
+                                <label for="marks4">4 Marks</label>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Cognitive Level *</label>
-                        <select id="cognitiveLevel" required>
-                            <option value="">Select Level</option>
-                            <option value="R">Remember</option>
-                            <option value="U">Understand</option>
-                            <option value="A">Apply</option>
-                        </select>
-                    </div>
+
                     <button type="submit" class="success">
                         <i class="fas fa-save"></i> Add Question
                     </button>
@@ -177,11 +599,11 @@
             </div>
         </div>
 
-        <!-- My Questions Paged -->
+        <!-- ==================== MY QUESTIONS PAGINATED ==================== -->
         <div id="myQuestionsPaged" class="section">
-            <h1>My Questions (Paginated)</h1>
+            <h1><i class="fas fa-list"></i> My Questions</h1>
             <div class="card">
-                <h2><i class="fas fa-list"></i> View My Questions with Pagination</h2>
+                <h2><i class="fas fa-user"></i> Questions Created by You</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Page Number</label>
@@ -196,18 +618,23 @@
                             <option value="100">100 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="loadMyQuestionsPaged()">
+                            <i class="fas fa-search"></i> Load My Questions
+                        </button>
+                    </div>
                 </div>
-                <button onclick="loadMyQuestionsPaged()"><i class="fas fa-search"></i> Load My Questions</button>
                 <div id="myQuestionsPagedResult"></div>
-                <div class="pagination" id="myQuestionsPagination"></div>
+                <div id="myQuestionsPagination"></div>
             </div>
         </div>
 
-        <!-- All Questions Paged -->
+        <!-- ==================== ALL QUESTIONS PAGINATED ==================== -->
         <div id="allQuestionsPaged" class="section">
-            <h1>All Questions (Paginated)</h1>
+            <h1><i class="fas fa-database"></i> All Questions</h1>
             <div class="card">
-                <h2><i class="fas fa-database"></i> View All Questions with Pagination</h2>
+                <h2><i class="fas fa-list"></i> Complete Question Bank</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Page Number</label>
@@ -222,35 +649,47 @@
                             <option value="100">100 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="loadAllQuestionsPaged()">
+                            <i class="fas fa-search"></i> Load Questions
+                        </button>
+                    </div>
                 </div>
-                <button onclick="loadAllQuestionsPaged()"><i class="fas fa-search"></i> Load Questions</button>
                 <div id="allQuestionsPagedResult"></div>
-                <div class="pagination" id="allQuestionsPagination"></div>
+                <div id="allQuestionsPagination"></div>
             </div>
         </div>
 
-        <!-- Question By ID -->
+        <!-- ==================== QUESTION BY ID ==================== -->
         <div id="questionById" class="section">
-            <h1>Find Question By ID</h1>
+            <h1><i class="fas fa-search"></i> Find Question</h1>
             <div class="card">
-                <h2><i class="fas fa-search"></i> Search Question by ID</h2>
-                <div class="form-group">
-                    <label>Question ID</label>
-                    <input type="number" id="questionId" placeholder="Enter question ID">
+                <h2><i class="fas fa-id-card"></i> Search by Question ID</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Question ID</label>
+                        <input type="number" id="questionId" placeholder="Enter question ID">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="findQuestionById()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
                 </div>
-                <button onclick="findQuestionById()"><i class="fas fa-search"></i> Search</button>
                 <div id="questionByIdResult"></div>
             </div>
         </div>
 
-        <!-- By Subject Code Paged -->
+        <!-- ==================== BY SUBJECT CODE PAGINATED ==================== -->
         <div id="bySubjectCodePaged" class="section">
-            <h1>Questions by Subject Code (Paginated)</h1>
+            <h1><i class="fas fa-code"></i> Filter by Subject Code</h1>
             <div class="card">
-                <h2><i class="fas fa-code"></i> Find Questions by Subject Code</h2>
+                <h2><i class="fas fa-filter"></i> Questions by Subject Code</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Subject Code</label>
+                        <label>Subject Code *</label>
                         <input type="text" id="subjectCodePaged" placeholder="e.g., CS101">
                     </div>
                     <div class="form-group">
@@ -266,24 +705,26 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="searchBySubjectCodePaged()"><i class="fas fa-search"></i> Search</button>
+                <button onclick="searchBySubjectCodePaged()">
+                    <i class="fas fa-search"></i> Search
+                </button>
                 <div id="bySubjectCodePagedResult"></div>
-                <div class="pagination" id="subjectCodePagination"></div>
+                <div id="subjectCodePagination"></div>
             </div>
         </div>
 
-        <!-- By Subject Code with CO Paged -->
+        <!-- ==================== BY SUBJECT CODE & CO ==================== -->
         <div id="bySubjectCodeCOPaged" class="section">
-            <h1>Filter by Subject Code & CO (Paginated)</h1>
+            <h1><i class="fas fa-filter"></i> Filter by Code & CO</h1>
             <div class="card">
-                <h2><i class="fas fa-filter"></i> Filter by Subject Code and CO</h2>
+                <h2><i class="fas fa-bullseye"></i> Questions by Subject Code and CO</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Subject Code</label>
+                        <label>Subject Code *</label>
                         <input type="text" id="subjectCodeCOPaged" placeholder="e.g., CS101">
                     </div>
                     <div class="form-group">
-                        <label>Mapped CO</label>
+                        <label>Mapped CO *</label>
                         <input type="text" id="mappedCOPaged" placeholder="e.g., CO1">
                     </div>
                 </div>
@@ -301,49 +742,53 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="searchBySubjectCodeCOPaged()"><i class="fas fa-filter"></i> Apply Filter</button>
+                <button onclick="searchBySubjectCodeCOPaged()">
+                    <i class="fas fa-filter"></i> Apply Filter
+                </button>
                 <div id="bySubjectCodeCOPagedResult"></div>
-                <div class="pagination" id="subjectCodeCOPagination"></div>
+                <div id="subjectCodeCOPagination"></div>
             </div>
         </div>
 
-        <!-- By Subject Code with CO and Level -->
+        <!-- ==================== BY SUBJECT CODE, CO & LEVEL ==================== -->
         <div id="bySubjectCodeCOLevel" class="section">
-            <h1>Filter by Code, CO & Cognitive Level</h1>
+            <h1><i class="fas fa-layer-group"></i> Advanced Filter</h1>
             <div class="card">
-                <h2><i class="fas fa-layer-group"></i> Advanced Filter</h2>
+                <h2><i class="fas fa-chart-line"></i> Filter by Code, CO & Cognitive Level</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Subject Code</label>
+                        <label>Subject Code *</label>
                         <input type="text" id="subjectCodeCOLevel" placeholder="e.g., CS101">
                     </div>
                     <div class="form-group">
-                        <label>Mapped CO</label>
+                        <label>Mapped CO *</label>
                         <input type="text" id="mappedCOLevel" placeholder="e.g., CO1">
                     </div>
                     <div class="form-group">
-                        <label>Cognitive Level</label>
+                        <label>Cognitive Level *</label>
                         <select id="cognitiveLevelCode">
                             <option value="">Select Level</option>
-                            <option value="R">Remember</option>
-                            <option value="U">Understand</option>
-                            <option value="A">Apply</option>
+                            <option value="R">Remember (R)</option>
+                            <option value="U">Understand (U)</option>
+                            <option value="A">Apply (A)</option>
                         </select>
                     </div>
                 </div>
-                <button onclick="searchBySubjectCodeCOLevel()"><i class="fas fa-search"></i> Search</button>
+                <button onclick="searchBySubjectCodeCOLevel()">
+                    <i class="fas fa-search"></i> Search
+                </button>
                 <div id="bySubjectCodeCOLevelResult"></div>
             </div>
         </div>
 
-        <!-- By Subject Name Paged -->
+        <!-- ==================== BY SUBJECT NAME PAGINATED ==================== -->
         <div id="bySubjectNamePaged" class="section">
-            <h1>Questions by Subject Name (Paginated)</h1>
+            <h1><i class="fas fa-book"></i> Filter by Subject Name</h1>
             <div class="card">
-                <h2><i class="fas fa-book"></i> Find Questions by Subject Name</h2>
+                <h2><i class="fas fa-filter"></i> Questions by Subject Name</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Subject Name</label>
+                        <label>Subject Name *</label>
                         <input type="text" id="subjectNamePaged" placeholder="e.g., Database Systems">
                     </div>
                     <div class="form-group">
@@ -359,24 +804,26 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="searchBySubjectNamePaged()"><i class="fas fa-search"></i> Search</button>
+                <button onclick="searchBySubjectNamePaged()">
+                    <i class="fas fa-search"></i> Search
+                </button>
                 <div id="bySubjectNamePagedResult"></div>
-                <div class="pagination" id="subjectNamePagination"></div>
+                <div id="subjectNamePagination"></div>
             </div>
         </div>
 
-        <!-- By Subject Name with CO Paged -->
+        <!-- ==================== BY SUBJECT NAME & CO ==================== -->
         <div id="bySubjectNameCOPaged" class="section">
-            <h1>Filter by Subject Name & CO (Paginated)</h1>
+            <h1><i class="fas fa-filter"></i> Filter by Name & CO</h1>
             <div class="card">
-                <h2><i class="fas fa-filter"></i> Filter by Subject Name and CO</h2>
+                <h2><i class="fas fa-bullseye"></i> Questions by Subject Name and CO</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Subject Name</label>
+                        <label>Subject Name *</label>
                         <input type="text" id="subjectNameCOPaged" placeholder="e.g., Database Systems">
                     </div>
                     <div class="form-group">
-                        <label>Mapped CO</label>
+                        <label>Mapped CO *</label>
                         <input type="text" id="mappedCONamePaged" placeholder="e.g., CO1">
                     </div>
                 </div>
@@ -394,215 +841,340 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="searchBySubjectNameCOPaged()"><i class="fas fa-filter"></i> Apply Filter</button>
+                <button onclick="searchBySubjectNameCOPaged()">
+                    <i class="fas fa-filter"></i> Apply Filter
+                </button>
                 <div id="bySubjectNameCOPagedResult"></div>
-                <div class="pagination" id="subjectNameCOPagination"></div>
+                <div id="subjectNameCOPagination"></div>
             </div>
         </div>
 
-        <!-- By Subject Name with CO and Level -->
+        <!-- ==================== BY SUBJECT NAME, CO & LEVEL ==================== -->
         <div id="bySubjectNameCOLevel" class="section">
-            <h1>Filter by Name, CO & Cognitive Level</h1>
+            <h1><i class="fas fa-layer-group"></i> Advanced Filter</h1>
             <div class="card">
-                <h2><i class="fas fa-layer-group"></i> Advanced Filter</h2>
+                <h2><i class="fas fa-chart-line"></i> Filter by Name, CO & Cognitive Level</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Subject Name</label>
+                        <label>Subject Name *</label>
                         <input type="text" id="subjectNameCOLevel" placeholder="e.g., Database Systems">
                     </div>
                     <div class="form-group">
-                        <label>Mapped CO</label>
+                        <label>Mapped CO *</label>
                         <input type="text" id="mappedCONameLevel" placeholder="e.g., CO1">
                     </div>
                     <div class="form-group">
-                        <label>Cognitive Level</label>
+                        <label>Cognitive Level *</label>
                         <select id="cognitiveLevelName">
                             <option value="">Select Level</option>
-                            <option value="R">Remember</option>
-                            <option value="U">Understand</option>
-                            <option value="A">Apply</option>
+                            <option value="R">Remember (R)</option>
+                            <option value="U">Understand (U)</option>
+                            <option value="A">Apply (A)</option>
                         </select>
                     </div>
                 </div>
-                <button onclick="searchBySubjectNameCOLevel()"><i class="fas fa-search"></i> Search</button>
+                <button onclick="searchBySubjectNameCOLevel()">
+                    <i class="fas fa-search"></i> Search
+                </button>
                 <div id="bySubjectNameCOLevelResult"></div>
             </div>
         </div>
 
-        <!-- Generate By Code -->
+        <!-- ==================== GENERATE BY CODE ==================== -->
         <div id="generateByCode" class="section">
-            <h1>Generate Paper By Subject Code</h1>
+            <h1><i class="fas fa-cogs"></i> Generate Paper by Code</h1>
             <div class="card">
-                <h2><i class="fas fa-cogs"></i> Generate Paper By Subject Code</h2>
-                <div class="form-group">
-                    <label>Subject Code *</label>
-                    <input type="text" id="genSubjectCode" placeholder="e.g., CS101" />
-                </div>
-                <div class="form-group">
-                    <label>Mapped COs (comma-separated) *</label>
-                    <input type="text" id="genMappedCOs" placeholder="e.g., CO1,CO2,CO3" />
-                </div>
-                <div class="form-group">
-                    <label>Question Distribution by Marks *</label>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Number of 2-Mark Questions</label>
-                            <input type="number" id="gen2Marks" min="0" max="50" value="5" />
-                        </div>
-                        <div class="form-group">
-                            <label>Number of 4-Mark Questions</label>
-                            <input type="number" id="gen4Marks" min="0" max="50" value="5" />
-                        </div>
+                <h2><i class="fas fa-magic"></i> Automatic Paper Generation</h2>
+
+                <div class="generation-form">
+                    <div class="form-group">
+                        <label>Subject Code *</label>
+                        <input type="text" id="genSubjectCode" placeholder="e.g., CS101">
                     </div>
-                    <small>Total marks will be: <span id="genTotalMarksDisplay">(2 × 5) + (4 × 5) = 30</span></small>
-                </div>
-                <div class="form-group">
-                    <label>Number of Questions by Cognitive Level *</label>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Apply Level (A) Count</label>
-                            <input type="number" id="genA" min="0" max="50" value="3" />
-                        </div>
-                        <div class="form-group">
-                            <label>Remember Level (R) Count</label>
-                            <input type="number" id="genR" min="0" max="50" value="5" />
-                        </div>
-                        <div class="form-group">
-                            <label>Understand Level (U) Count</label>
-                            <input type="number" id="genU" min="0" max="50" value="2" />
-                        </div>
+
+                    <div class="form-group">
+                        <label>Mapped COs (comma-separated) *</label>
+                        <input type="text" id="genMappedCOs" placeholder="e.g., CO1, CO2, CO3">
+                        <small>Select which Course Outcomes to include</small>
                     </div>
-                    <small>Total questions = A + R + U</small>
+
+                    <div class="form-group">
+                        <label>Question Distribution by Marks</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Number of 2-Mark Questions</label>
+                                <input type="number" id="gen2Marks" min="0" max="50" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label>Number of 4-Mark Questions</label>
+                                <input type="number" id="gen4Marks" min="0" max="50" value="5">
+                            </div>
+                        </div>
+                        <small>Total marks: <span id="genTotalMarksDisplay">(2 × 5) + (4 × 5) = 30</span></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Number of Questions by Cognitive Level</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Apply Level (A)</label>
+                                <input type="number" id="genA" min="0" max="50" value="3">
+                            </div>
+                            <div class="form-group">
+                                <label>Remember Level (R)</label>
+                                <input type="number" id="genR" min="0" max="50" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label>Understand Level (U)</label>
+                                <input type="number" id="genU" min="0" max="50" value="2">
+                            </div>
+                        </div>
+                        <small>Total questions = A + R + U = <span id="totalQuestionsCountGen">10</span></small>
+                    </div>
                 </div>
-                <button onclick="generateByCode()" class="success">Generate Paper</button>
+
+                <button onclick="generateByCode()" class="success">
+                    <i class="fas fa-magic"></i> Generate Paper
+                </button>
+
                 <div id="generatedPaper"></div>
             </div>
         </div>
 
-        <!-- Generate By Name -->
+        <!-- ==================== GENERATE BY NAME ==================== -->
         <div id="generateByName" class="section">
-            <h1>Generate Paper By Subject Name</h1>
+            <h1><i class="fas fa-cogs"></i> Generate Paper by Name</h1>
             <div class="card">
-                <h2><i class="fas fa-cogs"></i> Generate Paper By Subject Name</h2>
-                <div class="form-group">
-                    <label>Subject Name *</label>
-                    <input type="text" id="genSubjectName" placeholder="e.g., Database Systems" />
-                </div>
-                <div class="form-group">
-                    <label>Mapped COs (comma-separated) *</label>
-                    <input type="text" id="genByNameMappedCOs" placeholder="e.g., CO1,CO2,CO3" />
-                </div>
-                <div class="form-group">
-                    <label>Question Distribution by Marks *</label>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Number of 2-Mark Questions</label>
-                            <input type="number" id="genByName2Marks" min="0" max="50" value="5" />
-                        </div>
-                        <div class="form-group">
-                            <label>Number of 4-Mark Questions</label>
-                            <input type="number" id="genByName4Marks" min="0" max="50" value="5" />
-                        </div>
+                <h2><i class="fas fa-magic"></i> Automatic Paper Generation by Subject Name</h2>
+
+                <div class="generation-form">
+                    <div class="form-group">
+                        <label>Subject Name *</label>
+                        <input type="text" id="genSubjectName" placeholder="e.g., Database Systems">
                     </div>
-                    <small>Total marks will be: <span id="genByNameTotalMarksDisplay">(2 × 5) + (4 × 5) = 30</span></small>
-                </div>
-                <div class="form-group">
-                    <label>Number of Questions by Cognitive Level *</label>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Apply Level (A) Count</label>
-                            <input type="number" id="genByNameA" min="0" max="50" value="3" />
-                        </div>
-                        <div class="form-group">
-                            <label>Remember Level (R) Count</label>
-                            <input type="number" id="genByNameR" min="0" max="50" value="5" />
-                        </div>
-                        <div class="form-group">
-                            <label>Understand Level (U) Count</label>
-                            <input type="number" id="genByNameU" min="0" max="50" value="2" />
-                        </div>
+
+                    <div class="form-group">
+                        <label>Mapped COs (comma-separated) *</label>
+                        <input type="text" id="genByNameMappedCOs" placeholder="e.g., CO1, CO2, CO3">
+                        <small>Select which Course Outcomes to include</small>
                     </div>
-                    <small>Total questions = A + R + U</small>
+
+                    <div class="form-group">
+                        <label>Question Distribution by Marks</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Number of 2-Mark Questions</label>
+                                <input type="number" id="genByName2Marks" min="0" max="50" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label>Number of 4-Mark Questions</label>
+                                <input type="number" id="genByName4Marks" min="0" max="50" value="5">
+                            </div>
+                        </div>
+                        <small>Total marks: <span id="genByNameTotalMarksDisplay">(2 × 5) + (4 × 5) = 30</span></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Number of Questions by Cognitive Level</label>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Apply Level (A)</label>
+                                <input type="number" id="genByNameA" min="0" max="50" value="3">
+                            </div>
+                            <div class="form-group">
+                                <label>Remember Level (R)</label>
+                                <input type="number" id="genByNameR" min="0" max="50" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label>Understand Level (U)</label>
+                                <input type="number" id="genByNameU" min="0" max="50" value="2">
+                            </div>
+                        </div>
+                        <small>Total questions = A + R + U = <span id="totalQuestionsCountGenByName">10</span></small>
+                    </div>
                 </div>
-                <button onclick="generateByName()" class="success">Generate Paper</button>
+
+                <button onclick="generateByName()" class="success">
+                    <i class="fas fa-magic"></i> Generate Paper
+                </button>
+
                 <div id="generatedPaperByName"></div>
             </div>
         </div>
 
-        <!-- My Question Papers -->
+        <!-- ==================== MY QUESTION PAPERS ==================== -->
         <div id="myQuestionPapers" class="section">
-            <h1>My Question Papers</h1>
+            <h1><i class="fas fa-file-alt"></i> My Question Papers</h1>
             <div class="card">
-                <h2><i class="fas fa-file-alt"></i> View My Question Papers</h2>
-                <button onclick="myQuestionPaper()">Load Papers</button>
+                <h2><i class="fas fa-list"></i> Papers You've Submitted</h2>
+                <button onclick="myQuestionPaper()" class="primary">
+                    <i class="fas fa-search"></i> Load My Papers
+                </button>
                 <div id="myQuestionPapersResult"></div>
             </div>
         </div>
 
-        <!-- Download Paper By ID -->
+        <!-- ==================== DOWNLOAD PAPER BY ID ==================== -->
         <div id="paperById" class="section">
-            <h1>Download Paper By ID</h1>
+            <h1><i class="fas fa-download"></i> Download Question Paper</h1>
             <div class="card">
-                <h2><i class="fas fa-download"></i> Download Question Paper by ID</h2>
-                <div class="form-group">
-                    <label>Paper ID</label>
-                    <input type="text" id="paperId" placeholder="Enter paper ID" />
+                <h2><i class="fas fa-file-pdf"></i> Download Paper by ID</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Paper ID</label>
+                        <input type="number" id="paperId" placeholder="Enter paper ID">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="downloadQuestionPaper()" class="success">
+                            <i class="fas fa-download"></i> Download PDF
+                        </button>
+                    </div>
                 </div>
-                <button onclick="downloadQuestionPaper()">Download Paper</button>
                 <div id="paperByIdResult"></div>
             </div>
         </div>
 
-        <!-- Delete By ID -->
+        <!-- ==================== DELETE BY ID ==================== -->
         <div id="deleteById" class="section">
-            <h1>Delete Question By ID</h1>
+            <h1><i class="fas fa-trash"></i> Delete Question</h1>
             <div class="card">
-                <h2><i class="fas fa-trash"></i> Delete Question By ID</h2>
+                <h2><i class="fas fa-exclamation-triangle"></i> Permanently Delete Question</h2>
+                <div class="alert warning">
+                    <i class="fas fa-exclamation-triangle"></i> Warning: This action cannot be undone!
+                </div>
                 <div class="form-group">
                     <label>Question ID to Delete</label>
-                    <input type="number" id="deleteId" placeholder="Enter question ID" />
+                    <input type="number" id="deleteId" placeholder="Enter question ID">
                 </div>
-                <button class="delete" onclick="deleteById()">Delete Question</button>
+                <button class="delete" onclick="deleteById()">
+                    <i class="fas fa-trash"></i> Delete Question
+                </button>
                 <div id="deleteByIdResult"></div>
             </div>
         </div>
 
-        <!-- Update Email -->
+        <!-- ==================== UPDATE EMAIL ==================== -->
         <div id="updateEmail" class="section">
-            <h1>Update Email</h1>
+            <h1><i class="fas fa-envelope"></i> Update Email</h1>
             <div class="card">
-                <h2><i class="fas fa-envelope"></i> Update Your Email Address</h2>
+                <h2><i class="fas fa-user-edit"></i> Change Your Email Address</h2>
+                <div class="alert info">
+                    <i class="fas fa-info-circle"></i> You will need to verify your new email address.
+                </div>
                 <div class="form-group">
                     <label>New Email Address</label>
-                    <input type="email" id="newEmail" placeholder="newteacher@example.com" />
+                    <input type="email" id="newEmail" placeholder="newteacher@example.com">
                 </div>
-                <button onclick="updateEmail()">Update Email</button>
+                <button onclick="updateEmail()">
+                    <i class="fas fa-save"></i> Update Email
+                </button>
                 <div id="updateEmailResult"></div>
             </div>
         </div>
 
-        <!-- Update Password -->
+        <!-- ==================== UPDATE PASSWORD ==================== -->
         <div id="updatePassword" class="section">
-            <h1>Update Password</h1>
+            <h1><i class="fas fa-lock"></i> Update Password</h1>
             <div class="card">
-                <h2><i class="fas fa-lock"></i> Update Your Password</h2>
+                <h2><i class="fas fa-key"></i> Change Your Password</h2>
                 <div class="form-group">
                     <label>New Password</label>
-                    <input type="password" id="newPassword" placeholder="Enter new password" />
+                    <input type="password" id="newPassword" placeholder="Enter new password (min 6 characters)">
                 </div>
                 <div class="form-group">
                     <label>Confirm New Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm new password" />
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
                 </div>
-                <button onclick="updatePassword()">Update Password</button>
+                <button onclick="updatePassword()">
+                    <i class="fas fa-save"></i> Update Password
+                </button>
                 <div id="updatePasswordResult"></div>
             </div>
         </div>
+
     </div>
 </div>
 
+<!-- Scripts -->
 <script th:src="@{/js/api.js}"></script>
-<script th:src="@{/js/teacher-dashboard.js}"></script>
 <script th:src="@{/js/common-dashboard.js}"></script>
+<script th:src="@{/js/teacher-dashboard.js}"></script>
+
+<script>
+    // Update total questions count display
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update total questions count in generation form
+        const genA = document.getElementById('genA');
+        const genR = document.getElementById('genR');
+        const genU = document.getElementById('genU');
+        const totalSpan = document.getElementById('totalQuestionsCountGen');
+
+        function updateTotal() {
+            const total = (parseInt(genA.value) || 0) + (parseInt(genR.value) || 0) + (parseInt(genU.value) || 0);
+            if (totalSpan) totalSpan.textContent = total;
+        }
+
+        if (genA && genR && genU) {
+            genA.addEventListener('input', updateTotal);
+            genR.addEventListener('input', updateTotal);
+            genU.addEventListener('input', updateTotal);
+            updateTotal();
+        }
+
+        // For generate by name section
+        const genByNameA = document.getElementById('genByNameA');
+        const genByNameR = document.getElementById('genByNameR');
+        const genByNameU = document.getElementById('genByNameU');
+        const totalByNameSpan = document.getElementById('totalQuestionsCountGenByName');
+
+        function updateTotalByName() {
+            const total = (parseInt(genByNameA.value) || 0) + (parseInt(genByNameR.value) || 0) + (parseInt(genByNameU.value) || 0);
+            if (totalByNameSpan) totalByNameSpan.textContent = total;
+        }
+
+        if (genByNameA && genByNameR && genByNameU) {
+            genByNameA.addEventListener('input', updateTotalByName);
+            genByNameR.addEventListener('input', updateTotalByName);
+            genByNameU.addEventListener('input', updateTotalByName);
+            updateTotalByName();
+        }
+
+        // Set teacher name from token
+        const token = AuthAPI.getToken();
+        if (token) {
+            try {
+                const tokenData = AuthAPI.parseJwt(token);
+                const teacherName = tokenData.name || tokenData.sub || 'Teacher';
+                const teacherNameElem = document.getElementById('teacherName');
+                if (teacherNameElem) teacherNameElem.textContent = teacherName;
+            } catch (e) {
+                console.error('Error parsing token:', e);
+            }
+        }
+
+        // Load dashboard stats
+        setTimeout(async function() {
+            if (typeof loadMyQuestionsPaged === 'function') {
+                try {
+                    const myQuestionsData = await TeacherAPI.getMyQuestionsPaged(0, 1);
+                    const myQuestionsCountElem = document.getElementById('myQuestionsCount');
+                    if (myQuestionsCountElem && myQuestionsData) {
+                        myQuestionsCountElem.textContent = myQuestionsData.totalElements || 0;
+                    }
+
+                    const allQuestionsData = await TeacherAPI.getAllQuestionsPaged(0, 1);
+                    const totalQuestionsElem = document.getElementById('totalQuestions');
+                    if (totalQuestionsElem && allQuestionsData) {
+                        totalQuestionsElem.textContent = allQuestionsData.totalElements || 0;
+                    }
+                } catch (e) {
+                    console.error('Failed to load stats:', e);
+                }
+            }
+        }, 500);
+    });
+</script>
+
 </body>
 </html>

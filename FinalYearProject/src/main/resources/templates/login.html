@@ -1,106 +1,795 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Question Paper System</title>
-  <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QPGen - Login | Question Paper Generation System</title>
+  <meta name="description" content="Login to QPGen - Smart Question Paper Generation System">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background shapes */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x bottom;
+      background-size: cover;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* Dark Mode */
+    body.dark {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+
+    body.dark .login-container {
+      background: #1e293b;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark .login-header h1 {
+      color: #e2e8f0;
+    }
+
+    body.dark .input-group input {
+      background: #0f172a;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+
+    body.dark .input-group input:focus {
+      border-color: #4f46e5;
+    }
+
+    body.dark .input-group i {
+      color: #64748b;
+    }
+
+    body.dark .remember-me label {
+      color: #94a3b8;
+    }
+
+    body.dark .register-link {
+      color: #94a3b8;
+    }
+
+    /* Login Container */
+    .login-container {
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      width: 100%;
+      max-width: 450px;
+      overflow: hidden;
+      animation: slideUp 0.6s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Login Header */
+    .login-header {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      padding: 2rem;
+      text-align: center;
+      color: white;
+    }
+
+    .logo-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .login-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    /* Login Body */
+    .login-body {
+      padding: 2rem;
+    }
+
+    /* Alert Messages */
+    .alert {
+      padding: 0.875rem 1rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .alert.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid #ef4444;
+    }
+
+    .alert.success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid #10b981;
+    }
+
+    .alert.info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-left: 4px solid #3b82f6;
+    }
+
+    body.dark .alert.error {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+
+    body.dark .alert.success {
+      background: #064e3b;
+      color: #a7f3d0;
+    }
+
+    body.dark .alert.info {
+      background: #1e3a8a;
+      color: #bfdbfe;
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 1rem;
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.875rem 1rem 0.875rem 2.75rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      transition: all 0.3s;
+      background: white;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .input-group input::placeholder {
+      color: #cbd5e1;
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      left: auto !important;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+      color: #4f46e5;
+    }
+
+    /* Remember Me & Forgot Password */
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 0.875rem;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .remember-me input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #4f46e5;
+    }
+
+    .remember-me label {
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .forgot-password {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .forgot-password:hover {
+      color: #4338ca;
+      text-decoration: underline;
+    }
+
+    /* Login Button */
+    .login-btn {
+      width: 100%;
+      padding: 0.875rem;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Register Link */
+    .register-section {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .register-link {
+      color: #475569;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .register-link a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
+    body.dark .register-section {
+      border-top-color: #334155;
+    }
+
+    /* Demo Credentials */
+    .demo-credentials {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    body.dark .demo-credentials {
+      background: #0f172a;
+    }
+
+    .demo-credentials p {
+      color: #64748b;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .demo-credentials code {
+      display: block;
+      padding: 0.25rem 0;
+      color: #475569;
+      font-size: 0.7rem;
+    }
+
+    body.dark .demo-credentials code {
+      color: #94a3b8;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: white;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+
+    body.dark .theme-toggle {
+      background: #1e293b;
+      color: #facc15;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .login-container {
+        border-radius: 1.5rem;
+      }
+
+      .login-header {
+        padding: 1.5rem;
+      }
+
+      .login-body {
+        padding: 1.5rem;
+      }
+
+      .form-options {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
-
 <body>
+
+<!-- Theme Toggle Button -->
+<button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+  <i class="fas fa-moon"></i>
+</button>
+
 <div class="login-container">
-  <h1 class="login-title">Question Paper System</h1>
-
-  <form id="loginForm">
-    <div class="form-group">
-      <label>Email:</label>
-      <input type="email" name="email" required />
+  <div class="login-header">
+    <div class="logo-icon">
+      <i class="fas fa-file-alt"></i>
     </div>
+    <h1>Welcome Back</h1>
+    <p>Login to access your dashboard</p>
+  </div>
 
-    <div class="form-group">
-      <label>Password:</label>
-      <input type="password" name="password" required />
+  <div class="login-body">
+    <!-- Message Container -->
+    <div id="message"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <div class="form-group">
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="email" name="email" placeholder="Email Address" required autocomplete="email">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
+          <i class="fas fa-eye-slash password-toggle" id="togglePassword"></i>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Remember me</label>
+        </label>
+        <a href="#" class="forgot-password" id="forgotPassword">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">
+        <i class="fas fa-sign-in-alt"></i>
+        <span>Login</span>
+      </button>
+    </form>
+
+    <div class="register-section">
+      <p class="register-link">
+        Don't have an account? <a href="/register">Create an account</a>
+      </p>
     </div>
-
-    <button onclick="window.location.href='http://localhost:8080/register';">Dont have a account</button>
-    <button type="submit" id="loginBtn">Login</button>
-  </form>
-
-  <div id="message"></div>
+  </div>
 </div>
 
 <script th:src="@{/js/api.js}"></script>
-
 <script>
-  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  // ============================================
+  // DOM Elements
+  // ============================================
+  const loginForm = document.getElementById('loginForm');
+  const loginBtn = document.getElementById('loginBtn');
+  const messageDiv = document.getElementById('message');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const rememberMeCheckbox = document.getElementById('rememberMe');
+  const togglePasswordBtn = document.getElementById('togglePassword');
+  const forgotPasswordLink = document.getElementById('forgotPassword');
+
+  // ============================================
+  // Theme Management
+  // ============================================
+  function initTheme() {
+    const savedTheme = localStorage.getItem('qpgen-theme');
+    const body = document.body;
+
+    if (savedTheme === 'dark') {
+      body.classList.add('dark');
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+  }
+
+  function toggleTheme() {
+    const body = document.body;
+    const themeToggle = document.getElementById('themeToggle');
+
+    body.classList.toggle('dark');
+    const isDark = body.classList.contains('dark');
+
+    localStorage.setItem('qpgen-theme', isDark ? 'dark' : 'light');
+    themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+  }
+
+  // ============================================
+  // Password Toggle
+  // ============================================
+  function togglePasswordVisibility() {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    togglePasswordBtn.classList.toggle('fa-eye');
+    togglePasswordBtn.classList.toggle('fa-eye-slash');
+  }
+
+  // ============================================
+  // Alert Messages
+  // ============================================
+  function showMessage(message, type) {
+    const alertClass = type === 'error' ? 'error' : (type === 'success' ? 'success' : 'info');
+    messageDiv.innerHTML = `
+            <div class="alert ${alertClass}">
+                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : (type === 'success' ? 'fa-check-circle' : 'fa-info-circle')}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+    // Auto-hide success messages after 3 seconds
+    if (type === 'success') {
+      setTimeout(() => {
+        if (messageDiv.innerHTML.includes(message)) {
+          messageDiv.innerHTML = '';
+        }
+      }, 3000);
+    }
+  }
+
+  function clearMessage() {
+    messageDiv.innerHTML = '';
+  }
+
+  // ============================================
+  // Save/Load Credentials
+  // ============================================
+  function saveCredentials(email, password, remember) {
+    if (remember) {
+      localStorage.setItem('saved_email', email);
+      localStorage.setItem('saved_password', btoa(password)); // Basic encoding, not for production
+      localStorage.setItem('remember_me', 'true');
+    } else {
+      localStorage.removeItem('saved_email');
+      localStorage.removeItem('saved_password');
+      localStorage.setItem('remember_me', 'false');
+    }
+  }
+
+  function loadCredentials() {
+    const remember = localStorage.getItem('remember_me') === 'true';
+    if (remember) {
+      const savedEmail = localStorage.getItem('saved_email');
+      const savedPassword = localStorage.getItem('saved_password');
+      if (savedEmail) emailInput.value = savedEmail;
+      if (savedPassword) passwordInput.value = atob(savedPassword);
+      rememberMeCheckbox.checked = true;
+    }
+  }
+
+  // ============================================
+  // Redirect Based on Role
+  // ============================================
+  function redirectToDashboard(role) {
+    switch(role) {
+      case 'ROLE_ADMIN':
+        window.location.href = '/admin-dashboard';
+        break;
+      case 'ROLE_TEACHER':
+        window.location.href = '/teacher-dashboard';
+        break;
+      case 'ROLE_STUDENT':
+        window.location.href = '/student-dashboard';
+        break;
+      case 'ROLE_SUPERVISOR':
+        window.location.href = '/supervisor-dashboard';
+        break;
+      default:
+        window.location.href = '/dashboard';
+    }
+  }
+
+  // ============================================
+  // Login Handler
+  // ============================================
+  async function handleLogin(e) {
     e.preventDefault();
 
-    const btn = document.getElementById("loginBtn");
-    const msg = document.getElementById("message");
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    const rememberMe = rememberMeCheckbox.checked;
 
-    btn.disabled = true;
-    btn.textContent = "Logging in...";
-    msg.innerHTML = "";
+    // Validation
+    if (!email || !password) {
+      showMessage('Please enter both email and password', 'error');
+      return;
+    }
 
-    const formData = new FormData(e.target);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    if (!isValidEmail(email)) {
+      showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    // Disable button and show loading state
+    loginBtn.disabled = true;
+    const originalBtnHtml = loginBtn.innerHTML;
+    loginBtn.innerHTML = '<div class="spinner"></div><span>Logging in...</span>';
+    clearMessage();
 
     try {
+      // Call login API
       const response = await AuthAPI.login(email, password);
 
-      // Save JWT
+      // Save JWT token
       AuthAPI.setToken(response.token);
 
-      // Extract role from JWT
+      // Save credentials if remember me is checked
+      saveCredentials(email, password, rememberMe);
+
+      // Get role from token
       const role = AuthAPI.getRole();
 
-      // Redirect by role - use simple window.location redirects
-      switch (role) {
-        case "ROLE_ADMIN":
-          window.location.href = "/admin-dashboard";
-          break;
-        case "ROLE_TEACHER":
-          window.location.href = "/teacher-dashboard";
-          break;
-        case "ROLE_STUDENT":
-          window.location.href = "/student-dashboard";
-          break;
-        case "ROLE_SUPERVISOR":
-          window.location.href = "/supervisor-dashboard";
-          break;
-        default:
-          window.location.href = "/";
-      }
+      // Show success message
+      const roleName = role.replace('ROLE_', '');
+      showMessage(`Login successful! Redirecting to ${roleName} dashboard...`, 'success');
+
+      // Redirect after short delay
+      setTimeout(() => {
+        redirectToDashboard(role);
+      }, 1500);
 
     } catch (error) {
-      msg.innerHTML = `<div class="error">${error.message}</div>`;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Login";
+      console.error('Login error:', error);
+
+      let errorMessage = 'Login failed. Please check your credentials.';
+      if (error.message.includes('User is locked')) {
+        errorMessage = 'Your account has been locked. Please contact an administrator.';
+      } else if (error.message.includes('Account not verified')) {
+        errorMessage = 'Please verify your email before logging in. Check your inbox for the OTP.';
+      } else if (error.message.includes('Invalid credentials')) {
+        errorMessage = 'Invalid email or password. Please try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      showMessage(errorMessage, 'error');
+
+      // Reset button
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = originalBtnHtml;
+    }
+  }
+
+  // ============================================
+  // Forgot Password Handler
+  // ============================================
+  function handleForgotPassword(e) {
+    e.preventDefault();
+    const email = emailInput.value.trim();
+
+    if (!email) {
+      showMessage('Please enter your email address to reset password', 'info');
+      emailInput.focus();
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    // In a real implementation, this would call a password reset API
+    showMessage(`Password reset link has been sent to ${email}. Please check your inbox.`, 'success');
+  }
+
+  // ============================================
+  // Email Validation
+  // ============================================
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // ============================================
+  // Check if Already Logged In
+  // ============================================
+  function checkExistingSession() {
+    if (typeof AuthAPI !== 'undefined' && AuthAPI.isAuthenticated && AuthAPI.isAuthenticated()) {
+      const role = AuthAPI.getRole();
+      if (role) {
+        showMessage(`You are already logged in. Redirecting to dashboard...`, 'info');
+        setTimeout(() => {
+          redirectToDashboard(role);
+        }, 1500);
+      }
+    }
+  }
+
+  // ============================================
+  // Event Listeners
+  // ============================================
+  loginForm.addEventListener('submit', handleLogin);
+  togglePasswordBtn.addEventListener('click', togglePasswordVisibility);
+  forgotPasswordLink.addEventListener('click', handleForgotPassword);
+
+  // Theme toggle
+  const themeToggleBtn = document.getElementById('themeToggle');
+  themeToggleBtn.addEventListener('click', toggleTheme);
+
+  // Add enter key support for password field
+  passwordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      handleLogin(e);
     }
   });
 
-  // Auto-redirect if already logged in - FIX THIS SECTION
-  // Check if AuthAPI exists and has the required methods
-  if (typeof AuthAPI !== 'undefined' && AuthAPI.isAuthenticated && AuthAPI.isAuthenticated()) {
-    const role = AuthAPI.getRole();
-    switch (role) {
-      case "ROLE_ADMIN":
-        window.location.href = "/admin-dashboard";
-        break;
-      case "ROLE_TEACHER":
-        window.location.href = "/teacher-dashboard";
-        break;
-      case "ROLE_STUDENT":
-        window.location.href = "/student-dashboard";
-        break;
-      case "ROLE_SUPERVISOR":
-        window.location.href = "/supervisor-dashboard";
-        break;
+  // Real-time validation
+  emailInput.addEventListener('input', () => {
+    if (messageDiv.innerHTML.includes('email')) {
+      clearMessage();
+    }
+  });
+
+  passwordInput.addEventListener('input', () => {
+    if (messageDiv.innerHTML.includes('password')) {
+      clearMessage();
+    }
+  });
+
+  // ============================================
+  // Initialize
+  // ============================================
+  function init() {
+    initTheme();
+    loadCredentials();
+    checkExistingSession();
+
+    // Focus on email input
+    if (!emailInput.value) {
+      emailInput.focus();
+    } else if (!passwordInput.value) {
+      passwordInput.focus();
     }
   }
-</script>
 
+  // Wait for DOM and API to be ready
+  document.addEventListener('DOMContentLoaded', () => {
+    // Small delay to ensure AuthAPI is loaded
+    setTimeout(init, 100);
+  });
+</script>
 </body>
 </html>

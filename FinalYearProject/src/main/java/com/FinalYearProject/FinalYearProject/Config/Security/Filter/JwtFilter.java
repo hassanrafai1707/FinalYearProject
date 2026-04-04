@@ -81,7 +81,6 @@ public class JwtFilter extends OncePerRequestFilter {
                         path.startsWith("/webjars") ||
                         path.equals("/")
         ) {
-            System.out.println("Request:"+request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -89,7 +88,6 @@ public class JwtFilter extends OncePerRequestFilter {
             token=authHeader.substring(7); //separate the heder type form heder
             username= jwtService.extractUserEmail(token);
             try {
-                System.out.println("Request:"+request.getRequestURI());
                 jwtService.isTokenExpiredOrThrow(token);
             } catch (Exception e) {
                 ObjectMapper objectMapper=new ObjectMapper();

@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QPGen | Smart Question Paper Generation System</title>
+    <meta name="description" content="Automated question paper generation system with role-based access, CO mapping, and digital approval workflows.">
+    <meta name="author" content="Hassan Abdul Rahim Patel">
+
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -23,20 +31,20 @@
             overflow-x: hidden;
         }
 
-        /* dark mode */
+        /* Dark Mode */
         body.dark {
             background: #0b1120;
             color: #e2e8f0;
         }
 
+        body.dark .navbar,
+        body.dark .footer,
         body.dark .card,
         body.dark .feature-card,
         body.dark .stat-card,
-        body.dark .endpoint-section,
-        body.dark .footer,
-        body.dark .navbar,
-        body.dark .workflow {
-            background-color: #111827;
+        body.dark .workflow-card,
+        body.dark .role-card {
+            background: #111827;
             border-color: #1e293b;
         }
 
@@ -47,15 +55,22 @@
 
         body.dark .tech-badge {
             background: #1e293b;
+            color: #cbd5e1;
         }
 
-        body.dark .btn-secondary {
+        body.dark .btn-outline {
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        body.dark .btn-outline:hover {
             background: #1e293b;
-            color: #e2e8f0;
+            border-color: #4f46e5;
         }
 
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
@@ -63,100 +78,124 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #3b82f6;
+            background: #4f46e5;
             border-radius: 10px;
         }
 
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338ca;
+        }
+
+        body.dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        /* Container */
         .container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        /* navbar */
+        /* Navigation */
         .navbar {
-            background: white;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             border-bottom: 1px solid #eef2ff;
+            transition: all 0.3s ease;
         }
+
         body.dark .navbar {
-            background: #0f172ad9;
-            backdrop-filter: blur(12px);
+            background: rgba(15, 23, 42, 0.95);
             border-bottom-color: #1e293b;
         }
+
         .nav-flex {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem 0;
         }
+
         .logo {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .logo-icon {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            width: 40px;
-            height: 40px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             color: white;
-            box-shadow: 0 6px 12px -6px rgba(37,99,235,0.3);
+            box-shadow: 0 6px 12px -6px rgba(79, 70, 229, 0.4);
         }
+
         .logo h1 {
             font-size: 1.65rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            background: linear-gradient(135deg, #1e3a8a, #4f46e5);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
+
         body.dark .logo h1 {
-            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
+            background-clip: text;
         }
+
         .nav-links {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             align-items: center;
             flex-wrap: wrap;
         }
+
         .nav-links a {
             text-decoration: none;
             font-weight: 500;
-            color: #1e293b;
+            color: #334155;
             transition: 0.2s;
-            padding: 0.4rem 0.8rem;
         }
+
         body.dark .nav-links a {
             color: #cbd5e1;
         }
+
         .nav-links a:hover {
-            color: #2563eb;
+            color: #4f46e5;
         }
+
         .btn-login {
             background: transparent;
-            border: 1px solid #2563eb;
+            border: 1.5px solid #4f46e5;
             padding: 0.5rem 1.2rem;
             border-radius: 40px;
             font-weight: 600;
-            color: #2563eb;
+            color: #4f46e5;
             transition: 0.2s;
             cursor: pointer;
         }
+
         .btn-login:hover {
-            background: #2563eb10;
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-1px);
         }
+
         .btn-register {
-            background: #2563eb;
+            background: #4f46e5;
             border: none;
             padding: 0.5rem 1.2rem;
             border-radius: 40px;
@@ -164,12 +203,15 @@
             color: white;
             transition: 0.2s;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(37,99,235,0.3);
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
         }
+
         .btn-register:hover {
-            background: #1d4ed8;
+            background: #4338ca;
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
         }
+
         .theme-toggle-btn {
             background: #eef2ff;
             border: none;
@@ -177,156 +219,242 @@
             height: 38px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: 0.2s;
         }
+
         body.dark .theme-toggle-btn {
             background: #1e293b;
             color: #facc15;
         }
 
-        /* hero */
+        .theme-toggle-btn:hover {
+            transform: rotate(15deg);
+        }
+
+        /* Mobile Menu Button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #334155;
+        }
+
+        body.dark .mobile-menu-btn {
+            color: #cbd5e1;
+        }
+
+        /* Hero Section */
         .hero {
             padding: 5rem 0 4rem;
             text-align: center;
         }
+
         .hero-badge {
             display: inline-block;
-            background: #e0e7ff;
-            padding: 0.3rem 1rem;
+            background: linear-gradient(135deg, #e0e7ff, #ede9fe);
+            padding: 0.4rem 1.2rem;
             border-radius: 40px;
             font-size: 0.85rem;
             font-weight: 600;
-            color: #1e40af;
+            color: #4f46e5;
             margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease;
         }
+
         .hero h1 {
-            font-size: 3.2rem;
+            font-size: 3.5rem;
             font-weight: 800;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #0f172a, #2563eb);
+            background: linear-gradient(135deg, #0f172a, #4f46e5, #7c3aed);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             margin-bottom: 1rem;
+            animation: fadeInUp 0.6s ease 0.1s both;
         }
+
         body.dark .hero h1 {
-            background: linear-gradient(135deg, #e2e8f0, #60a5fa);
+            background: linear-gradient(135deg, #e2e8f0, #a78bfa, #c4b5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
         }
+
         .hero p {
             font-size: 1.2rem;
             max-width: 700px;
             margin: 1rem auto;
-            color: #334155;
+            color: #475569;
+            animation: fadeInUp 0.6s ease 0.2s both;
         }
+
         body.dark .hero p {
-            color: #cbd5e1;
+            color: #94a3b8;
         }
+
         .cta-group {
             margin-top: 2rem;
             display: flex;
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
-        }
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 40px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: 0.2s;
-            box-shadow: 0 4px 6px -2px rgba(37,99,235,0.3);
-            display: inline-block;
-            cursor: pointer;
-            border: none;
-        }
-        .btn-primary:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-        }
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #0f172a;
-            padding: 0.8rem 2rem;
-            border-radius: 40px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: 0.2s;
-            cursor: pointer;
-            border: none;
+            animation: fadeInUp 0.6s ease 0.3s both;
         }
 
-        /* stats */
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 0.9rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1e293b;
+            padding: 0.9rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        body.dark .btn-secondary {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Stats Section */
         .stats-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 3rem;
-            margin: 3rem 0;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 2rem;
-            padding: 1.2rem 2rem;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-            border: 1px solid #eef2ff;
-        }
-        .stat-number {
-            font-size: 2.4rem;
-            font-weight: 800;
-            color: #2563eb;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .section-sub {
-            text-align: center;
-            color: #475569;
-            max-width: 680px;
-            margin: 0 auto 3rem auto;
-        }
-
-        /* feature cards - matching dashboard style */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             margin: 3rem 0;
         }
+
+        .stat-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eef2ff;
+            min-width: 160px;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #4f46e5;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: #64748b;
+            max-width: 680px;
+            margin: 0 auto 3rem auto;
+            font-size: 1.1rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
         .feature-card {
             background: white;
             border-radius: 1.5rem;
-            padding: 1.8rem;
+            padding: 2rem;
             border: 1px solid #eef2ff;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            text-align: center;
         }
+
         .feature-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.08);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.1);
         }
+
         .feature-icon {
-            background: #eef2ff;
-            width: 56px;
-            height: 56px;
+            background: linear-gradient(135deg, #e0e7ff, #ede9fe);
+            width: 64px;
+            height: 64px;
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            color: #2563eb;
-            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: #4f46e5;
+            margin: 0 auto 1.5rem;
         }
 
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        body.dark .feature-card p {
+            color: #94a3b8;
+        }
+
+        /* Tech Stack */
         .tech-cloud {
             display: flex;
             flex-wrap: wrap;
@@ -334,39 +462,70 @@
             gap: 1rem;
             margin: 2rem 0;
         }
+
         .tech-badge {
             background: #eef2ff;
             padding: 0.6rem 1.2rem;
             border-radius: 60px;
             font-weight: 500;
             font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s;
         }
 
-        .workflow {
-            background: linear-gradient(145deg, #f1f5f9, #ffffff);
+        .tech-badge:hover {
+            transform: scale(1.05);
+        }
+
+        body.dark .tech-badge {
+            background: #1e293b;
+        }
+
+        /* Workflow Section */
+        .workflow-section {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
             border-radius: 2rem;
-            padding: 2rem;
+            padding: 3rem 2rem;
             margin: 2rem 0;
         }
-        body.dark .workflow {
-            background: #0f172a;
+
+        body.dark .workflow-section {
+            background: linear-gradient(135deg, #0f172a, #111827);
         }
-        .flow-steps {
+
+        .workflow-steps {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 2rem;
             margin-top: 2rem;
         }
+
         .step {
             text-align: center;
             flex: 1;
             min-width: 140px;
+            position: relative;
         }
+
+        @media (min-width: 769px) {
+            .step:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                top: 30px;
+                right: -30px;
+                width: 40px;
+                height: 2px;
+                background: linear-gradient(90deg, #4f46e5, transparent);
+            }
+        }
+
         .step .circle {
-            background: #2563eb;
-            width: 48px;
-            height: 48px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            width: 56px;
+            height: 56px;
             margin: 0 auto 1rem;
             border-radius: 60px;
             display: flex;
@@ -374,60 +533,223 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
         }
 
-        .endpoint-section {
+        .step h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .step p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        body.dark .step p {
+            color: #94a3b8;
+        }
+
+        /* Role Cards */
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .role-card {
             background: white;
-            border-radius: 1.5rem;
-            padding: 1rem;
-            border: 1px solid #e2e8f0;
-            margin-top: 2rem;
-        }
-        .endpoint-code {
-            background: #0f172a;
-            padding: 0.8rem 1.2rem;
             border-radius: 1rem;
-            font-family: monospace;
-            font-size: 0.85rem;
-            color: #a5f3fc;
-            overflow-x: auto;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid #eef2ff;
+            transition: all 0.3s;
         }
 
+        .role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark .role-card {
+            background: #1e293b;
+        }
+
+        .role-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .role-card h4 {
+            margin-bottom: 0.5rem;
+        }
+
+        .role-card p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        body.dark .role-card p {
+            color: #94a3b8;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 2rem;
+            padding: 3rem;
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .cta-section h3 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
         .footer {
             background: white;
             border-top: 1px solid #eef2ff;
-            margin-top: 5rem;
-            padding: 2.5rem 0;
-            text-align: center;
-        }
-        body.dark .footer {
-            background: #0f172a;
+            margin-top: 4rem;
+            padding: 3rem 0 2rem;
         }
 
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.2rem; }
-            .nav-links { gap: 0.5rem; }
-            .btn-login, .btn-register { padding: 0.4rem 1rem; font-size: 0.9rem; }
-            .stats-grid { gap: 1rem; }
+        body.dark .footer {
+            background: #0f172a;
+            border-top-color: #1e293b;
         }
-        button, .btn-primary, .btn-secondary, .theme-toggle-btn, .btn-login, .btn-register {
-            cursor: pointer;
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .footer-section p, .footer-section a {
+            color: #64748b;
+            text-decoration: none;
+            line-height: 1.8;
+            font-size: 0.875rem;
+        }
+
+        .footer-section a:hover {
+            color: #4f46e5;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid #eef2ff;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        body.dark .footer-bottom {
+            border-top-color: #1e293b;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                border-radius: 0 0 1rem 1rem;
+            }
+
+            body.dark .nav-links {
+                background: #1e293b;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .workflow-steps {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cta-section {
+                padding: 2rem;
+            }
+
+            .cta-section h3 {
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
 <body>
+
 <nav class="navbar">
     <div class="container nav-flex">
         <div class="logo">
             <div class="logo-icon"><i class="fas fa-file-alt"></i></div>
             <h1>QPGen</h1>
         </div>
-        <div class="nav-links">
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
             <a href="#features">Features</a>
             <a href="#tech">Tech Stack</a>
             <a href="#workflow">Workflow</a>
-            <a href="#api">API</a>
+            <a href="#roles">Roles</a>
             <button class="btn-login" id="navLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
             <button class="btn-register" id="navRegisterBtn"><i class="fas fa-user-plus"></i> Register</button>
             <button class="theme-toggle-btn" id="darkModeToggle"><i class="fas fa-moon"></i></button>
@@ -437,106 +759,182 @@
 
 <main>
     <div class="container">
+        <!-- Hero Section -->
         <div class="hero">
-            <span class="hero-badge"><i class="fas fa-robot"></i> AI-Ready • Automated Paper Generation</span>
+            <span class="hero-badge">
+                <i class="fas fa-robot"></i> AI-Ready • Automated Paper Generation
+            </span>
             <h1>Question Paper Generation<br>System for Modern Education</h1>
             <p>From hours to minutes — QPGen streamlines exam creation with structured banks, cognitive mapping, and digital approval workflows.</p>
             <div class="cta-group">
-                <button class="btn-primary" id="heroLoginBtn"><i class="fas fa-rocket"></i> Login to Dashboard</button>
-                <button class="btn-secondary" id="heroRegisterBtn"><i class="fas fa-user-graduate"></i> Create Account</button>
+                <button class="btn-primary" id="heroLoginBtn">
+                    <i class="fas fa-rocket"></i> Login to Dashboard
+                </button>
+                <button class="btn-secondary" id="heroRegisterBtn">
+                    <i class="fas fa-user-graduate"></i> Create Account
+                </button>
             </div>
+
+            <!-- Stats -->
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-number">119+</div><div>API Endpoints</div></div>
-                <div class="stat-card"><div class="stat-number">18.5k</div><div>Lines of Code</div></div>
-                <div class="stat-card"><div class="stat-number">4</div><div>User Roles</div></div>
+                <div class="stat-card">
+                    <div class="stat-number">119+</div>
+                    <div class="stat-label">API Endpoints</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">18.5k</div>
+                    <div class="stat-label">Lines of Code</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">User Roles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Availability</div>
+                </div>
             </div>
         </div>
 
+        <!-- Features Section -->
         <div id="features">
             <h2 class="section-title">Powerful Features</h2>
             <div class="section-sub">Everything you need to create, review and export examination papers with confidence.</div>
+
             <div class="features-grid">
-                <div class="feature-card"><div class="feature-icon"><i class="fas fa-database"></i></div><h3>Structured Bank</h3><p>Tag questions by Subject, CO (CO1–CO3), Bloom's levels (R/U/A) and marks (2/4/6).</p></div>
-                <div class="feature-card"><div class="feature-icon"><i class="fas fa-magic"></i></div><h3>Auto Generation</h3><p>Generate balanced papers based on cognitive distribution & marks allocation instantly.</p></div>
-                <div class="feature-card"><div class="feature-icon"><i class="fas fa-check-double"></i></div><h3>Review Workflow</h3><p>Teacher submits → Supervisor reviews, comments & approves with full audit trail.</p></div>
-                <div class="feature-card"><div class="feature-icon"><i class="fas fa-file-pdf"></i></div><h3>PDF Export</h3><p>One-click downloadable, professionally formatted PDFs using OpenPDF.</p></div>
-                <div class="feature-card"><div class="feature-icon"><i class="fas fa-shield-alt"></i></div><h3>JWT Security</h3><p>Custom authentication filter + role-based access (Admin, Teacher, Supervisor, Student).</p></div>
-                <div class="feature-card"><div class="feature-icon"><i class="fas fa-envelope"></i></div><h3>Email Verification</h3><p>Two-factor account activation with OTP & confirmation link (JavaMailSender + Redis).</p></div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="feature-icon"><i class="fas fa-database"></i></div>
+                    <h3>Structured Question Bank</h3>
+                    <p>Tag questions by Subject, CO (CO1–CO3), Bloom's Taxonomy levels (R/U/A) and marks (2/4/6).</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-icon"><i class="fas fa-magic"></i></div>
+                    <h3>Automated Generation</h3>
+                    <p>Generate balanced papers based on cognitive distribution & marks allocation in seconds.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-icon"><i class="fas fa-check-double"></i></div>
+                    <h3>Review Workflow</h3>
+                    <p>Teacher submits → Supervisor reviews, comments & approves with full audit trail.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-icon"><i class="fas fa-file-pdf"></i></div>
+                    <h3>PDF Export</h3>
+                    <p>One-click downloadable, professionally formatted PDFs using OpenPDF library.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>JWT Security</h3>
+                    <p>Custom authentication filter + role-based access (Admin, Teacher, Supervisor, Student).</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-icon"><i class="fas fa-envelope"></i></div>
+                    <h3>Email Verification</h3>
+                    <p>Two-factor account activation with OTP & confirmation link (JavaMailSender + Redis).</p>
+                </div>
             </div>
         </div>
 
+        <!-- Technology Stack -->
         <div id="tech">
             <h2 class="section-title">Technology Stack</h2>
+            <div class="section-sub">Built with modern, enterprise-grade technologies</div>
+
             <div class="tech-cloud">
                 <span class="tech-badge"><i class="fab fa-java"></i> Java 17</span>
                 <span class="tech-badge"><i class="fas fa-leaf"></i> Spring Boot</span>
+                <span class="tech-badge"><i class="fas fa-lock"></i> Spring Security</span>
                 <span class="tech-badge"><i class="fas fa-database"></i> PostgreSQL</span>
                 <span class="tech-badge"><i class="fas fa-memory"></i> Redis</span>
-                <span class="tech-badge"><i class="fas fa-lock"></i> JWT (JJWT)</span>
+                <span class="tech-badge"><i class="fas fa-key"></i> JWT (JJWT)</span>
                 <span class="tech-badge"><i class="fab fa-html5"></i> HTML5/CSS3/JS</span>
                 <span class="tech-badge"><i class="fab fa-css3-alt"></i> Thymeleaf</span>
                 <span class="tech-badge"><i class="fas fa-file-pdf"></i> OpenPDF</span>
                 <span class="tech-badge"><i class="fab fa-docker"></i> Docker</span>
-            </div>
-            <div class="endpoint-section">
-                <h3 style="margin-bottom: 0.5rem;"><i class="fas fa-server"></i> Backend Excellence</h3>
-                <p>Spring Security, JPA/Hibernate, Maven, RESTful architecture, Global Exception Handling, and Role-based endpoints.</p>
+                <span class="tech-badge"><i class="fab fa-git-alt"></i> Git</span>
+                <span class="tech-badge"><i class="fas fa-chart-line"></i> Maven</span>
             </div>
         </div>
 
+        <!-- Workflow Section -->
         <div id="workflow">
             <h2 class="section-title">Complete Workflow</h2>
-            <div class="workflow">
-                <div class="flow-steps">
-                    <div class="step"><div class="circle"><i class="fas fa-plus"></i></div><h4>Create Q's</h4><p>Teacher adds questions with CO & Bloom's level</p></div>
-                    <div class="step"><div class="circle"><i class="fas fa-cogs"></i></div><h4>Generate</h4><p>Auto-select based on subject & marks</p></div>
-                    <div class="step"><div class="circle"><i class="fas fa-paper-plane"></i></div><h4>Submit</h4><p>Send paper for review</p></div>
-                    <div class="step"><div class="circle"><i class="fas fa-eye"></i></div><h4>Review</h4><p>Supervisor comments & approves/rejects</p></div>
-                    <div class="step"><div class="circle"><i class="fas fa-download"></i></div><h4>Export PDF</h4><p>Download approved paper</p></div>
+            <div class="section-sub">From question creation to final approval - fully digital process</div>
+
+            <div class="workflow-section">
+                <div class="workflow-steps">
+                    <div class="step">
+                        <div class="circle"><i class="fas fa-plus"></i></div>
+                        <h4>Create Questions</h4>
+                        <p>Teacher adds questions with CO & Bloom's level</p>
+                    </div>
+                    <div class="step">
+                        <div class="circle"><i class="fas fa-cogs"></i></div>
+                        <h4>Generate Paper</h4>
+                        <p>Auto-select based on subject & marks distribution</p>
+                    </div>
+                    <div class="step">
+                        <div class="circle"><i class="fas fa-paper-plane"></i></div>
+                        <h4>Submit Review</h4>
+                        <p>Send generated paper for supervisor review</p>
+                    </div>
+                    <div class="step">
+                        <div class="circle"><i class="fas fa-eye"></i></div>
+                        <h4>Review & Approve</h4>
+                        <p>Supervisor comments & approves/rejects paper</p>
+                    </div>
+                    <div class="step">
+                        <div class="circle"><i class="fas fa-download"></i></div>
+                        <h4>Export PDF</h4>
+                        <p>Download approved paper as professional PDF</p>
+                    </div>
                 </div>
-                <div style="text-align: center; margin-top: 2rem; font-size: 0.9rem;"><i class="fas fa-sync-alt"></i> Full cycle: If rejected, teacher revises and resubmits</div>
-            </div>
-        </div>
-
-        <div id="api">
-            <h2 class="section-title">API Ecosystem</h2>
-            <div class="section-sub">119+ secure endpoints for full control — from user management to paper generation.</div>
-            <div class="endpoint-section">
-                <h3><i class="fas fa-key"></i> Authentication</h3>
-                <div class="endpoint-code">POST /api/v1/auth/register | POST /api/v1/auth/login | POST /api/v1/auth/confirm</div>
-            </div>
-            <div class="endpoint-section">
-                <h3><i class="fas fa-chalkboard-teacher"></i> Teacher Core</h3>
-                <div class="endpoint-code">POST /api/v1/teacher/question | POST /api/v1/teacher/generate/question-paper/subjectCode | POST /api/v1/teacher/To-approve/questionPaper</div>
-            </div>
-            <div class="endpoint-section">
-                <h3><i class="fas fa-user-graduate"></i> Student & Supervisor</h3>
-                <div class="endpoint-code">GET /api/v1/student/questions/paged | PATCH /api/v1/supervisor/questionsPapers/approv/id</div>
-            </div>
-            <div class="endpoint-section">
-                <h3><i class="fas fa-user-shield"></i> Admin Power</h3>
-                <div class="endpoint-code">GET /api/v1/admin/users/paged | DELETE batch users | update roles/suspend</div>
-            </div>
-        </div>
-
-        <div style="margin: 3rem 0; background: #eef2ff30; border-radius: 2rem; padding: 2rem; text-align: center;">
-            <h3><i class="fas fa-users"></i> Four User Roles, One Unified Platform</h3>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin-top: 1.5rem;">
-                <div><i class="fas fa-chalkboard-user"></i> <strong>Teacher</strong><br>Create, generate, submit</div>
-                <div><i class="fas fa-clipboard-list"></i> <strong>Supervisor</strong><br>Review, comment, approve</div>
-                <div><i class="fas fa-graduation-cap"></i> <strong>Student</strong><br>Browse papers & questions</div>
-                <div><i class="fas fa-crown"></i> <strong>Admin</strong><br>Full user & audit control</div>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin: 3rem 0;">
-            <div style="background: linear-gradient(125deg, #1e293b, #0f172a); padding: 2.5rem; border-radius: 2rem; color: white;">
-                <h3 style="color: white; font-size: 1.8rem;">Ready to transform exam creation?</h3>
-                <p style="margin: 1rem 0; opacity: 0.9;">Join institutions using QPGen to reduce paper creation time from hours to minutes.</p>
-                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <button class="btn-primary" id="footerLoginBtn" style="background: #3b82f6;">Login</button>
-                    <button class="btn-secondary" id="footerRegisterBtn" style="background: #334155; color: white;">Register</button>
+                <div style="text-align: center; margin-top: 2rem; font-size: 0.9rem; color: #64748b;">
+                    <i class="fas fa-sync-alt"></i> Full cycle: If rejected, teacher revises and resubmits
                 </div>
+            </div>
+        </div>
+
+        <!-- User Roles Section -->
+        <div id="roles">
+            <h2 class="section-title">Four User Roles, One Unified Platform</h2>
+            <div class="section-sub">Role-based access control for complete institutional management</div>
+
+            <div class="roles-grid">
+                <div class="role-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="role-icon"><i class="fas fa-chalkboard-user" style="color: #8b5cf6;"></i></div>
+                    <h4>Teacher</h4>
+                    <p>Create questions, manage bank, generate papers, submit for review</p>
+                </div>
+                <div class="role-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="role-icon"><i class="fas fa-clipboard-list" style="color: #f59e0b;"></i></div>
+                    <h4>Supervisor</h4>
+                    <p>Review papers, add comments, approve/reject with feedback</p>
+                </div>
+                <div class="role-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="role-icon"><i class="fas fa-graduation-cap" style="color: #10b981;"></i></div>
+                    <h4>Student</h4>
+                    <p>Browse questions, view approved papers, filter by subject/CO</p>
+                </div>
+                <div class="role-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="role-icon"><i class="fas fa-crown" style="color: #ef4444;"></i></div>
+                    <h4>Admin</h4>
+                    <p>Full user management, role assignment, audit control, batch operations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h3>Ready to transform exam creation?</h3>
+            <p>Join institutions using QPGen to reduce paper creation time from hours to minutes.</p>
+            <div class="cta-buttons">
+                <button class="btn-primary" id="footerLoginBtn" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">
+                    <i class="fas fa-sign-in-alt"></i> Login Now
+                </button>
+                <button class="btn-secondary" id="footerRegisterBtn" style="background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.2);">
+                    <i class="fas fa-user-plus"></i> Register Account
+                </button>
             </div>
         </div>
     </div>
@@ -544,21 +942,55 @@
 
 <footer class="footer">
     <div class="container">
-        <p>© 2026 QPGen — Question Paper Generation System | Built with <i class="fas fa-heart" style="color: #ef4444;"></i> for Vidyalankar Polytechnic</p>
-        <p style="margin-top: 0.5rem; font-size: 0.85rem;">Project Guide: Prof. Madhavi M | Developer: Hassan Abdul Rahim Patel</p>
-        <p><i class="fab fa-github"></i> FinalYearProject | Spring Boot + PostgreSQL + Redis + JWT</p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-file-alt"></i> QPGen</h4>
+                <p>Smart Question Paper Generation System for modern educational institutions.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <p><a href="#features">Features</a></p>
+                <p><a href="#tech">Tech Stack</a></p>
+                <p><a href="#workflow">Workflow</a></p>
+                <p><a href="#roles">User Roles</a></p>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p><i class="fas fa-envelope"></i> hassanrafai1707@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> Vidyalankar Polytechnic, Mumbai</p>
+            </div>
+            <div class="footer-section">
+                <h4>Project Info</h4>
+                <p>Diploma in Computer Engineering (Semester 6)</p>
+                <p>Project Guide: Prof. Madhavi M</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 QPGen — Question Paper Generation System | Built with <i class="fas fa-heart" style="color: #ef4444;"></i> for Vidyalankar Polytechnic</p>
+            <p style="margin-top: 0.5rem;">Developed by Hassan Abdul Rahim Patel</p>
+        </div>
     </div>
 </footer>
 
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script th:src="@{/js/api.js}"></script>
 <script>
+    // Initialize AOS animations
+    AOS.init({
+        duration: 600,
+        once: true,
+        offset: 100
+    });
+
     // Dark mode toggle
     const darkToggle = document.getElementById('darkModeToggle');
     const body = document.body;
+
     if (localStorage.getItem('qpgen-theme') === 'dark') {
         body.classList.add('dark');
         darkToggle.innerHTML = '<i class="fas fa-sun"></i>';
     }
+
     darkToggle.addEventListener('click', () => {
         body.classList.toggle('dark');
         const isDark = body.classList.contains('dark');
@@ -566,7 +998,24 @@
         darkToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     });
 
-    // Redirect to login/register pages (these will use your existing api.js)
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    }
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('active');
+        });
+    });
+
+    // Redirect to login/register pages
     const LOGIN_URL = '/login';
     const REGISTER_URL = '/register';
 
@@ -594,7 +1043,7 @@
     });
 
     // Smooth scroll for anchor links
-    document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
             if (href && href !== "#") {
@@ -602,6 +1051,7 @@
                 if (target) {
                     e.preventDefault();
                     target.scrollIntoView({ behavior: 'smooth' });
+                    navLinks.classList.remove('active');
                 }
             }
         });

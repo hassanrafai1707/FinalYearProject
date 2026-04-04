@@ -3,11 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Frontend Only</title>
-    <link rel="stylesheet" th:href="@{/css/style1.css}">
+    <title>QPGen - Admin Dashboard | User Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        /* Additional admin-specific styles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        body.dark-mode .stat-card {
+            background: #1e293b;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        body.dark-mode .stat-number {
+            color: #e2e8f0;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .user-detail-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-top: 1rem;
+        }
+
+        body.dark-mode .user-detail-card {
+            background: #1e293b;
+        }
+
+        .user-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-light), white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        body.dark-mode .user-detail-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        .user-avatar {
+            width: 64px;
+            height: 64px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .user-info h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.25rem;
+        }
+
+        .user-email {
+            color: var(--gray);
+            margin: 0;
+        }
+
+        .user-status {
+            margin-left: auto;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .user-detail-body {
+            padding: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            width: 140px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .detail-value {
+            flex: 1;
+            color: var(--gray);
+        }
+
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+
+        .icon-btn {
+            background: transparent;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        .icon-btn:hover {
+            background: var(--gray-light);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .icon-btn.danger:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .icon-btn.success:hover {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .icon-btn.warning:hover {
+            background: #fed7aa;
+            color: var(--warning);
+        }
+
+        body.dark-mode .icon-btn.danger:hover {
+            background: #7f1d1d;
+            color: #fecaca;
+        }
+
+        body.dark-mode .icon-btn.success:hover {
+            background: #064e3b;
+            color: #a7f3d0;
+        }
+
+        .pagination-dots {
+            padding: 0 0.5rem;
+            color: var(--gray);
+        }
+
+        .role-select {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 0.375rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-suspended {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        body.dark-mode .status-active {
+            background: #14532d;
+            color: #bbf7d0;
+        }
+
+        body.dark-mode .status-suspended {
+            background: #7f1d1d;
+            color: #fecaca;
+        }
+
+        .transfer-section {
+            border-left: 3px solid var(--warning);
+        }
+    </style>
 </head>
 <body>
+
 <!-- Theme Toggle -->
 <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
     <i class="fas fa-moon"></i>
@@ -20,20 +238,26 @@
 
 <div class="dashboard">
     <!-- Sidebar -->
-    <!-- Sidebar - Updated with individual menu items -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2>Admin Panel</h2>
+            <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
             <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
         <ul>
+            <!-- Dashboard -->
+            <div class="menu-category">Overview</div>
+            <li><a href="#" onclick="showSection('dashboardHome')" class="active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a></li>
+
             <!-- User Management -->
             <div class="menu-category">User Management</div>
-            <li><a href="#" onclick="showSection('allUsersPaged')" class="active">
+            <li><a href="#" onclick="showSection('allUsersPaged')">
                 <i class="fas fa-users"></i>
-                <span>All Users (Paged)</span>
+                <span>All Users</span>
             </a></li>
             <li><a href="#" onclick="showSection('findUserById')">
                 <i class="fas fa-search"></i>
@@ -45,97 +269,62 @@
             </a></li>
             <li><a href="#" onclick="showSection('usersByRolePaged')">
                 <i class="fas fa-user-tag"></i>
-                <span>Users By Role (Paged)</span>
+                <span>Users By Role</span>
             </a></li>
 
             <!-- User Actions -->
             <div class="menu-category">User Actions</div>
             <li><a href="#" onclick="showSection('suspendById')">
                 <i class="fas fa-user-slash"></i>
-                <span>Suspend/Unsuspend by ID</span>
-            </a></li>
-            <li><a href="#" onclick="showSection('suspendByEmail')">
-                <i class="fas fa-user-times"></i>
-                <span>Suspend/Unsuspend by Email</span>
+                <span>Suspend/Unsuspend</span>
             </a></li>
             <li><a href="#" onclick="showSection('updatePasswordById')">
                 <i class="fas fa-key"></i>
-                <span>Update Password by ID</span>
-            </a></li>
-            <li><a href="#" onclick="showSection('updatePasswordByEmail')">
-                <i class="fas fa-key"></i>
-                <span>Update Password by Email</span>
+                <span>Update Password</span>
             </a></li>
             <li><a href="#" onclick="showSection('updateRoleById')">
                 <i class="fas fa-user-cog"></i>
-                <span>Update Role by ID</span>
-            </a></li>
-            <li><a href="#" onclick="showSection('updateRoleByEmail')">
-                <i class="fas fa-user-cog"></i>
-                <span>Update Role by Email</span>
+                <span>Update Role</span>
             </a></li>
 
             <!-- Deletion Management -->
-            <div class="menu-category">Deletion Management</div>
+            <div class="menu-category">Deletion</div>
             <li><a href="#" onclick="showSection('deleteById')">
                 <i class="fas fa-trash"></i>
-                <span>Delete by ID</span>
-            </a></li>
-            <li><a href="#" onclick="showSection('deleteByEmail')">
-                <i class="fas fa-trash-alt"></i>
-                <span>Delete by Email</span>
+                <span>Delete User</span>
             </a></li>
             <li><a href="#" onclick="showSection('batchDeleteById')">
                 <i class="fas fa-trash-restore"></i>
-                <span>Batch Delete by IDs</span>
-            </a></li>
-            <li><a href="#" onclick="showSection('batchDeleteByEmail')">
-                <i class="fas fa-trash-restore-alt"></i>
-                <span>Batch Delete by Emails</span>
+                <span>Batch Delete</span>
             </a></li>
 
-            <!-- Question Paper Management -->
-            <div class="menu-category">Question Paper Management</div>
+            <!-- Reference Transfer -->
+            <div class="menu-category">Reference Transfer</div>
             <li><a href="#" onclick="showSection('updateGeneratedByEmail')">
-                <i class="fas fa-envelope"></i>
-                <span>Update GeneratedBy (Email)</span>
-            </a></li>
-            <li><a href="#" onclick="showSection('updateGeneratedById')">
-                <i class="fas fa-id-card"></i>
-                <span>Update GeneratedBy (ID)</span>
+                <i class="fas fa-exchange-alt"></i>
+                <span>Transfer GeneratedBy</span>
             </a></li>
             <li><a href="#" onclick="showSection('updateApprovedByEmail')">
-                <i class="fas fa-envelope"></i>
-                <span>Update ApprovedBy (Email)</span>
+                <i class="fas fa-check-double"></i>
+                <span>Transfer ApprovedBy</span>
             </a></li>
-            <li><a href="#" onclick="showSection('updateApprovedById')">
-                <i class="fas fa-id-card"></i>
-                <span>Update ApprovedBy (ID)</span>
-            </a></li>
-
-            <!-- Question Management -->
-            <div class="menu-category">Question Management</div>
             <li><a href="#" onclick="showSection('updateCreatedByEmail')">
-                <i class="fas fa-envelope"></i>
-                <span>Update CreatedBy (Email)</span>
-            </a></li>
-            <li><a href="#" onclick="showSection('updateCreatedById')">
-                <i class="fas fa-id-card"></i>
-                <span>Update CreatedBy (ID)</span>
+                <i class="fas fa-pen-fancy"></i>
+                <span>Transfer CreatedBy</span>
             </a></li>
 
             <!-- Account Settings -->
-            <div class="menu-category">Account Settings</div>
+            <div class="menu-category">Account</div>
             <li><a href="#" onclick="showSection('updateAdminEmail')">
                 <i class="fas fa-envelope"></i>
-                <span>Update Admin Email</span>
+                <span>Update Email</span>
             </a></li>
             <li><a href="#" onclick="showSection('updateAdminPassword')">
                 <i class="fas fa-lock"></i>
-                <span>Update Admin Password</span>
+                <span>Update Password</span>
             </a></li>
 
-            <li><a href="#" onclick="logout()" style="color: #e74c3c;">
+            <li><a href="#" onclick="logout()" style="color: #ef4444;">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Logout</span>
             </a></li>
@@ -144,32 +333,55 @@
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <!-- Welcome Screen (Default) -->
-        <div id="welcomeScreen" class="section active">
-            <div class="welcome-screen">
-                <i class="fas fa-user-shield"></i>
-                <h1>Admin Dashboard</h1>
-                <p>Manage users, roles, suspensions, and perform administrative actions.</p>
-                <p><strong>All list views use pagination to handle duplicate data efficiently.</strong></p>
-                <p><em>Frontend-only version using mock data</em></p>
-                <button onclick="showSection('allUsersPaged')" style="margin-top: 20px;">
-                    <i class="fas fa-users"></i> Start Managing Users
-                </button>
+
+        <!-- ==================== DASHBOARD HOME ==================== -->
+        <div id="dashboardHome" class="section active">
+            <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+
+            <div class="stats-grid" id="dashboardStats">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-spinner fa-pulse"></i></div>
+                    <div class="stat-number">Loading...</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-user-shield"></i> Welcome, <span id="adminName">Admin</span></h2>
+                <p>Manage users, roles, suspensions, and perform administrative actions from this central dashboard.</p>
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button onclick="showSection('allUsersPaged')" class="primary">
+                        <i class="fas fa-users"></i> Manage Users
+                    </button>
+                    <button onclick="showSection('usersByRolePaged')" class="secondary">
+                        <i class="fas fa-user-tag"></i> View by Role
+                    </button>
+                    <button onclick="showSection('batchDeleteById')" class="danger">
+                        <i class="fas fa-trash"></i> Batch Operations
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-info-circle"></i> Quick Tips</h2>
+                <ul style="margin-left: 20px; line-height: 1.8;">
+                    <li>Use the sidebar to navigate between different management sections</li>
+                    <li>All user lists support pagination for better performance</li>
+                    <li>Use batch delete to remove multiple users at once</li>
+                    <li>Reference transfer helps when users leave the institution</li>
+                    <li>Dark mode toggle is available at the bottom right corner</li>
+                </ul>
             </div>
         </div>
 
-        <!-- All Users Paginated -->
+        <!-- ==================== ALL USERS PAGINATED ==================== -->
         <div id="allUsersPaged" class="section">
-            <h1>All Users (Paginated)</h1>
+            <h1><i class="fas fa-users"></i> All Users</h1>
             <div class="card">
-                <h2><i class="fas fa-users"></i> View All Users with Pagination</h2>
+                <h2><i class="fas fa-list"></i> User Management</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Page Number *</label>
-                        <input type="number" id="pageNoAllUsers" value="1" min="1">
-                    </div>
-                    <div class="form-group">
-                        <label>Page Size *</label>
+                        <label>Page Size</label>
                         <select id="pageSizeAllUsers">
                             <option value="10">10 per page</option>
                             <option value="20" selected>20 per page</option>
@@ -177,46 +389,49 @@
                             <option value="100">100 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="loadAllUsersPaged()"><i class="fas fa-sync-alt"></i> Load Users</button>
+                    </div>
                 </div>
-                <button onclick="loadAllUsersPaged()"><i class="fas fa-search"></i> Load Users</button>
-                <div id="allUsersPagedResult" style="margin-top: 20px;"></div>
-                <div class="pagination" id="allUsersPagination"></div>
+                <div id="allUsersPagedResult"></div>
+                <div id="allUsersPagination"></div>
             </div>
         </div>
 
-        <!-- Find User By ID -->
+        <!-- ==================== FIND USER BY ID ==================== -->
         <div id="findUserById" class="section">
-            <h1>Find User By ID</h1>
+            <h1><i class="fas fa-search"></i> Find User By ID</h1>
             <div class="card">
-                <h2><i class="fas fa-search"></i> Search User by ID</h2>
+                <h2><i class="fas fa-id-card"></i> Search by User ID</h2>
                 <div class="form-group">
                     <label>User ID *</label>
-                    <input type="text" id="userId" placeholder="Enter user ID (1-100)">
+                    <input type="number" id="userId" placeholder="Enter user ID (e.g., 1, 2, 3...)">
                 </div>
                 <button onclick="findUserById()"><i class="fas fa-search"></i> Search</button>
-                <div id="findUserByIdResult" style="margin-top: 20px;"></div>
+                <div id="findUserByIdResult"></div>
             </div>
         </div>
 
-        <!-- Find User By Email -->
+        <!-- ==================== FIND USER BY EMAIL ==================== -->
         <div id="findUserByEmail" class="section">
-            <h1>Find User By Email</h1>
+            <h1><i class="fas fa-envelope"></i> Find User By Email</h1>
             <div class="card">
-                <h2><i class="fas fa-envelope"></i> Search User by Email</h2>
+                <h2><i class="fas fa-search"></i> Search by Email Address</h2>
                 <div class="form-group">
-                    <label>User Email *</label>
+                    <label>Email Address *</label>
                     <input type="email" id="userEmail" placeholder="user@example.com">
                 </div>
                 <button onclick="findUserByEmail()"><i class="fas fa-search"></i> Search</button>
-                <div id="findUserByEmailResult" style="margin-top: 20px;"></div>
+                <div id="findUserByEmailResult"></div>
             </div>
         </div>
 
-        <!-- Users By Role Paginated -->
+        <!-- ==================== USERS BY ROLE ==================== -->
         <div id="usersByRolePaged" class="section">
-            <h1>Users By Role (Paginated)</h1>
+            <h1><i class="fas fa-user-tag"></i> Users By Role</h1>
             <div class="card">
-                <h2><i class="fas fa-user-tag"></i> Find Users by Role with Pagination</h2>
+                <h2><i class="fas fa-filter"></i> Filter by Role</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Role *</label>
@@ -229,10 +444,6 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Page Number</label>
-                        <input type="number" id="pageNoByRole" value="1" min="1">
-                    </div>
-                    <div class="form-group">
                         <label>Page Size</label>
                         <select id="pageSizeByRole">
                             <option value="10">10 per page</option>
@@ -240,107 +451,67 @@
                             <option value="50">50 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="searchUsersByRolePaged()"><i class="fas fa-search"></i> Search</button>
+                    </div>
                 </div>
-                <button onclick="searchUsersByRolePaged()"><i class="fas fa-search"></i> Search</button>
-                <div id="usersByRolePagedResult" style="margin-top: 20px;"></div>
-                <div class="pagination" id="usersByRolePagination"></div>
+                <div id="usersByRolePagedResult"></div>
+                <div id="usersByRolePagination"></div>
             </div>
         </div>
 
-        <!-- Suspend/Unsuspend by ID -->
+        <!-- ==================== SUSPEND/UNSUSPEND BY ID ==================== -->
         <div id="suspendById" class="section">
-            <h1>Suspend/Unsuspend User by ID</h1>
+            <h1><i class="fas fa-user-slash"></i> Suspend/Unsuspend User</h1>
             <div class="card">
-                <h2><i class="fas fa-user-slash"></i> Manage User Suspension by ID</h2>
+                <h2><i class="fas fa-ban"></i> Manage User Suspension by ID</h2>
                 <div class="form-group">
                     <label>User ID *</label>
-                    <input type="text" id="suspendUserId" placeholder="Enter user ID">
+                    <input type="number" id="suspendUserId" placeholder="Enter user ID">
                 </div>
                 <div class="form-group">
                     <label>Admin Password *</label>
-                    <input type="password" id="suspendIdPassword" placeholder="Enter admin password">
+                    <input type="password" id="suspendIdPassword" placeholder="Enter your admin password">
                 </div>
                 <div class="action-buttons">
                     <button class="warning" onclick="suspendUserById()"><i class="fas fa-user-slash"></i> Suspend User</button>
                     <button class="success" onclick="unsuspendUserById()"><i class="fas fa-user-check"></i> Unsuspend User</button>
                 </div>
-                <div id="suspendByIdResult" style="margin-top: 20px;"></div>
+                <div id="suspendByIdResult"></div>
             </div>
         </div>
 
-        <!-- Suspend/Unsuspend by Email -->
-        <div id="suspendByEmail" class="section">
-            <h1>Suspend/Unsuspend User by Email</h1>
-            <div class="card">
-                <h2><i class="fas fa-user-times"></i> Manage User Suspension by Email</h2>
-                <div class="form-group">
-                    <label>User Email *</label>
-                    <input type="email" id="suspendUserEmail" placeholder="user@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="suspendEmailPassword" placeholder="Enter admin password">
-                </div>
-                <div class="action-buttons">
-                    <button class="warning" onclick="suspendUserByEmail()"><i class="fas fa-user-slash"></i> Suspend User</button>
-                    <button class="success" onclick="unsuspendUserByEmail()"><i class="fas fa-user-check"></i> Unsuspend User</button>
-                </div>
-                <div id="suspendByEmailResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Update Password by ID -->
+        <!-- ==================== UPDATE PASSWORD BY ID ==================== -->
         <div id="updatePasswordById" class="section">
-            <h1>Update Password by User ID</h1>
+            <h1><i class="fas fa-key"></i> Update Password</h1>
             <div class="card">
-                <h2><i class="fas fa-key"></i> Update User Password by ID</h2>
+                <h2><i class="fas fa-lock"></i> Reset User Password by ID</h2>
                 <div class="form-group">
                     <label>User ID *</label>
-                    <input type="text" id="updatePassUserId" placeholder="Enter user ID">
+                    <input type="number" id="updatePassUserId" placeholder="Enter user ID">
                 </div>
                 <div class="form-group">
                     <label>New Password *</label>
-                    <input type="password" id="newPasswordById" placeholder="Enter new password">
+                    <input type="password" id="newPasswordById" placeholder="Enter new password (min 6 characters)">
                 </div>
                 <div class="form-group">
                     <label>Admin Password *</label>
-                    <input type="password" id="adminPassById" placeholder="Enter admin password">
+                    <input type="password" id="adminPassById" placeholder="Enter your admin password">
                 </div>
                 <button onclick="updatePasswordById()"><i class="fas fa-save"></i> Update Password</button>
-                <div id="updatePasswordByIdResult" style="margin-top: 20px;"></div>
+                <div id="updatePasswordByIdResult"></div>
             </div>
         </div>
 
-        <!-- Update Password by Email -->
-        <div id="updatePasswordByEmail" class="section">
-            <h1>Update Password by User Email</h1>
-            <div class="card">
-                <h2><i class="fas fa-key"></i> Update User Password by Email</h2>
-                <div class="form-group">
-                    <label>User Email *</label>
-                    <input type="email" id="updatePassUserEmail" placeholder="user@example.com">
-                </div>
-                <div class="form-group">
-                    <label>New Password *</label>
-                    <input type="password" id="newPasswordByEmail" placeholder="Enter new password">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="adminPassByEmail" placeholder="Enter admin password">
-                </div>
-                <button onclick="updatePasswordByEmail()"><i class="fas fa-save"></i> Update Password</button>
-                <div id="updatePasswordByEmailResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Update Role by ID -->
+        <!-- ==================== UPDATE ROLE BY ID ==================== -->
         <div id="updateRoleById" class="section">
-            <h1>Update User Role by ID</h1>
+            <h1><i class="fas fa-user-cog"></i> Update User Role</h1>
             <div class="card">
-                <h2><i class="fas fa-user-cog"></i> Update User Role by ID</h2>
+                <h2><i class="fas fa-exchange-alt"></i> Change User Role by ID</h2>
                 <div class="form-group">
                     <label>User ID *</label>
-                    <input type="text" id="updateRoleUserId" placeholder="Enter user ID">
+                    <input type="number" id="updateRoleUserId" placeholder="Enter user ID">
                 </div>
                 <div class="form-group">
                     <label>New Role *</label>
@@ -354,275 +525,177 @@
                 </div>
                 <div class="form-group">
                     <label>Admin Password *</label>
-                    <input type="password" id="updateRolePass" placeholder="Enter admin password">
+                    <input type="password" id="updateRolePass" placeholder="Enter your admin password">
                 </div>
                 <button onclick="updateRoleById()"><i class="fas fa-save"></i> Update Role</button>
-                <div id="updateRoleByIdResult" style="margin-top: 20px;"></div>
+                <div id="updateRoleByIdResult"></div>
             </div>
         </div>
 
-        <!-- Update Role by Email -->
-        <div id="updateRoleByEmail" class="section">
-            <h1>Update User Role by Email</h1>
-            <div class="card">
-                <h2><i class="fas fa-user-cog"></i> Update User Role by Email</h2>
-                <div class="form-group">
-                    <label>User Email *</label>
-                    <input type="email" id="updateRoleUserEmail" placeholder="user@example.com">
-                </div>
-                <div class="form-group">
-                    <label>New Role *</label>
-                    <select id="newRoleByEmail">
-                        <option value="">Select Role</option>
-                        <option value="ROLE_ADMIN">Admin</option>
-                        <option value="ROLE_TEACHER">Teacher</option>
-                        <option value="ROLE_STUDENT">Student</option>
-                        <option value="ROLE_SUPERVISOR">Supervisor</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="updateRoleEmailPass" placeholder="Enter admin password">
-                </div>
-                <button onclick="updateRoleByEmail()"><i class="fas fa-save"></i> Update Role</button>
-                <div id="updateRoleByEmailResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Delete by ID -->
+        <!-- ==================== DELETE BY ID ==================== -->
         <div id="deleteById" class="section">
-            <h1>Delete User by ID</h1>
+            <h1><i class="fas fa-trash"></i> Delete User</h1>
             <div class="card">
-                <h2><i class="fas fa-trash"></i> Delete User by ID</h2>
+                <h2><i class="fas fa-exclamation-triangle"></i> Permanently Delete User by ID</h2>
+                <div class="alert warning">
+                    <i class="fas fa-exclamation-triangle"></i> Warning: This action cannot be undone!
+                </div>
                 <div class="form-group">
                     <label>User ID *</label>
-                    <input type="text" id="deleteUserId" placeholder="Enter user ID">
+                    <input type="number" id="deleteUserId" placeholder="Enter user ID to delete">
                 </div>
                 <div class="form-group">
                     <label>Admin Password *</label>
-                    <input type="password" id="deleteIdPassword" placeholder="Enter admin password">
+                    <input type="password" id="deleteIdPassword" placeholder="Enter your admin password">
                 </div>
-                <button class="delete" onclick="deleteUserById()"><i class="fas fa-trash"></i> Delete User</button>
-                <div id="deleteByIdResult" style="margin-top: 20px;"></div>
+                <button class="delete" onclick="deleteUserById()"><i class="fas fa-trash"></i> Permanently Delete User</button>
+                <div id="deleteByIdResult"></div>
             </div>
         </div>
 
-        <!-- Delete by Email -->
-        <div id="deleteByEmail" class="section">
-            <h1>Delete User by Email</h1>
-            <div class="card">
-                <h2><i class="fas fa-trash-alt"></i> Delete User by Email</h2>
-                <div class="form-group">
-                    <label>User Email *</label>
-                    <input type="email" id="deleteUserEmail" placeholder="user@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="deleteEmailPassword" placeholder="Enter admin password">
-                </div>
-                <button class="delete" onclick="deleteUserByEmail()"><i class="fas fa-trash"></i> Delete User</button>
-                <div id="deleteByEmailResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Batch Delete by IDs -->
+        <!-- ==================== BATCH DELETE BY IDS ==================== -->
         <div id="batchDeleteById" class="section">
-            <h1>Batch Delete Users by IDs</h1>
+            <h1><i class="fas fa-trash-restore"></i> Batch Delete Users</h1>
             <div class="card">
-                <h2><i class="fas fa-trash-restore"></i> Batch Delete Users by IDs</h2>
+                <h2><i class="fas fa-layer-group"></i> Delete Multiple Users by IDs</h2>
+                <div class="alert warning">
+                    <i class="fas fa-exclamation-triangle"></i> Warning: This action cannot be undone!
+                </div>
                 <div class="form-group">
                     <label>User IDs (comma-separated) *</label>
-                    <input type="text" id="batchDeleteIds" placeholder="e.g., 4,5,6">
+                    <input type="text" id="batchDeleteIds" placeholder="e.g., 4,5,6,7">
+                    <small>Enter multiple user IDs separated by commas</small>
                 </div>
                 <div class="form-group">
                     <label>Admin Password *</label>
-                    <input type="password" id="batchDeleteIdPassword" placeholder="Enter admin password">
+                    <input type="password" id="batchDeleteIdPassword" placeholder="Enter your admin password">
                 </div>
                 <button class="delete" onclick="batchDeleteByIds()"><i class="fas fa-trash"></i> Delete Selected Users</button>
-                <div id="batchDeleteByIdResult" style="margin-top: 20px;"></div>
+                <div id="batchDeleteByIdResult"></div>
             </div>
         </div>
 
-        <!-- Batch Delete by Emails -->
-        <div id="batchDeleteByEmail" class="section">
-            <h1>Batch Delete Users by Emails</h1>
-            <div class="card">
-                <h2><i class="fas fa-trash-restore-alt"></i> Batch Delete Users by Emails</h2>
+        <!-- ==================== TRANSFER GENERATEDBY ==================== -->
+        <div id="updateGeneratedByEmail" class="section">
+            <h1><i class="fas fa-exchange-alt"></i> Transfer GeneratedBy References</h1>
+            <div class="card transfer-section">
+                <h2><i class="fas fa-file-alt"></i> Transfer Question Paper Ownership</h2>
+                <p>Transfer all question papers generated by a user to another user (e.g., when a teacher leaves).</p>
                 <div class="form-group">
-                    <label>User Emails (comma-separated) *</label>
-                    <input type="text" id="batchDeleteEmails" placeholder="e.g., user1@example.com,user2@example.com">
+                    <label>From (Original Email) *</label>
+                    <input type="email" id="originalEmail" placeholder="oldteacher@example.com">
+                </div>
+                <div class="form-group">
+                    <label>To (Replace Email) *</label>
+                    <input type="email" id="replaceEmail" placeholder="newteacher@example.com">
                 </div>
                 <div class="form-group">
                     <label>Admin Password *</label>
-                    <input type="password" id="batchDeleteEmailPassword" placeholder="Enter admin password">
+                    <input type="password" id="updateGenByEmailPass" placeholder="Enter your admin password">
                 </div>
-                <button class="delete" onclick="batchDeleteByEmails()"><i class="fas fa-trash"></i> Delete Selected Users</button>
-                <div id="batchDeleteByEmailResult" style="margin-top: 20px;"></div>
+                <button onclick="updateGeneratedByEmail()"><i class="fas fa-exchange-alt"></i> Transfer GeneratedBy</button>
+                <div id="updateGeneratedByEmailResult"></div>
             </div>
         </div>
 
-        <!-- Update Admin Email -->
+        <!-- ==================== TRANSFER APPROVEDBY ==================== -->
+        <div id="updateApprovedByEmail" class="section">
+            <h1><i class="fas fa-exchange-alt"></i> Transfer ApprovedBy References</h1>
+            <div class="card transfer-section">
+                <h2><i class="fas fa-check-double"></i> Transfer Approval Records</h2>
+                <p>Transfer all approvals done by a supervisor to another user.</p>
+                <div class="form-group">
+                    <label>From (Original Email) *</label>
+                    <input type="email" id="originalApprovedEmail" placeholder="oldsupervisor@example.com">
+                </div>
+                <div class="form-group">
+                    <label>To (Replace Email) *</label>
+                    <input type="email" id="replaceApprovedEmail" placeholder="newsupervisor@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateAppByEmailPass" placeholder="Enter your admin password">
+                </div>
+                <button onclick="updateApprovedByEmail()"><i class="fas fa-exchange-alt"></i> Transfer ApprovedBy</button>
+                <div id="updateApprovedByEmailResult"></div>
+            </div>
+        </div>
+
+        <!-- ==================== TRANSFER CREATEDBY ==================== -->
+        <div id="updateCreatedByEmail" class="section">
+            <h1><i class="fas fa-exchange-alt"></i> Transfer CreatedBy References</h1>
+            <div class="card transfer-section">
+                <h2><i class="fas fa-pen-fancy"></i> Transfer Question Ownership</h2>
+                <p>Transfer all questions created by a teacher to another teacher.</p>
+                <div class="form-group">
+                    <label>From (Original Email) *</label>
+                    <input type="email" id="originalCreatedEmail" placeholder="oldteacher@example.com">
+                </div>
+                <div class="form-group">
+                    <label>To (Replace Email) *</label>
+                    <input type="email" id="replaceCreatedEmail" placeholder="newteacher@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Admin Password *</label>
+                    <input type="password" id="updateCreatedByEmailPass" placeholder="Enter your admin password">
+                </div>
+                <button onclick="updateCreatedByEmail()"><i class="fas fa-exchange-alt"></i> Transfer CreatedBy</button>
+                <div id="updateCreatedByEmailResult"></div>
+            </div>
+        </div>
+
+        <!-- ==================== UPDATE ADMIN EMAIL ==================== -->
         <div id="updateAdminEmail" class="section">
-            <h1>Update Admin Email</h1>
+            <h1><i class="fas fa-envelope"></i> Update Email</h1>
             <div class="card">
-                <h2><i class="fas fa-envelope"></i> Update Your Email Address</h2>
+                <h2><i class="fas fa-user-edit"></i> Change Your Email Address</h2>
+                <div class="alert info">
+                    <i class="fas fa-info-circle"></i> You will need to log in again after changing your email.
+                </div>
                 <div class="form-group">
                     <label>New Email Address *</label>
                     <input type="email" id="newAdminEmail" placeholder="newadmin@example.com">
                 </div>
                 <button onclick="updateAdminEmail()"><i class="fas fa-save"></i> Update Email</button>
-                <div id="updateAdminEmailResult" style="margin-top: 20px;"></div>
+                <div id="updateAdminEmailResult"></div>
             </div>
         </div>
 
-        <!-- Update Admin Password -->
+        <!-- ==================== UPDATE ADMIN PASSWORD ==================== -->
         <div id="updateAdminPassword" class="section">
-            <h1>Update Admin Password</h1>
+            <h1><i class="fas fa-lock"></i> Update Password</h1>
             <div class="card">
-                <h2><i class="fas fa-lock"></i> Update Your Password</h2>
+                <h2><i class="fas fa-key"></i> Change Your Password</h2>
                 <div class="form-group">
                     <label>New Password *</label>
-                    <input type="password" id="newAdminPassword" placeholder="Enter new password">
+                    <input type="password" id="newAdminPassword" placeholder="Enter new password (min 6 characters)">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password *</label>
+                    <input type="password" id="confirmAdminPassword" placeholder="Confirm new password">
                 </div>
                 <button onclick="updateAdminPassword()"><i class="fas fa-save"></i> Update Password</button>
-                <div id="updateAdminPasswordResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-        <div id="updateGeneratedByEmail" class="section">
-            <h1>Update GeneratedBy (Email)</h1>
-            <div class="card">
-                <h2><i class="fas fa-file-alt"></i> Update GeneratedBy using Email</h2>
-                <div class="form-group">
-                    <label>Replace Email *</label>
-                    <input type="email" id="replaceEmail" placeholder="newuser@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Original Email *</label>
-                    <input type="email" id="originalEmail" placeholder="olduser@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="updateGenByEmailPass" placeholder="Enter admin password">
-                </div>
-                <button onclick="updateGeneratedByEmail()"><i class="fas fa-sync"></i> Update GeneratedBy</button>
-                <div id="updateGeneratedByEmailResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Update GeneratedBy using ID -->
-        <div id="updateGeneratedById" class="section">
-            <h1>Update GeneratedBy (ID)</h1>
-            <div class="card">
-                <h2><i class="fas fa-file-alt"></i> Update GeneratedBy using ID</h2>
-                <div class="form-group">
-                    <label>Replace ID *</label>
-                    <input type="number" id="replaceId" placeholder="Enter new user ID">
-                </div>
-                <div class="form-group">
-                    <label>Original ID *</label>
-                    <input type="number" id="originalId" placeholder="Enter old user ID">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="updateGenByIdPass" placeholder="Enter admin password">
-                </div>
-                <button onclick="updateGeneratedById()"><i class="fas fa-sync"></i> Update GeneratedBy</button>
-                <div id="updateGeneratedByIdResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Update ApprovedBy using Email -->
-        <div id="updateApprovedByEmail" class="section">
-            <h1>Update ApprovedBy (Email)</h1>
-            <div class="card">
-                <h2><i class="fas fa-check-circle"></i> Update ApprovedBy using Email</h2>
-                <div class="form-group">
-                    <label>Replace Email *</label>
-                    <input type="email" id="replaceApprovedEmail" placeholder="newuser@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Original Email *</label>
-                    <input type="email" id="originalApprovedEmail" placeholder="olduser@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="updateAppByEmailPass" placeholder="Enter admin password">
-                </div>
-                <button onclick="updateApprovedByEmail()"><i class="fas fa-sync"></i> Update ApprovedBy</button>
-                <div id="updateApprovedByEmailResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Update ApprovedBy using ID -->
-        <div id="updateApprovedById" class="section">
-            <h1>Update ApprovedBy (ID)</h1>
-            <div class="card">
-                <h2><i class="fas fa-check-circle"></i> Update ApprovedBy using ID</h2>
-                <div class="form-group">
-                    <label>Replace ID *</label>
-                    <input type="number" id="replaceApprovedId" placeholder="Enter new user ID">
-                </div>
-                <div class="form-group">
-                    <label>Original ID *</label>
-                    <input type="number" id="originalApprovedId" placeholder="Enter old user ID">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="updateAppByIdPass" placeholder="Enter admin password">
-                </div>
-                <button onclick="updateApprovedById()"><i class="fas fa-sync"></i> Update ApprovedBy</button>
-                <div id="updateApprovedByIdResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Update CreatedBy using Email -->
-        <div id="updateCreatedByEmail" class="section">
-            <h1>Update CreatedBy (Email)</h1>
-            <div class="card">
-                <h2><i class="fas fa-question-circle"></i> Update CreatedBy using Email</h2>
-                <div class="form-group">
-                    <label>Replace Email *</label>
-                    <input type="email" id="replaceCreatedEmail" placeholder="newuser@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Original Email *</label>
-                    <input type="email" id="originalCreatedEmail" placeholder="olduser@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="updateCreatedByEmailPass" placeholder="Enter admin password">
-                </div>
-                <button onclick="updateCreatedByEmail()"><i class="fas fa-sync"></i> Update CreatedBy</button>
-                <div id="updateCreatedByEmailResult" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- Update CreatedBy using ID -->
-        <div id="updateCreatedById" class="section">
-            <h1>Update CreatedBy (ID)</h1>
-            <div class="card">
-                <h2><i class="fas fa-question-circle"></i> Update CreatedBy using ID</h2>
-                <div class="form-group">
-                    <label>Replace ID *</label>
-                    <input type="number" id="replaceCreatedId" placeholder="Enter new user ID">
-                </div>
-                <div class="form-group">
-                    <label>Original ID *</label>
-                    <input type="number" id="originalCreatedId" placeholder="Enter old user ID">
-                </div>
-                <div class="form-group">
-                    <label>Admin Password *</label>
-                    <input type="password" id="updateCreatedByIdPass" placeholder="Enter admin password">
-                </div>
-                <button onclick="updateCreatedById()"><i class="fas fa-sync"></i> Update CreatedBy</button>
-                <div id="updateCreatedByIdResult" style="margin-top: 20px;"></div>
+                <div id="updateAdminPasswordResult"></div>
             </div>
         </div>
 
     </div>
 </div>
+
+<!-- Scripts -->
 <script th:src="@{/js/api.js}"></script>
-<script th:src="@{/js/admin-dashboard.js}"></script>
 <script th:src="@{/js/common-dashboard.js}"></script>
+<script th:src="@{/js/admin-dashboard.js}"></script>
+
+<script>
+    // Additional initialization for admin dashboard
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Load dashboard stats
+        if (typeof loadDashboardStats === 'function') {
+            await loadDashboardStats();
+        }
+    });
+</script>
+
 </body>
 </html>

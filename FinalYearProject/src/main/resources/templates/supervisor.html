@@ -1,12 +1,240 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"><head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Supervisor Dashboard</title>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QPGen - Supervisor Dashboard | Review & Approve Papers</title>
+    <meta name="description" content="Supervisor dashboard - Review question papers, add comments, and approve/reject submissions">
+
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/style1.css}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+
+    <!-- Main Styles -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+    <style>
+        /* Additional Supervisor Dashboard Specific Styles */
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-text h2 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.5rem;
+        }
+
+        .welcome-text p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        .welcome-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-badge .number {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .stat-badge .label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* Status Cards */
+        .status-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            text-align: center;
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+
+        body.dark-mode .status-card {
+            background: #1e293b;
+        }
+
+        .status-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-card.pending { border-left-color: #f59e0b; }
+        .status-card.approved { border-left-color: #10b981; }
+        .status-card.total { border-left-color: #4f46e5; }
+
+        .status-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .status-card .label {
+            color: var(--gray);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Review Modal */
+        .review-modal .modal-container {
+            max-width: 500px;
+        }
+
+        .review-form textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .review-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .decision-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            flex: 1;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            flex: 1;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+
+        /* Comment Badge */
+        .comment-badge {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        body.dark-mode .comment-badge {
+            background: #78350f;
+            color: #fde68a;
+        }
+
+        /* Paper Card */
+        .paper-preview-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.dark-mode .paper-preview-card {
+            background: #1e293b;
+        }
+
+        .paper-preview-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateX(5px);
+        }
+
+        .paper-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .paper-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: var(--gray-light);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        body.dark-mode .filter-section {
+            background: #0f172a;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .status-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .decision-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
+
 <!-- Theme Toggle -->
 <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
     <i class="fas fa-moon"></i>
@@ -21,203 +249,185 @@
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2>Supervisor Panel</h2>
+            <h2><i class="fas fa-user-shield"></i> Supervisor Panel</h2>
             <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
         <ul>
-            <!-- Question Management -->
+            <div class="menu-category">Dashboard</div>
+            <li><a href="#" onclick="showSection('dashboardHome')" class="active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a></li>
+
             <div class="menu-category">Question Management</div>
-            <li>
-                <a
-                        href="#"
-                        onclick="showSection('allQuestionsPaged')"
-                        class="active"
-                >
-                    <i class="fas fa-file-alt"></i>
-                    <span>All Questions (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('questionById')">
-                    <i class="fas fa-search"></i>
-                    <span>Question By ID</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('bySubjectCodePaged')">
-                    <i class="fas fa-code"></i>
-                    <span>By Subject Code (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('bySubjectCodeCOPaged')">
-                    <i class="fas fa-filter"></i>
-                    <span>Code & CO (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('bySubjectNamePaged')">
-                    <i class="fas fa-book"></i>
-                    <span>By Subject Name (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('byCreatedByEmail')">
-                    <i class="fas fa-user"></i>
-                    <span>By Creator Email</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('byCreatedById')">
-                    <i class="fas fa-id-card"></i>
-                    <span>By Creator ID</span>
-                </a>
-            </li>
+            <li><a href="#" onclick="showSection('allQuestionsPaged')">
+                <i class="fas fa-database"></i>
+                <span>All Questions</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('questionById')">
+                <i class="fas fa-search"></i>
+                <span>Question By ID</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('bySubjectCodePaged')">
+                <i class="fas fa-code"></i>
+                <span>By Subject Code</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('bySubjectCodeCOPaged')">
+                <i class="fas fa-filter"></i>
+                <span>Code & CO</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('bySubjectNamePaged')">
+                <i class="fas fa-book"></i>
+                <span>By Subject Name</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('byCreatedByEmail')">
+                <i class="fas fa-user"></i>
+                <span>By Creator Email</span>
+            </a></li>
 
-            <!-- Paper Management -->
             <div class="menu-category">Paper Management</div>
-            <li>
-                <a href="#" onclick="showSection('allPapersPaged')">
-                    <i class="fas fa-copy"></i>
-                    <span>All Papers (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('paperById')">
-                    <i class="fas fa-search"></i>
-                    <span>Paper By ID</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('paperByTitle')">
-                    <i class="fas fa-heading"></i>
-                    <span>Paper By Title</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('byGeneratorEmailPaged')">
-                    <i class="fas fa-user-tie"></i>
-                    <span>By Generator Email (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('byGeneratorIdPaged')">
-                    <i class="fas fa-id-badge"></i>
-                    <span>By Generator ID (Paged)</span>
-                </a>
-            </li>
+            <li><a href="#" onclick="showSection('allPapersPaged')">
+                <i class="fas fa-file-alt"></i>
+                <span>All Papers</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('paperById')">
+                <i class="fas fa-search"></i>
+                <span>Paper By ID</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('paperByTitle')">
+                <i class="fas fa-heading"></i>
+                <span>Paper By Title</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('byGeneratorEmailPaged')">
+                <i class="fas fa-user-tie"></i>
+                <span>By Generator Email</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('byGeneratorIdPaged')">
+                <i class="fas fa-id-badge"></i>
+                <span>By Generator ID</span>
+            </a></li>
 
-            <!-- Approval Management -->
             <div class="menu-category">Approval Management</div>
-            <li>
-                <a href="#" onclick="showSection('byApproverEmailPaged')">
-                    <i class="fas fa-user-check"></i>
-                    <span>By Approver Email (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('byApproverIdPaged')">
-                    <i class="fas fa-check-circle"></i>
-                    <span>By Approver ID (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('approvedPapersPaged')">
-                    <i class="fas fa-check"></i>
-                    <span>Approved Papers (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('pendingPapersPaged')">
-                    <i class="fas fa-clock"></i>
-                    <span>Pending Papers (Paged)</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('approveById')">
-                    <i class="fas fa-thumbs-up"></i>
-                    <span>Approve/Reject by ID</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('approveByTitle')">
-                    <i class="fas fa-file-signature"></i>
-                    <span>Approve/Reject by Title</span>
-                </a>
-            </li>
+            <li><a href="#" onclick="showSection('byApproverEmailPaged')">
+                <i class="fas fa-user-check"></i>
+                <span>By Approver Email</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('approvedPapersPaged')">
+                <i class="fas fa-check-circle"></i>
+                <span>Approved Papers</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('pendingPapersPaged')">
+                <i class="fas fa-clock"></i>
+                <span>Pending Papers</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('approveById')">
+                <i class="fas fa-thumbs-up"></i>
+                <span>Review by ID</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('approveByTitle')">
+                <i class="fas fa-file-signature"></i>
+                <span>Review by Title</span>
+            </a></li>
 
-            <!-- Account Settings -->
-            <div class="menu-category">Account Settings</div>
-            <li>
-                <a href="#" onclick="showSection('updateEmail')">
-                    <i class="fas fa-envelope"></i>
-                    <span>Update Email</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" onclick="showSection('updatePassword')">
-                    <i class="fas fa-lock"></i>
-                    <span>Update Password</span>
-                </a>
-            </li>
+            <div class="menu-category">Account</div>
+            <li><a href="#" onclick="showSection('updateEmail')">
+                <i class="fas fa-envelope"></i>
+                <span>Update Email</span>
+            </a></li>
+            <li><a href="#" onclick="showSection('updatePassword')">
+                <i class="fas fa-lock"></i>
+                <span>Update Password</span>
+            </a></li>
 
-            <li>
-                <a href="#" onclick="logout()" style="color: #e74c3c">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
+            <li><a href="#" onclick="logout()" style="color: #ef4444;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a></li>
         </ul>
     </div>
 
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
-        <!-- Welcome Screen (Default) -->
-        <div id="welcomeScreen" class="section active">
-            <div class="welcome-screen">
-                <i class="fas fa-user-shield"></i>
-                <h1>Supervisor Dashboard</h1>
-                <p>
-                    Manage questions, review question papers, and approve/reject
-                    submissions.
-                </p>
-                <p>
-                    <strong
-                    >All list views use pagination to handle duplicate data
-                        efficiently.</strong
-                    >
-                </p>
-                <p><em>Frontend-only version using mock data</em></p>
-                <button
-                        onclick="showSection('allQuestionsPaged')"
-                        style="margin-top: 20px"
-                >
-                    <i class="fas fa-file-alt"></i> Start Managing Questions
-                </button>
+
+        <!-- ==================== DASHBOARD HOME ==================== -->
+        <div id="dashboardHome" class="section active">
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h2>Welcome, <span id="supervisorName">Supervisor</span>!</h2>
+                    <p><i class="fas fa-clipboard-list"></i> Review and manage question papers for approval</p>
+                </div>
+                <div class="welcome-stats">
+                    <div class="stat-badge">
+                        <div class="number" id="pendingCount">-</div>
+                        <div class="label">Pending Review</div>
+                    </div>
+                    <div class="stat-badge">
+                        <div class="number" id="approvedCount">-</div>
+                        <div class="label">Approved</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Cards -->
+            <div class="status-cards">
+                <div class="status-card pending">
+                    <div class="number" id="pendingPapersCount">-</div>
+                    <div class="label">Pending Papers</div>
+                </div>
+                <div class="status-card approved">
+                    <div class="number" id="approvedPapersCount">-</div>
+                    <div class="label">Approved Papers</div>
+                </div>
+                <div class="status-card total">
+                    <div class="number" id="totalPapersCount">-</div>
+                    <div class="label">Total Papers</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-info-circle"></i> Supervisor Guide</h2>
+                <p>As a Supervisor, you can:</p>
+                <ul style="margin-top: 1rem; margin-left: 1.5rem; line-height: 1.8;">
+                    <li><i class="fas fa-file-alt"></i> Browse all questions in the system</li>
+                    <li><i class="fas fa-search"></i> Search and filter questions by various criteria</li>
+                    <li><i class="fas fa-clipboard-list"></i> View all question papers submitted by teachers</li>
+                    <li><i class="fas fa-check-circle"></i> Review pending papers and add feedback comments</li>
+                    <li><i class="fas fa-thumbs-up"></i> Approve well-prepared papers</li>
+                    <li><i class="fas fa-thumbs-down"></i> Reject papers that need revisions with constructive feedback</li>
+                    <li><i class="fas fa-download"></i> Download approved papers as PDF</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-rocket"></i> Quick Actions</h2>
+                <div class="action-buttons">
+                    <button onclick="showSection('pendingPapersPaged')" class="warning">
+                        <i class="fas fa-clock"></i> Review Pending Papers
+                    </button>
+                    <button onclick="showSection('allPapersPaged')" class="primary">
+                        <i class="fas fa-file-alt"></i> View All Papers
+                    </button>
+                    <button onclick="showSection('approveById')" class="secondary">
+                        <i class="fas fa-search"></i> Quick Review by ID
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- All Questions Paginated -->
+        <!-- ==================== ALL QUESTIONS PAGINATED ==================== -->
         <div id="allQuestionsPaged" class="section">
-            <h1>All Questions (Paginated)</h1>
+            <h1><i class="fas fa-database"></i> All Questions</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-file-alt"></i> View All Questions with Pagination
-                </h2>
+                <h2><i class="fas fa-list"></i> Question Bank Overview</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Page Number *</label>
-                        <input
-                                type="number"
-                                id="pageNoAllQuestions"
-                                value="1"
-                                min="1"
-                        />
+                        <label>Page Number</label>
+                        <input type="number" id="pageNoAllQuestions" value="1" min="1">
                     </div>
                     <div class="form-group">
-                        <label>Page Size *</label>
+                        <label>Page Size</label>
                         <select id="pageSizeAllQuestions">
                             <option value="10">10 per page</option>
                             <option value="20" selected>20 per page</option>
@@ -225,55 +435,52 @@
                             <option value="100">100 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="loadAllQuestionsPaged()">
+                            <i class="fas fa-search"></i> Load Questions
+                        </button>
+                    </div>
                 </div>
-                <button onclick="loadAllQuestionsPaged()">
-                    <i class="fas fa-search"></i> Load Questions
-                </button>
-                <div id="allQuestionsPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="allQuestionsPagination"></div>
+                <div id="allQuestionsPagedResult"></div>
+                <div id="allQuestionsPagination"></div>
             </div>
         </div>
 
-        <!-- Question By ID -->
+        <!-- ==================== QUESTION BY ID ==================== -->
         <div id="questionById" class="section">
-            <h1>Find Question By ID</h1>
+            <h1><i class="fas fa-search"></i> Find Question</h1>
             <div class="card">
-                <h2><i class="fas fa-search"></i> Search Question by ID</h2>
-                <div class="form-group">
-                    <label>Question ID *</label>
-                    <input
-                            type="text"
-                            id="questionId"
-                            placeholder="Enter question ID (1-100)"
-                    />
+                <h2><i class="fas fa-id-card"></i> Search by Question ID</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Question ID</label>
+                        <input type="number" id="questionId" placeholder="Enter question ID">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="findQuestionById()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
                 </div>
-                <button onclick="findQuestionById()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <div id="questionByIdResult" style="margin-top: 20px"></div>
+                <div id="questionByIdResult"></div>
             </div>
         </div>
 
-        <!-- By Subject Code Paginated -->
+        <!-- ==================== BY SUBJECT CODE PAGINATED ==================== -->
         <div id="bySubjectCodePaged" class="section">
-            <h1>Questions by Subject Code (Paginated)</h1>
+            <h1><i class="fas fa-code"></i> Filter by Subject Code</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-code"></i> Find Questions by Subject Code
-                    (Paginated)
-                </h2>
+                <h2><i class="fas fa-filter"></i> Questions by Subject Code</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Subject Code *</label>
-                        <input
-                                type="text"
-                                id="subjectCodePaged"
-                                placeholder="e.g., CS101"
-                        />
+                        <input type="text" id="subjectCodePaged" placeholder="e.g., CS101">
                     </div>
                     <div class="form-group">
                         <label>Page Number</label>
-                        <input type="number" id="pageNoSubjectCode" value="1" min="1" />
+                        <input type="number" id="pageNoSubjectCode" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Page Size</label>
@@ -287,42 +494,30 @@
                 <button onclick="searchBySubjectCodePaged()">
                     <i class="fas fa-search"></i> Search
                 </button>
-                <div id="bySubjectCodePagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="subjectCodePagination"></div>
+                <div id="bySubjectCodePagedResult"></div>
+                <div id="subjectCodePagination"></div>
             </div>
         </div>
 
-        <!-- By Subject Code with CO Paginated -->
+        <!-- ==================== BY SUBJECT CODE & CO ==================== -->
         <div id="bySubjectCodeCOPaged" class="section">
-            <h1>Filter by Subject Code & CO (Paginated)</h1>
+            <h1><i class="fas fa-filter"></i> Filter by Code & CO</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-filter"></i> Filter by Subject Code and CO
-                    (Paginated)
-                </h2>
+                <h2><i class="fas fa-bullseye"></i> Questions by Subject Code and CO</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Subject Code *</label>
-                        <input
-                                type="text"
-                                id="subjectCodeCOPaged"
-                                placeholder="e.g., CS101"
-                        />
+                        <input type="text" id="subjectCodeCOPaged" placeholder="e.g., CS101">
                     </div>
                     <div class="form-group">
                         <label>Mapped CO *</label>
-                        <input type="text" id="mappedCOPaged" placeholder="e.g., CO1" />
+                        <input type="text" id="mappedCOPaged" placeholder="e.g., CO1">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Page Number</label>
-                        <input
-                                type="number"
-                                id="pageNoSubjectCodeCO"
-                                value="1"
-                                min="1"
-                        />
+                        <input type="number" id="pageNoSubjectCodeCO" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Page Size</label>
@@ -336,31 +531,24 @@
                 <button onclick="searchBySubjectCodeCOPaged()">
                     <i class="fas fa-filter"></i> Apply Filter
                 </button>
-                <div id="bySubjectCodeCOPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="subjectCodeCOPagination"></div>
+                <div id="bySubjectCodeCOPagedResult"></div>
+                <div id="subjectCodeCOPagination"></div>
             </div>
         </div>
 
-        <!-- By Subject Name Paginated -->
+        <!-- ==================== BY SUBJECT NAME PAGINATED ==================== -->
         <div id="bySubjectNamePaged" class="section">
-            <h1>Questions by Subject Name (Paginated)</h1>
+            <h1><i class="fas fa-book"></i> Filter by Subject Name</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-book"></i> Find Questions by Subject Name
-                    (Paginated)
-                </h2>
+                <h2><i class="fas fa-filter"></i> Questions by Subject Name</h2>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Subject Name *</label>
-                        <input
-                                type="text"
-                                id="subjectNamePaged"
-                                placeholder="e.g., Database Systems"
-                        />
+                        <input type="text" id="subjectNamePaged" placeholder="e.g., Database Systems">
                     </div>
                     <div class="form-group">
                         <label>Page Number</label>
-                        <input type="number" id="pageNoSubjectName" value="1" min="1" />
+                        <input type="number" id="pageNoSubjectName" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Page Size</label>
@@ -374,151 +562,110 @@
                 <button onclick="searchBySubjectNamePaged()">
                     <i class="fas fa-search"></i> Search
                 </button>
-                <div id="bySubjectNamePagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="subjectNamePagination"></div>
+                <div id="bySubjectNamePagedResult"></div>
+                <div id="subjectNamePagination"></div>
             </div>
         </div>
 
-        <!-- By Created By Email -->
+        <!-- ==================== BY CREATOR EMAIL ==================== -->
         <div id="byCreatedByEmail" class="section">
-            <h1>Questions by Creator Email</h1>
+            <h1><i class="fas fa-user"></i> Filter by Creator</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-user"></i> Find Questions Created by User (Email)
-                </h2>
+                <h2><i class="fas fa-envelope"></i> Questions by Creator Email</h2>
                 <div class="form-group">
-                    <label>Creator Email *</label>
-                    <input
-                            type="email"
-                            id="creatorEmail"
-                            placeholder="teacher@example.com"
-                    />
+                    <label>Creator Email</label>
+                    <input type="email" id="creatorEmail" placeholder="teacher@example.com">
                 </div>
                 <button onclick="searchByCreatedByEmail()">
                     <i class="fas fa-search"></i> Search
                 </button>
-                <div id="byCreatedByEmailResult" style="margin-top: 20px"></div>
+                <div id="byCreatedByEmailResult"></div>
             </div>
         </div>
 
-        <!-- By Created By ID -->
-        <div id="byCreatedById" class="section">
-            <h1>Questions by Creator ID</h1>
-            <div class="card">
-                <h2>
-                    <i class="fas fa-id-card"></i> Find Questions Created by User (ID)
-                </h2>
-                <div class="form-group">
-                    <label>Creator ID *</label>
-                    <input type="text" id="creatorId" placeholder="e.g., 5" />
-                </div>
-                <button onclick="searchByCreatedById()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <div id="byCreatedByIdResult" style="margin-top: 20px"></div>
-            </div>
-        </div>
-
-        <!-- All Papers Paginated -->
+        <!-- ==================== ALL PAPERS PAGINATED ==================== -->
         <div id="allPapersPaged" class="section">
-            <h1>All Question Papers (Paginated)</h1>
+            <h1><i class="fas fa-file-alt"></i> All Question Papers</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-copy"></i> View All Question Papers with
-                    Pagination
-                </h2>
+                <h2><i class="fas fa-list"></i> Papers Overview</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Page Number *</label>
-                        <input type="number" id="pageNoAllPapers" value="1" min="1" />
+                        <label>Page Number</label>
+                        <input type="number" id="pageNoAllPapers" value="1" min="1">
                     </div>
                     <div class="form-group">
-                        <label>Page Size *</label>
+                        <label>Page Size</label>
                         <select id="pageSizeAllPapers">
                             <option value="10">10 per page</option>
                             <option value="20" selected>20 per page</option>
                             <option value="50">50 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="loadAllPapersPaged()">
+                            <i class="fas fa-search"></i> Load Papers
+                        </button>
+                    </div>
                 </div>
-                <button onclick="loadAllPapersPaged()">
-                    <i class="fas fa-search"></i> Load Papers
-                </button>
-                <div id="allPapersPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="allPapersPagination"></div>
+                <div id="allPapersPagedResult"></div>
+                <div id="allPapersPagination"></div>
             </div>
         </div>
 
-        <!-- Paper By ID -->
+        <!-- ==================== PAPER BY ID ==================== -->
         <div id="paperById" class="section">
-            <h1>Find Paper By ID</h1>
+            <h1><i class="fas fa-search"></i> Find Paper</h1>
             <div class="card">
-                <h2><i class="fas fa-search"></i> Search Question Paper by ID</h2>
-                <div class="form-group">
-                    <label>Paper ID *</label>
-                    <input
-                            type="text"
-                            id="paperId"
-                            placeholder="Enter paper ID (1-50)"
-                    />
+                <h2><i class="fas fa-id-card"></i> Search by Paper ID</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Paper ID</label>
+                        <input type="number" id="paperId" placeholder="Enter paper ID">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="findPaperById()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <button onclick="downloadQuestionPaperSupervisor()" class="success">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
                 </div>
-                <button onclick="findPaperById()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <button onclick="downloadQuestionPaperSupervisor()" style="margin-left: 10px; background-color: #17a2b8;">
-                    <i class="fas fa-download"></i> Download Paper
-                </button>
-                <div id="paperByIdResult" style="margin-top: 20px"></div>
+                <div id="paperByIdResult"></div>
             </div>
         </div>
 
-        <!-- Paper By Title -->
+        <!-- ==================== PAPER BY TITLE ==================== -->
         <div id="paperByTitle" class="section">
-            <h1>Find Paper By Exam Title</h1>
+            <h1><i class="fas fa-heading"></i> Find Paper by Title</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-heading"></i> Search Question Paper by Title
-                </h2>
+                <h2><i class="fas fa-search"></i> Search by Exam Title</h2>
                 <div class="form-group">
-                    <label>Exam Title *</label>
-                    <input
-                            type="text"
-                            id="examTitleSearch"
-                            placeholder="e.g., Midterm Exam 2024"
-                    />
+                    <label>Exam Title</label>
+                    <input type="text" id="examTitleSearch" placeholder="Enter exam title">
                 </div>
                 <button onclick="findPaperByTitle()">
                     <i class="fas fa-search"></i> Search
                 </button>
-                <div id="paperByTitleResult" style="margin-top: 20px"></div>
+                <div id="paperByTitleResult"></div>
             </div>
         </div>
 
-        <!-- By Generator Email Paginated -->
+        <!-- ==================== BY GENERATOR EMAIL ==================== -->
         <div id="byGeneratorEmailPaged" class="section">
-            <h1>Papers by Generator Email (Paginated)</h1>
+            <h1><i class="fas fa-user-tie"></i> Papers by Generator</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-user-tie"></i> Find Papers Generated by User
-                    (Email)
-                </h2>
+                <h2><i class="fas fa-envelope"></i> Papers Generated by Email</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Generator Email *</label>
-                        <input
-                                type="email"
-                                id="generatorEmail"
-                                placeholder="teacher@example.com"
-                        />
+                        <label>Generator Email</label>
+                        <input type="email" id="generatorEmail" placeholder="teacher@example.com">
                     </div>
                     <div class="form-group">
                         <label>Page Number</label>
-                        <input
-                                type="number"
-                                id="pageNoGeneratorEmail"
-                                value="1"
-                                min="1"
-                        />
+                        <input type="number" id="pageNoGeneratorEmail" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Page Size</label>
@@ -532,29 +679,24 @@
                 <button onclick="searchByGeneratorEmailPaged()">
                     <i class="fas fa-search"></i> Search
                 </button>
-                <div
-                        id="byGeneratorEmailPagedResult"
-                        style="margin-top: 20px"
-                ></div>
-                <div class="pagination" id="generatorEmailPagination"></div>
+                <div id="byGeneratorEmailPagedResult"></div>
+                <div id="generatorEmailPagination"></div>
             </div>
         </div>
 
-        <!-- By Generator ID Paginated -->
+        <!-- ==================== BY GENERATOR ID ==================== -->
         <div id="byGeneratorIdPaged" class="section">
-            <h1>Papers by Generator ID (Paginated)</h1>
+            <h1><i class="fas fa-id-badge"></i> Papers by Generator ID</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-id-badge"></i> Find Papers Generated by User (ID)
-                </h2>
+                <h2><i class="fas fa-id-card"></i> Papers Generated by User ID</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Generator ID *</label>
-                        <input type="text" id="generatorId" placeholder="e.g., 5" />
+                        <label>Generator ID</label>
+                        <input type="number" id="generatorId" placeholder="Enter user ID">
                     </div>
                     <div class="form-group">
                         <label>Page Number</label>
-                        <input type="number" id="pageNoGeneratorId" value="1" min="1" />
+                        <input type="number" id="pageNoGeneratorId" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Page Size</label>
@@ -568,36 +710,24 @@
                 <button onclick="searchByGeneratorIdPaged()">
                     <i class="fas fa-search"></i> Search
                 </button>
-                <div id="byGeneratorIdPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="generatorIdPagination"></div>
+                <div id="byGeneratorIdPagedResult"></div>
+                <div id="generatorIdPagination"></div>
             </div>
         </div>
 
-        <!-- By Approver Email Paginated -->
+        <!-- ==================== BY APPROVER EMAIL ==================== -->
         <div id="byApproverEmailPaged" class="section">
-            <h1>Papers by Approver Email (Paginated)</h1>
+            <h1><i class="fas fa-user-check"></i> Papers by Approver</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-user-check"></i> Find Papers Approved by
-                    Supervisor (Email)
-                </h2>
+                <h2><i class="fas fa-envelope"></i> Papers Approved by Email</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Approver Email *</label>
-                        <input
-                                type="email"
-                                id="approverEmail"
-                                placeholder="supervisor@example.com"
-                        />
+                        <label>Approver Email</label>
+                        <input type="email" id="approverEmail" placeholder="supervisor@example.com">
                     </div>
                     <div class="form-group">
                         <label>Page Number</label>
-                        <input
-                                type="number"
-                                id="pageNoApproverEmail"
-                                value="1"
-                                min="1"
-                        />
+                        <input type="number" id="pageNoApproverEmail" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Page Size</label>
@@ -611,211 +741,226 @@
                 <button onclick="searchByApproverEmailPaged()">
                     <i class="fas fa-search"></i> Search
                 </button>
-                <div id="byApproverEmailPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="approverEmailPagination"></div>
+                <div id="byApproverEmailPagedResult"></div>
+                <div id="approverEmailPagination"></div>
             </div>
         </div>
 
-        <!-- By Approver ID Paginated -->
-        <div id="byApproverIdPaged" class="section">
-            <h1>Papers by Approver ID (Paginated)</h1>
+        <!-- ==================== APPROVED PAPERS ==================== -->
+        <div id="approvedPapersPaged" class="section">
+            <h1><i class="fas fa-check-circle"></i> Approved Papers</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-check-circle"></i> Find Papers Approved by
-                    Supervisor (ID)
-                </h2>
+                <h2><i class="fas fa-check"></i> View All Approved Papers</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Approver ID *</label>
-                        <input type="text" id="approverId" placeholder="e.g., 3" />
-                    </div>
-                    <div class="form-group">
                         <label>Page Number</label>
-                        <input type="number" id="pageNoApproverId" value="1" min="1" />
+                        <input type="number" id="pageNoApproved" value="1" min="1">
                     </div>
                     <div class="form-group">
                         <label>Page Size</label>
-                        <select id="pageSizeApproverId">
-                            <option value="10">10 per page</option>
-                            <option value="20" selected>20 per page</option>
-                            <option value="50">50 per page</option>
-                        </select>
-                    </div>
-                </div>
-                <button onclick="searchByApproverIdPaged()">
-                    <i class="fas fa-search"></i> Search
-                </button>
-                <div id="byApproverIdPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="approverIdPagination"></div>
-            </div>
-        </div>
-
-        <!-- Approved Papers Paginated -->
-        <div id="approvedPapersPaged" class="section">
-            <h1>Approved Papers (Paginated)</h1>
-            <div class="card">
-                <h2><i class="fas fa-check"></i> View Approved Papers</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Page Number *</label>
-                        <input type="number" id="pageNoApproved" value="1" min="1" />
-                    </div>
-                    <div class="form-group">
-                        <label>Page Size *</label>
                         <select id="pageSizeApproved">
                             <option value="10">10 per page</option>
                             <option value="20" selected>20 per page</option>
                             <option value="50">50 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="loadApprovedPapersPaged()">
+                            <i class="fas fa-search"></i> Load Approved Papers
+                        </button>
+                    </div>
                 </div>
-                <button onclick="loadApprovedPapersPaged()">
-                    <i class="fas fa-search"></i> Load Approved Papers
-                </button>
-                <div id="approvedPapersPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="approvedPapersPagination"></div>
+                <div id="approvedPapersPagedResult"></div>
+                <div id="approvedPapersPagination"></div>
             </div>
         </div>
 
-        <!-- Pending Papers Paginated -->
+        <!-- ==================== PENDING PAPERS ==================== -->
         <div id="pendingPapersPaged" class="section">
-            <h1>Pending/Rejected Papers (Paginated)</h1>
+            <h1><i class="fas fa-clock"></i> Pending Papers</h1>
             <div class="card">
-                <h2><i class="fas fa-clock"></i> View Pending/Rejected Papers</h2>
+                <h2><i class="fas fa-hourglass-half"></i> Papers Awaiting Review</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Page Number *</label>
-                        <input type="number" id="pageNoPending" value="1" min="1" />
+                        <label>Page Number</label>
+                        <input type="number" id="pageNoPending" value="1" min="1">
                     </div>
                     <div class="form-group">
-                        <label>Page Size *</label>
+                        <label>Page Size</label>
                         <select id="pageSizePending">
                             <option value="10">10 per page</option>
                             <option value="20" selected>20 per page</option>
                             <option value="50">50 per page</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button onclick="loadPendingPapersPaged()">
+                            <i class="fas fa-search"></i> Load Pending Papers
+                        </button>
+                    </div>
                 </div>
-                <button onclick="loadPendingPapersPaged()">
-                    <i class="fas fa-search"></i> Load Pending Papers
-                </button>
-                <div id="pendingPapersPagedResult" style="margin-top: 20px"></div>
-                <div class="pagination" id="pendingPapersPagination"></div>
+                <div id="pendingPapersPagedResult"></div>
+                <div id="pendingPapersPagination"></div>
             </div>
         </div>
 
-        <!-- Approve/Reject by ID -->
-        <!-- Approve/Reject by ID -->
+        <!-- ==================== REVIEW BY ID ==================== -->
         <div id="approveById" class="section">
-            <h1>Approve/Reject Paper by ID</h1>
+            <h1><i class="fas fa-thumbs-up"></i> Review Paper by ID</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-thumbs-up"></i> Approve or Reject Question Paper
-                </h2>
+                <h2><i class="fas fa-file-alt"></i> Review Question Paper</h2>
                 <div class="form-group">
-                    <label>Paper ID *</label>
-                    <input type="text" id="approvePaperId" placeholder="Enter paper ID" />
+                    <label>Paper ID</label>
+                    <input type="number" id="approvePaperId" placeholder="Enter paper ID to review">
                 </div>
                 <div class="form-group">
-                    <label>Comment</label>
-                    <textarea id="approveComment" rows="3" placeholder="Enter approval/rejection comment..."></textarea>
+                    <label>Comment / Feedback</label>
+                    <textarea id="approveComment" rows="3" placeholder="Enter your feedback or comments for the teacher..."></textarea>
                 </div>
                 <div class="action-buttons">
-                    <button class="approve" onclick="approvePaperById()">
-                        <i class="fas fa-check"></i> Approve Paper
+                    <button onclick="checkPaperForApproval()" class="secondary">
+                        <i class="fas fa-search"></i> Check Paper
                     </button>
-                    <button class="reject" onclick="rejectPaperById()">
-                        <i class="fas fa-times"></i> Reject Paper
+                    <button onclick="approvePaperById()" class="success">
+                        <i class="fas fa-check-circle"></i> Approve
                     </button>
-                    <button onclick="checkPaperForApproval()">
-                        <i class="fas fa-search"></i> Check
+                    <button onclick="rejectPaperById()" class="danger">
+                        <i class="fas fa-times-circle"></i> Reject
                     </button>
                 </div>
-                <div id="approveByIdResult" style="margin-top: 20px"></div>
+                <div id="approveByIdResult"></div>
             </div>
         </div>
 
-        <!-- Approve/Reject by Title -->
+        <!-- ==================== REVIEW BY TITLE ==================== -->
         <div id="approveByTitle" class="section">
-            <h1>Approve/Reject Paper by Title</h1>
+            <h1><i class="fas fa-file-signature"></i> Review Paper by Title</h1>
             <div class="card">
-                <h2>
-                    <i class="fas fa-file-signature"></i> Approve or Reject by Exam Title
-                </h2>
+                <h2><i class="fas fa-search"></i> Review by Exam Title</h2>
                 <div class="form-group">
-                    <label>Exam Title *</label>
-                    <input type="text" id="approveExamTitle" placeholder="e.g., Midterm Exam 2024" />
+                    <label>Exam Title</label>
+                    <input type="text" id="approveExamTitle" placeholder="Enter exam title to review">
                 </div>
                 <div class="form-group">
-                    <label>Comment</label>
-                    <textarea id="approveTitleComment" rows="3" placeholder="Enter approval/rejection comment..."></textarea>
+                    <label>Comment / Feedback</label>
+                    <textarea id="approveTitleComment" rows="3" placeholder="Enter your feedback or comments for the teacher..."></textarea>
                 </div>
                 <div class="action-buttons">
-                    <button class="approve" onclick="approvePaperByTitle()">
-                        <i class="fas fa-check"></i> Approve by Title
+                    <button onclick="checkPaperByTitle()" class="secondary">
+                        <i class="fas fa-search"></i> Check Paper
                     </button>
-                    <button class="reject" onclick="rejectPaperByTitle()">
-                        <i class="fas fa-times"></i> Reject by Title
+                    <button onclick="approvePaperByTitle()" class="success">
+                        <i class="fas fa-check-circle"></i> Approve
                     </button>
-                    <button onclick="checkPaperByTitle()">
-                        <i class="fas fa-search"></i> Check
+                    <button onclick="rejectPaperByTitle()" class="danger">
+                        <i class="fas fa-times-circle"></i> Reject
                     </button>
                 </div>
-                <div id="approveByTitleResult" style="margin-top: 20px"></div>
+                <div id="approveByTitleResult"></div>
             </div>
         </div>
 
-        <!-- Update Email -->
+        <!-- ==================== UPDATE EMAIL ==================== -->
         <div id="updateEmail" class="section">
-            <h1>Update Email</h1>
+            <h1><i class="fas fa-envelope"></i> Update Email</h1>
             <div class="card">
-                <h2><i class="fas fa-envelope"></i> Update Your Email Address</h2>
+                <h2><i class="fas fa-user-edit"></i> Change Your Email Address</h2>
+                <div class="alert info">
+                    <i class="fas fa-info-circle"></i> You will need to verify your new email address.
+                </div>
                 <div class="form-group">
-                    <label>New Email Address *</label>
-                    <input
-                            type="email"
-                            id="newEmail"
-                            placeholder="newsemail@example.com"
-                    />
+                    <label>New Email Address</label>
+                    <input type="email" id="newEmail" placeholder="newemail@example.com">
                 </div>
                 <button onclick="updateEmail()">
                     <i class="fas fa-save"></i> Update Email
                 </button>
-                <div id="updateEmailResult" style="margin-top: 20px"></div>
+                <div id="updateEmailResult"></div>
             </div>
         </div>
 
-        <!-- Update Password -->
+        <!-- ==================== UPDATE PASSWORD ==================== -->
         <div id="updatePassword" class="section">
-            <h1>Update Password</h1>
+            <h1><i class="fas fa-lock"></i> Update Password</h1>
             <div class="card">
-                <h2><i class="fas fa-lock"></i> Update Your Password</h2>
+                <h2><i class="fas fa-key"></i> Change Your Password</h2>
                 <div class="form-group">
-                    <label>Old Password *</label>
-                    <input
-                            type="password"
-                            id="oldPassword"
-                            placeholder="Enter old password"
-                    />
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" placeholder="Enter new password (min 6 characters)">
                 </div>
                 <div class="form-group">
-                    <label>New Password *</label>
-                    <input
-                            type="password"
-                            id="newPassword"
-                            placeholder="Enter new password"
-                    />
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm new password">
                 </div>
                 <button onclick="updatePassword()">
                     <i class="fas fa-save"></i> Update Password
                 </button>
-                <div id="updatePasswordResult" style="margin-top: 20px"></div>
+                <div id="updatePasswordResult"></div>
             </div>
         </div>
+
     </div>
 </div>
+
+<!-- Scripts -->
 <script th:src="@{/js/api.js}"></script>
-<script th:src="@{/js/supervisor-dashboard.js}"></script>
 <script th:src="@{/js/common-dashboard.js}"></script>
+<script th:src="@{/js/supervisor-dashboard.js}"></script>
+
+<script>
+    // Additional initialization for supervisor dashboard
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Load dashboard stats
+        if (typeof loadAllPapersPaged === 'function') {
+            try {
+                // Get pending count
+                const pendingData = await SupervisorAPI.findNotApprovedPaged(0, 1);
+                const pendingCountElem = document.getElementById('pendingPapersCount');
+                if (pendingCountElem && pendingData) {
+                    pendingCountElem.textContent = pendingData.totalElements || 0;
+                }
+
+                // Get approved count
+                const approvedData = await SupervisorAPI.findApprovedPaged(0, 1);
+                const approvedCountElem = document.getElementById('approvedPapersCount');
+                if (approvedCountElem && approvedData) {
+                    approvedCountElem.textContent = approvedData.totalElements || 0;
+                }
+
+                // Get total count
+                const totalData = await SupervisorAPI.getAllQuestionPapersPaged(0, 1);
+                const totalCountElem = document.getElementById('totalPapersCount');
+                if (totalCountElem && totalData) {
+                    totalCountElem.textContent = totalData.totalElements || 0;
+                }
+
+                // Update welcome stats
+                const pendingWelcomeElem = document.getElementById('pendingCount');
+                if (pendingWelcomeElem) pendingWelcomeElem.textContent = pendingData?.totalElements || 0;
+                const approvedWelcomeElem = document.getElementById('approvedCount');
+                if (approvedWelcomeElem) approvedWelcomeElem.textContent = approvedData?.totalElements || 0;
+
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
+        }
+
+        // Set supervisor name from token
+        const token = AuthAPI.getToken();
+        if (token) {
+            try {
+                const tokenData = AuthAPI.parseJwt(token);
+                const supervisorName = tokenData.name || tokenData.sub || 'Supervisor';
+                const supervisorNameElem = document.getElementById('supervisorName');
+                if (supervisorNameElem) supervisorNameElem.textContent = supervisorName;
+            } catch (e) {
+                console.error('Error parsing token:', e);
+            }
+        }
+    });
+</script>
+
 </body>
 </html>
