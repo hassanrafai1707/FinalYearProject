@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.*;
+import java.util.stream.Collector;
 
 /**
  * QuestionService - Business Logic Service for Question Bank Management
@@ -471,7 +472,9 @@ public class QuestionService {
         if(allowed.isEmpty()){
             throw new QuestionNotFoundException("No questions found for selected subject  code + CO");
         }
-        if (allowed.size()>sumOfNumberOfCognitiveLevel*2){
+        if (
+                (long) allowed.size() <sumOfNumberOfCognitiveLevel* 2L
+        ){
             throw new InsufficientQuestionsException("not enough question to generate question papers ");
         }
         Collections.shuffle(allowed);
@@ -584,7 +587,9 @@ public class QuestionService {
         if(allowed.isEmpty()){
             throw new QuestionNotFoundException("No questions found for selected subject + CO");
         }
-        if (allowed.size()>sumOfNumberOfCognitiveLevel*2){
+        if (
+                (long) allowed.size() <sumOfNumberOfCognitiveLevel* 2L
+    ){
             throw new InsufficientQuestionsException("not enough question to generate question papers ");
         }
         Collections.shuffle(allowed);
