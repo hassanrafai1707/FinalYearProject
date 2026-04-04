@@ -19,20 +19,19 @@ import java.time.Duration;
 @Configuration
 public class RateLimiterConfig {
 
-    @Value("${spring.data.redis.host:localhost}")
-    private String host;
+//    @Value("${spring.data.redis.host:localhost}")
+//    private String host;
+//
+//    @Value("${spring.data.redis.port:6379}")
+//    private int port;
 
-    @Value("${spring.data.redis.port:6379}")
-    private int port;
-
+    @Value("${spring.data.redis.url=:redis://localhost:6379}")
+    private String link;
     @Bean
     public RedisClient redisClient() {
         // Fix: Use the static 'create' method, not an instance call
         return RedisClient.create(
-                RedisURI.builder()
-                        .withHost(host)
-                        .withPort(port)
-                        .build()
+                RedisURI.create(link)
         );
     }
 

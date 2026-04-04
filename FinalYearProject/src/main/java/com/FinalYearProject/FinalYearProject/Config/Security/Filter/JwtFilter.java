@@ -64,23 +64,24 @@ public class JwtFilter extends OncePerRequestFilter {
         String authHeader =request.getHeader("Authorization");//contain auth heder
         String path = request.getServletPath();
         if (//All allowed paths without auth
-                 path.startsWith(appVersion+"/login") ||
-                 path.startsWith(appVersion+"/register") ||
-                 path.startsWith(appVersion+"/auth")||
-                 path.equals("/login") ||
-                 path.equals("/register") ||
-                 path.equals("/admin-dashboard")||
-                 path.equals("/teacher-dashboard")||
-                 path.equals("/supervisor-dashboard")||
-                 path.equals("/student-dashboard")||
-                 path.startsWith("/confirm") ||
-                 path.equals("/favicon.ico") ||
-                 path.startsWith("/css") ||
-                 path.startsWith("/js") ||
-                 path.startsWith("/images") ||
-                 path.startsWith("/webjars") ||
-                 path.equals("/")
+                path.startsWith(appVersion+"/login") ||
+                        path.startsWith(appVersion+"/register") ||
+                        path.startsWith(appVersion+"/auth")||
+                        path.equals("/login") ||
+                        path.equals("/register") ||
+                        path.equals("/admin-dashboard")||
+                        path.equals("/teacher-dashboard")||
+                        path.equals("/supervisor-dashboard")||
+                        path.equals("/student-dashboard")||
+                        path.startsWith("/confirm") ||
+                        path.equals("/favicon.ico") ||
+                        path.startsWith("/css") ||
+                        path.startsWith("/js") ||
+                        path.startsWith("/images") ||
+                        path.startsWith("/webjars") ||
+                        path.equals("/")
         ) {
+            System.out.println("Request:"+request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -88,6 +89,7 @@ public class JwtFilter extends OncePerRequestFilter {
             token=authHeader.substring(7); //separate the heder type form heder
             username= jwtService.extractUserEmail(token);
             try {
+                System.out.println("Request:"+request.getRequestURI());
                 jwtService.isTokenExpiredOrThrow(token);
             } catch (Exception e) {
                 ObjectMapper objectMapper=new ObjectMapper();
