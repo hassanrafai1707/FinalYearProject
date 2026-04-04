@@ -511,6 +511,7 @@ public class QuestionPaperService {
     @SneakyThrows
     public ByteArrayInputStream downloadQuestionPaper(Long id){
         QuestionPaper questionPaper=findById(id);
+        List<Question> questionList=questionPaper.getListOfQuestion().stream().toList();
         if (!questionPaper.getGeneratedBy().getDepartment().equals(UserUtil.getUserAuthentication().getUser().getDepartment())){
             throw new DepartmentMissMatchException("you can not download this question ");
         }
@@ -561,9 +562,9 @@ public class QuestionPaperService {
                         pdfTable.addCell(heder);
                     }
             );
-            if (questionPaper.getListOfQuestion().isEmpty()) throw new QuestionNotFoundException("there are not questions in this question paper");
+            if (questionList.isEmpty()) throw new QuestionNotFoundException("there are not questions in this question paper");
 
-            for (Question question : questionPaper.getListOfQuestion().stream().sorted(Comparator.comparing(Question::getQuestionMarks)).toList()){
+            for (Question question : questionList.stream().sorted(Comparator.comparing(Question::getQuestionMarks)).toList()){
 
                 // ID
                 PdfPCell qId=new PdfPCell(new Phrase(question.getId().toString(),bodyFont));
@@ -614,7 +615,7 @@ public class QuestionPaperService {
                     new PdfPCell(
                     new Phrase(
                             String.valueOf(
-                                    questionPaper.getListOfQuestion().stream().mapToInt(Question::getQuestionMarks).sum()
+                                    questionList.stream().mapToInt(Question::getQuestionMarks).sum()
                             ),
                             bodyFont
                     )
@@ -640,6 +641,7 @@ public class QuestionPaperService {
     @SneakyThrows
     public ByteArrayInputStream downloadQuestionPaperTeacher(Long id){
         QuestionPaper questionPaper=findById(id);
+        List<Question> questionList=questionPaper.getListOfQuestion().stream().toList();
         if (questionPaper.getGeneratedBy().getId()!=UserUtil.getUserAuthentication().getUser().getId()){
             throw new UserNotAuthorizesException("You are not aloud to download this question paper ");
         }
@@ -690,9 +692,9 @@ public class QuestionPaperService {
                         pdfTable.addCell(heder);
                     }
             );
-            if (questionPaper.getListOfQuestion().isEmpty()) throw new QuestionNotFoundException("there are not questions in this question paper");
+            if (questionList.isEmpty()) throw new QuestionNotFoundException("there are not questions in this question paper");
 
-            for (Question question : questionPaper.getListOfQuestion().stream().sorted(Comparator.comparing(Question::getQuestionMarks)).toList()){
+            for (Question question : questionList.stream().sorted(Comparator.comparing(Question::getQuestionMarks)).toList()){
 
                 // ID
                 PdfPCell qId=new PdfPCell(new Phrase(question.getId().toString(),bodyFont));
@@ -743,7 +745,7 @@ public class QuestionPaperService {
                     new PdfPCell(
                             new Phrase(
                                     String.valueOf(
-                                            questionPaper.getListOfQuestion().stream().mapToInt(Question::getQuestionMarks).sum()
+                                            questionList.stream().mapToInt(Question::getQuestionMarks).sum()
                                     ),
                                     bodyFont
                             )
