@@ -36,6 +36,33 @@ function updateTotalMarks(twoMarksId, fourMarksId, displayId) {
     }
 }
 
+// Helper: Show alert message
+function showAlert(message, type, containerId) {
+    const container = containerId ? document.getElementById(containerId) : null;
+    const alertHtml = `<div class="alert ${type}">${message}</div>`;
+
+    if (container) {
+        container.innerHTML = alertHtml;
+        setTimeout(() => {
+            if (container.innerHTML === alertHtml) {
+                container.innerHTML = '';
+            }
+        }, 5000);
+    } else {
+        // Create temporary toast notification
+        const toast = document.createElement('div');
+        toast.className = `alert ${type}`;
+        toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 10000; max-width: 350px;';
+        toast.innerHTML = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 // ====================
 // QUESTION MANAGEMENT
 // ====================
@@ -385,34 +412,22 @@ function displayQuestionPapers(papers, containerId) {
         const statusText = isApproved ? 'Approved' : 'Pending';
 
         html += `<tr>
-            <td>${paper.id || 'N/A'}</td>
-            <td><strong>${paper.examTitle || 'Untitled'}</strong></td>
-            <td><code>${paper.subjectCode || 'N/A'}</code></td>
-            <td>${paper.subjectName || 'N/A'}</td>
-            <td class="status-${isApproved ? 'approved' : 'pending'}">${statusText}</td>
-            <td>${paper.generatedBy || paper.createdBy || 'N/A'}</td>
-            <td>${paper.approvedBy || (isApproved ? 'Approved' : 'Pending approval')}</td>
-            <td>
-                <button onclick="downloadQuestionPaperById(${paper.id})" class="small-btn" style="background-color: #17a2b8; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
-                    <i class="fas fa-download"></i> Download
-                </button>
-            </td>
-        </tr>`;
+        <td>${paper.id || 'N/A'}</td>
+        <td><strong>${paper.examTitle || 'Untitled'}</strong></td>
+        <td><code>${paper.questions?.[0]?.subjectCode || 'N/A'}</code></td>
+        <td>${paper.questions?.[0]?.subjectName || 'N/A'}</td>
+        <td class="status-${isApproved ? 'approved' : 'pending'}">${statusText}</td>
+        <td>${paper.generatedBy?.email || paper.generatedBy?.id || 'N/A'}</td>
+        <td>${paper.approvedBy?.email || paper.approvedBy?.id || (isApproved ? 'Approved' : 'Pending approval')}</td>
+        <td>
+            <button onclick="downloadQuestionPaperById(${paper.id})" class="small-btn">
+                Download
+            </button>
+        </td>
+    </tr>`;
     });
 
     html += '</tbody></table></div>';
-
-    // Add pagination info if multiple pages
-    if (totalPages > 1) {
-        html += `<div class="pagination-info" style="margin-top: 15px; text-align: center;">
-            Page ${currentPage} of ${totalPages} | Total: ${papers.totalElements || papersArray.length} papers
-        </div>`;
-    } else {
-        html += `<div class="pagination-info" style="margin-top: 15px; text-align: center;">
-            Total: ${papersArray.length} papers
-        </div>`;
-    }
-
     container.innerHTML = html;
 }
 
@@ -613,7 +628,7 @@ function displayPagedQuestions(result, containerId, paginationId, currentPage, l
         const shortQuestion = q.questionBody.length > 100 ? q.questionBody.substring(0, 100) + '...' : q.questionBody;
         html += `<tr>
             <td>${q.id}</td>
-            <td title="${q.questionBody.replace(/"/g, '&quot;')}">${shortQuestion}</td>
+            <td title="${q.questionBody.replace(/"/g, '&quot;')}">${escapeHtml(shortQuestion)}</td>
             <td>${q.subjectName}</td>
             <td><code>${q.subjectCode}</code></td>
             <td>${q.mappedCO}</td>
@@ -632,6 +647,17 @@ function displayPagedQuestions(result, containerId, paginationId, currentPage, l
     } else if (document.getElementById(paginationId)) {
         document.getElementById(paginationId).innerHTML = '';
     }
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
 }
 
 // Create pagination for teacher dashboard
@@ -695,7 +721,7 @@ function displaySingleQuestion(question, containerId) {
                 <tr><th>ID:</th><td>${question.id}</td></tr>
                 <tr><th>Subject Code:</th><td><code>${question.subjectCode}</code></td></tr>
                 <tr><th>Subject Name:</th><td>${question.subjectName}</td></tr>
-                <tr><th>Question:</th><td class="question-body">${question.questionBody}</td></tr>
+                <tr><th>Question:</th><td class="question-body">${escapeHtml(question.questionBody)}</td></tr>
                 <tr><th>Mapped CO:</th><td>${question.mappedCO}</td></tr>
                 <tr><th>Marks:</th><td class="mark-${question.questionMarks}">${question.questionMarks} marks</td></tr>
                 <tr><th>Cognitive Level:</th><td>${question.cognitiveLevel}</td></tr>
@@ -725,7 +751,7 @@ function displayQuestionsList(questions, containerId) {
         const shortQuestion = q.questionBody.length > 100 ? q.questionBody.substring(0, 100) + '...' : q.questionBody;
         html += `<tr>
             <td>${q.id}</td>
-            <td title="${q.questionBody.replace(/"/g, '&quot;')}">${shortQuestion}</td>
+            <td title="${q.questionBody.replace(/"/g, '&quot;')}">${escapeHtml(shortQuestion)}</td>
             <td>${q.subjectName}</td>
             <td><code>${q.subjectCode}</code></td>
             <td>${q.mappedCO}</td>
@@ -802,7 +828,7 @@ function displayGeneratedPaper(paper, containerId) {
         html += `
             <tr>
                 <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};"><strong>${q.id || 'N/A'}</strong></td>
-                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};" title="${(q.questionBody || '').replace(/"/g, '&quot;')}">${questionText}</td>
+                <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};" title="${(q.questionBody || '').replace(/"/g, '&quot;')}">${escapeHtml(questionText)}</td>
                 <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};">${q.subjectName || 'N/A'}</td>
                 <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};"><code>${q.subjectCode || 'N/A'}</code></td>
                 <td style="border: 1px solid ${borderColor}; padding: 8px; color: ${textColor};">${q.mappedCO || 'N/A'}</td>
@@ -883,11 +909,13 @@ function showExamTitleModal(questions) {
     };
 
     // Close on escape key
-    document.addEventListener('keydown', function(e) {
+    const escapeHandler = function(e) {
         if (e.key === 'Escape') {
             modal.remove();
+            document.removeEventListener('keydown', escapeHandler);
         }
-    });
+    };
+    document.addEventListener('keydown', escapeHandler);
 }
 
 // Updated quick submit function with exam title parameter
@@ -941,3 +969,8 @@ function clearApprovalInput() {
 // Make functions globally available
 window.downloadQuestionPaperById = downloadQuestionPaperById;
 window.displayQuestionPapers = displayQuestionPapers;
+window.showExamTitleModal = showExamTitleModal;
+window.quickSubmitForApproval = quickSubmitForApproval;
+window.copyToClipboard = copyToClipboard;
+window.clearApprovalInput = clearApprovalInput;
+window.changeTeacherPage = changeTeacherPage;
