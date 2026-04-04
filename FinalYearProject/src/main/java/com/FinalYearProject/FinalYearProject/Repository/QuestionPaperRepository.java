@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,34 +29,44 @@ import java.util.Optional;
 @Repository
 public interface QuestionPaperRepository extends JpaRepository<QuestionPaper,Long> {
 
+    @Transactional(readOnly = true)
     @Query("SELECT q FROM QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion where q.id=:id AND q.generatedBy.department=:department")
     Optional<QuestionPaper> findById(@Param("id") Long id,@Param("department") String department);
 
+    @Transactional(readOnly = true)
     @Query("select q from QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion where q.examTitle=:examTitle and q.generatedBy.department=:department")
     Optional<QuestionPaper> findByExamTitle(@Param("examTitle") String examTitle,@Param("department") String department);
 
+    @Transactional(readOnly = true)
     @Query("select q from QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion where q.generatedBy=:generatedBy and q.generatedBy.department=:department")
     List<QuestionPaper> findByGeneratedBy(User generatedBy,@Param("department") String department);
 
-    @Query("select q from QuestionPaper q where q.generatedBy=:generatedBy and q.generatedBy.department=:department")
+    @Transactional(readOnly = true)
+    @Query("select q from QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion where q.generatedBy=:generatedBy and q.generatedBy.department=:department")
     Page<QuestionPaper> findByGeneratedBy(User generatedBy,@Param("department") String department,Pageable pageable);
 
+    @Transactional(readOnly = true)
     @Query("SELECT q FROM QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion WHERE q.approvedBy=:approvedBy and q.generatedBy.department=:department")
     List<QuestionPaper> findByApprovedBy(User approvedBy,@Param("department") String department);
 
-    @Query("SELECT q FROM QuestionPaper q WHERE q.approvedBy=:approvedBy and q.generatedBy.department=:department")
+    @Transactional(readOnly = true)
+    @Query("SELECT q FROM QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion WHERE q.approvedBy=:approvedBy and q.generatedBy.department=:department")
     Page<QuestionPaper> findByApprovedBy(User approvedBy,@Param("department") String department ,Pageable pageable);
 
+    @Transactional(readOnly = true)
     @Query("SELECT q FROM QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion WHERE q.approved=:approved and q.generatedBy.department=:department")
     List<QuestionPaper> findByApproved(Boolean approved,@Param("department") String department);
 
-    @Query("SELECT q FROM QuestionPaper q WHERE q.approved=:approved and q.generatedBy.department=:department")
+    @Transactional(readOnly = true)
+    @Query("SELECT q FROM QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion WHERE q.approved=:approved and q.generatedBy.department=:department")
     Page<QuestionPaper> findByApproved(Boolean approved,@Param("department") String department,Pageable pageable);
 
+    @Transactional(readOnly = true)
     @Query("select q from QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion where q.generatedBy.department=:department")
     List<QuestionPaper> findByDepartment(@Param("department") String department);
 
-    @Query("select q from QuestionPaper q where q.generatedBy.department=:department")
+    @Transactional(readOnly = true)
+    @Query("select q from QuestionPaper q LEFT JOIN FETCH q.generatedBy LEFT JOIN FETCH q.approvedBy LEFT JOIN FETCH q.listOfQuestion where q.generatedBy.department=:department")
     Page<QuestionPaper> findByDepartment(@Param("department") String department,Pageable pageable);
 
     Boolean existsByQuestionPaperFingerprint(String questionPaperFingerprint);

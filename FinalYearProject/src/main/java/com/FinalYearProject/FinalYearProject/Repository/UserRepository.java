@@ -32,29 +32,37 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     //simple query handled by spring boot
     Optional<User> findByEmail(String email);
+
     Boolean existsByEmail(String email);
+
     List<User> findByRole(String role);
+
     Page<User> findByRole(String role, Pageable pageable);
+
     List<User> findByDepartment(String department);
-    Page<User> findByDepartment(String department,Pageable pageable);
+
+    Page<User> findByDepartment(String department, Pageable pageable);
 
     //complex query handle by @Query
     @Transactional
     @Modifying
     @Query("DELETE FROM User u WHERE u.email =:email")
     void deleteByEmail(@Param("email") String email);
+
     @Transactional
     @Modifying
     @Query("UPDATE User u set u.is_enable=true, u.locked=false,u.expired=false where u.email=:email")
-    void updateIsEnableLockedExpiredToTrue(@Param("email")String email);
+    void updateIsEnableLockedExpiredToTrue(@Param("email") String email);
+
     @Transactional
     @Modifying
     @Query("DELETE User u WHERE u.id IN :ids")
     void deleteUserInBatchById(@Param("ids") List<Long> Ids);
+
     @Transactional
     @Modifying
     @Query("DELETE User u WHERE u.email IN:emails")
-    void deleteUserInBatchByEmail(@Param("emails")List<String> emails);
+    void deleteUserInBatchByEmail(@Param("emails") List<String> emails);
 
     @Query("SELECT u.id FROM User u WHERE u.id IN:ids")
     List<Long> validIDs(@Param("ids") List<Long> ids);
