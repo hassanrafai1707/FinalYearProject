@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Exceptions;
 
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.InsufficientQuestionsException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.DuplicateQuestionPaperException;
@@ -127,8 +128,8 @@ public class GlobalExceptionHandler  {
         return buildResponse(e,HttpStatus.UNAUTHORIZED,request);
     }
 
-    @ExceptionHandler(ToManyRequests.class)
-    public ResponseEntity<ErrorResponse> handleToManyRequests(ToManyRequests e,HttpServletRequest request){
-        return buildResponse(e,HttpStatus.TOO_MANY_REQUESTS,request);
+    @ExceptionHandler(InsufficientQuestionsException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientQuestionsException(InsufficientQuestionsException e,HttpServletRequest request){
+        return buildResponse(e,HttpStatus.BAD_REQUEST,request);
     }
 }

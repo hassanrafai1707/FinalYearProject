@@ -1,6 +1,7 @@
 package com.FinalYearProject.FinalYearProject.Util;
 
 import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -26,9 +27,12 @@ public class QuestionPaperUtil {
 
     public static String sha256FingerPrintUsingIds(List<Long> Ids){
         try{
-            String temp=Ids.toString();
+            StringBuilder stringBuffer=new StringBuilder();
+            for (Long id : Ids){
+               stringBuffer.append(id);
+            }
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hashCode=md.digest(temp.getBytes(StandardCharsets.UTF_8));
+            byte[] hashCode=md.digest(stringBuffer.toString().getBytes(StandardCharsets.UTF_8));
             StringBuilder hex=new StringBuilder();
             for (byte h :hashCode){
                 hex.append(String.format("%02x",h));

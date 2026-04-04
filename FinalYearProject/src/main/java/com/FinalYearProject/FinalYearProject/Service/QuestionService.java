@@ -1,13 +1,12 @@
 package com.FinalYearProject.FinalYearProject.Service;
 
-import com.FinalYearProject.FinalYearProject.Domain.QuestionPaper;
 import com.FinalYearProject.FinalYearProject.Domain.User;
 import com.FinalYearProject.FinalYearProject.Exceptions.DepartmentMissMatchException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.DuplicateQuestionException;
+import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.InsufficientQuestionsException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.QuestionNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.QuestionException.UnacceptableQuestion;
 import com.FinalYearProject.FinalYearProject.Domain.Question;
-import com.FinalYearProject.FinalYearProject.Exceptions.QuestionPaperException.QuestionPaperNotFoundException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.UserNotAuthorizesException;
 import com.FinalYearProject.FinalYearProject.Exceptions.UserEeceptions.WrongPasswordException;
 import com.FinalYearProject.FinalYearProject.Repository.QuestionRepository;
@@ -448,6 +447,7 @@ public class QuestionService {
     }
 
     @PreAuthorize("hasRole('TEACHER')")
+    @SneakyThrows
     public List<Question> generateBySubjectCodeQuestion(
             String subjectCode,
             String[] mappedCOs,
@@ -457,6 +457,11 @@ public class QuestionService {
             int maxNumberOf2Marks,
             int maxNumberOf4Marks
     ) {
+        int sumOfNumberOfCognitiveLevel=numberOfCognitiveLevel_A+numberOfCognitiveLevel_R+numberOfCognitiveLevel_U;
+        int sumOfMarks=maxNumberOf2Marks+maxNumberOf4Marks;
+        if (sumOfNumberOfCognitiveLevel!=sumOfMarks){
+            throw new BadRequestException("something went wrong A+R+U is not equals to 2 marks + 4 marks ");
+        }
         List<Question> output=new ArrayList<>();
         List<Question> allowed=questionRepository.findValidQuestionsWithSubjectCode(
                 subjectCode,
@@ -465,6 +470,9 @@ public class QuestionService {
         );
         if(allowed.isEmpty()){
             throw new QuestionNotFoundException("No questions found for selected subject  code + CO");
+        }
+        if (allowed.size()>sumOfNumberOfCognitiveLevel*2){
+            throw new InsufficientQuestionsException("not enough question to generate question papers ");
         }
         Collections.shuffle(allowed);
         for (Question question:allowed){
@@ -552,6 +560,7 @@ public class QuestionService {
 
 
     @PreAuthorize("hasRole('TEACHER')")
+    @SneakyThrows
     public List<Question> generateBySubjectNameQuestion(
             String subjectName,
             String[] mappedCOs,
@@ -561,6 +570,11 @@ public class QuestionService {
             int maxNumberOf2Marks,
             int maxNumberOf4Marks
     ) {
+        int sumOfNumberOfCognitiveLevel=numberOfCognitiveLevel_A+numberOfCognitiveLevel_R+numberOfCognitiveLevel_U;
+        int sumOfMarks=maxNumberOf2Marks+maxNumberOf4Marks;
+        if (sumOfNumberOfCognitiveLevel!=sumOfMarks){
+            throw new BadRequestException("something went wrong A+R+U is not equals to 2 marks + 4 marks ");
+        }
         List<Question> allowed = questionRepository.findValidQuestionWithSubjectName(
                 subjectName,
                 mappedCOs,
@@ -569,6 +583,9 @@ public class QuestionService {
         List<Question> output = new ArrayList<>();
         if(allowed.isEmpty()){
             throw new QuestionNotFoundException("No questions found for selected subject + CO");
+        }
+        if (allowed.size()>sumOfNumberOfCognitiveLevel*2){
+            throw new InsufficientQuestionsException("not enough question to generate question papers ");
         }
         Collections.shuffle(allowed);
         for (Question question:allowed){
