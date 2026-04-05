@@ -592,7 +592,7 @@ async function searchBySubjectNameCOPaged() {
 async function searchBySubjectNameCOLevel() {
     const name = document.getElementById('subjectNameCOLevel')?.value.trim();
     const co = document.getElementById('mappedCONameLevel')?.value.trim();
-    const level = document.getElementById('cognitiveLevel')?.value;
+    const level = document.getElementById('cognitiveLevelName')?.value;
     const resultDiv = document.getElementById('bySubjectNameCOLevelResult');
 
     if (!name || !co || !level) {

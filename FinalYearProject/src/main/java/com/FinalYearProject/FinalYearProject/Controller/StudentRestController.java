@@ -57,7 +57,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/pagged")
+    @GetMapping("/questions/paged")
     public ResponseEntity<?>  getAllQuestionsPaged(
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "size",defaultValue = "100") int size
@@ -104,7 +104,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/pagged")
+    @GetMapping("/questions/subjectCode/paged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCode(
             @RequestParam(value = "pageNo" ,defaultValue = "0") int pageNo,
@@ -151,7 +151,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/mappedCO/pagged")
+    @GetMapping("/questions/subjectCode/mappedCO/paged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectCodeMappedCO(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
@@ -208,7 +208,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel/pagged")
+    @GetMapping("/questions/subjectCode/mappedCO/cognitiveLevel/paged")
     @SneakyThrows
     private ResponseEntity<?> findByCognitiveLevel(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
@@ -243,7 +243,7 @@ public class StudentRestController {
     @GetMapping("/questions/subjectName")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectName(@RequestParam("subjectName") String subjectName){
-        if (!subjectName.isEmpty()){
+        if (subjectName.isEmpty()){
             throw new BadRequestException("the request must contain 'subjectName'");
         }
         return ResponseUtility.responseTemplateForMultipleData(
@@ -258,7 +258,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/pagged")
+    @GetMapping("/questions/subjectName/paged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectName(
             @RequestParam(value = "pageNo",defaultValue = "0")int pageNo,
@@ -305,7 +305,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/mappedCO/pagged")
+    @GetMapping("/questions/subjectName/mappedCO/paged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCO(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
@@ -363,7 +363,7 @@ public class StudentRestController {
         );
     }
 
-    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel/pagged")
+    @GetMapping("/questions/subjectName/mappedCO/cognitiveLevel/paged")
     @SneakyThrows
     public ResponseEntity<?> findBySubjectNameMappedCOCognitiveLevel(
             @RequestParam(value = "pageNo", defaultValue = "0")int pageNo,
