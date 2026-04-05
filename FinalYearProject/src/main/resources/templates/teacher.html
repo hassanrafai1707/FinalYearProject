@@ -171,22 +171,6 @@
             flex-wrap: wrap;
         }
 
-        .summary-stat {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .summary-stat .label {
-            font-size: 0.7rem;
-            color: var(--gray);
-            text-transform: uppercase;
-        }
-
-        .summary-stat .value {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
         /* Level Tags */
         .level-tag {
             display: inline-block;
@@ -203,34 +187,6 @@
         body.dark-mode .level-R { background: #78350f; color: #fde68a; }
         body.dark-mode .level-U { background: #1e3a8a; color: #bfdbfe; }
         body.dark-mode .level-A { background: #14532d; color: #bbf7d0; }
-
-        /* Question Row */
-        .question-row {
-            padding: 0.75rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
-        }
-
-        .question-row:hover {
-            background: var(--gray-light);
-        }
-
-        body.dark-mode .question-row:hover {
-            background: #2d2d3d;
-        }
-
-        .question-text {
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-
-        .question-meta {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            font-size: 0.7rem;
-            color: var(--gray);
-        }
 
         /* Question Detail Card */
         .question-detail-card {
@@ -319,6 +275,139 @@
             margin: 0.25rem 0;
         }
 
+        /* Pagination Styles - Modern with Arrows */
+        .pagination-wrapper {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--gray);
+            text-align: center;
+        }
+
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .pagination button {
+            min-width: 2.5rem;
+            height: 2.5rem;
+            padding: 0 0.75rem;
+            background: var(--gray-light);
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        body.dark-mode .pagination button {
+            background: #334155;
+            color: #e2e8f0;
+            border-color: #475569;
+        }
+
+        .pagination button:hover:not(.disabled):not(.active) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .pagination button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pagination button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .pagination-arrow {
+            font-size: 0.875rem;
+        }
+
+        .pagination-dots {
+            padding: 0 0.25rem;
+            color: var(--gray);
+            font-size: 0.875rem;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        .loading-spinner i {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            background: white;
+            color: var(--dark);
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            animation: slideInRight 0.3s ease;
+        }
+
+        body.dark-mode .toast {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .toast-success { border-left: 4px solid var(--success); }
+        .toast-error { border-left: 4px solid var(--danger); }
+        .toast-info { border-left: 4px solid var(--primary); }
+
+        .toast-success i { color: var(--success); }
+        .toast-error i { color: var(--danger); }
+        .toast-info i { color: var(--primary); }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Cache Indicator */
+        .cache-indicator {
+            font-size: 0.7rem;
+            color: var(--gray);
+            margin-left: 0.5rem;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .welcome-banner {
@@ -343,12 +432,50 @@
             .question-meta-grid {
                 grid-template-columns: 1fr;
             }
+
+            .pagination button {
+                min-width: 2rem;
+                height: 2rem;
+                padding: 0 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            .pagination-dots {
+                padding: 0 0.125rem;
+            }
+
+            .pagination-info {
+                font-size: 0.75rem;
+            }
+
+            .toast {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: calc(100% - 2rem);
+            }
         }
 
         /* Update total questions display */
         #totalQuestionsCount {
             font-weight: 600;
             color: var(--primary);
+        }
+
+        .stat {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .stat-value {
+            color: var(--primary);
+            font-weight: 500;
         }
     </style>
 </head>
@@ -381,15 +508,15 @@
             </a></li>
 
             <div class="menu-category">Question Management</div>
-            <li><a href="#" onclick="showSection('addQuestion')">
+            <li><a href="#" onclick="showSectionAndLoad('addQuestion')">
                 <i class="fas fa-plus-circle"></i>
                 <span>Add Question</span>
             </a></li>
-            <li><a href="#" onclick="showSection('myQuestionsPaged')">
+            <li><a href="#" onclick="showSectionAndLoad('myQuestionsPaged')">
                 <i class="fas fa-list"></i>
                 <span>My Questions</span>
             </a></li>
-            <li><a href="#" onclick="showSection('allQuestionsPaged')">
+            <li><a href="#" onclick="showSectionAndLoad('allQuestionsPaged')">
                 <i class="fas fa-database"></i>
                 <span>All Questions</span>
             </a></li>
@@ -437,7 +564,7 @@
             </a></li>
 
             <div class="menu-category">Question Papers</div>
-            <li><a href="#" onclick="showSection('myQuestionPapers')">
+            <li><a href="#" onclick="showSectionAndLoad('myQuestionPapers')">
                 <i class="fas fa-file-alt"></i>
                 <span>My Papers</span>
             </a></li>
@@ -526,13 +653,13 @@
             <div class="card">
                 <h2><i class="fas fa-rocket"></i> Quick Actions</h2>
                 <div class="action-buttons">
-                    <button onclick="showSection('addQuestion')" class="success">
+                    <button onclick="showSectionAndLoad('addQuestion')" class="success">
                         <i class="fas fa-plus-circle"></i> Add New Question
                     </button>
                     <button onclick="showSection('generateByCode')" class="primary">
                         <i class="fas fa-cogs"></i> Generate Paper
                     </button>
-                    <button onclick="showSection('myQuestionPapers')" class="secondary">
+                    <button onclick="showSectionAndLoad('myQuestionPapers')" class="secondary">
                         <i class="fas fa-file-alt"></i> View My Papers
                     </button>
                 </div>
@@ -601,7 +728,7 @@
 
         <!-- ==================== MY QUESTIONS PAGINATED ==================== -->
         <div id="myQuestionsPaged" class="section">
-            <h1><i class="fas fa-list"></i> My Questions</h1>
+            <h1><i class="fas fa-list"></i> My Questions <span id="myQuestionsCacheIndicator" class="cache-indicator"></span></h1>
             <div class="card">
                 <h2><i class="fas fa-user"></i> Questions Created by You</h2>
                 <div class="form-row">
@@ -620,8 +747,8 @@
                     </div>
                     <div class="form-group">
                         <label>&nbsp;</label>
-                        <button onclick="loadMyQuestionsPaged()">
-                            <i class="fas fa-search"></i> Load My Questions
+                        <button onclick="loadMyQuestionsPaged(true)">
+                            <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                     </div>
                 </div>
@@ -1102,6 +1229,15 @@
 <script th:src="@{/js/teacher-dashboard.js}"></script>
 
 <script>
+    // Cache for My Questions data
+    let myQuestionsCache = {
+        data: null,
+        currentPage: 1,
+        pageSize: 20,
+        totalPages: 0,
+        hasCache: false
+    };
+
     // Update total questions count display
     document.addEventListener('DOMContentLoaded', function() {
         // Update total questions count in generation form
@@ -1160,13 +1296,13 @@
                     const myQuestionsData = await TeacherAPI.getMyQuestionsPaged(0, 1);
                     const myQuestionsCountElem = document.getElementById('myQuestionsCount');
                     if (myQuestionsCountElem && myQuestionsData) {
-                        myQuestionsCountElem.textContent = myQuestionsData.totalElements || 0;
+                        myQuestionsCountElem.textContent = myQuestionsData.page?.totalElements || myQuestionsData.totalElements || 0;
                     }
 
                     const allQuestionsData = await TeacherAPI.getAllQuestionsPaged(0, 1);
                     const totalQuestionsElem = document.getElementById('totalQuestions');
                     if (totalQuestionsElem && allQuestionsData) {
-                        totalQuestionsElem.textContent = allQuestionsData.totalElements || 0;
+                        totalQuestionsElem.textContent = allQuestionsData.page?.totalElements || allQuestionsData.totalElements || 0;
                     }
                 } catch (e) {
                     console.error('Failed to load stats:', e);
@@ -1174,6 +1310,53 @@
             }
         }, 500);
     });
+
+    // Show section and load data only once for cached sections
+    let sectionLoaded = {
+        myQuestionsPaged: false,
+        allQuestionsPaged: false,
+        myQuestionPapers: false
+    };
+
+    function showSectionAndLoad(sectionId) {
+        showSection(sectionId);
+
+        // Load data only once for these sections
+        if (sectionId === 'myQuestionsPaged' && !sectionLoaded.myQuestionsPaged) {
+            sectionLoaded.myQuestionsPaged = true;
+            loadMyQuestionsPaged(true);
+        } else if (sectionId === 'myQuestionsPaged' && sectionLoaded.myQuestionsPaged) {
+            // Show cached data
+            if (myQuestionsCache.hasCache) {
+                displayCachedMyQuestions();
+            }
+        } else if (sectionId === 'allQuestionsPaged' && !sectionLoaded.allQuestionsPaged) {
+            sectionLoaded.allQuestionsPaged = true;
+            loadAllQuestionsPaged();
+        } else if (sectionId === 'myQuestionPapers' && !sectionLoaded.myQuestionPapers) {
+            sectionLoaded.myQuestionPapers = true;
+            myQuestionPaper();
+        }
+    }
+
+    function displayCachedMyQuestions() {
+        if (myQuestionsCache.hasCache && myQuestionsCache.data) {
+            const resultDiv = document.getElementById('myQuestionsPagedResult');
+            const paginationDiv = document.getElementById('myQuestionsPagination');
+            const cacheIndicator = document.getElementById('myQuestionsCacheIndicator');
+
+            if (cacheIndicator) {
+                cacheIndicator.innerHTML = '<i class="fas fa-database"></i> Cached';
+                setTimeout(() => {
+                    if (cacheIndicator) cacheIndicator.innerHTML = '';
+                }, 3000);
+            }
+
+            if (typeof displayQuestionsTable === 'function') {
+                displayQuestionsTable('myQuestionsPagedResult', myQuestionsCache.data, 'myQuestionsPagination', true);
+            }
+        }
+    }
 </script>
 
 </body>
