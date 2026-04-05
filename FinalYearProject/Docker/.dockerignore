@@ -1,16 +1,10 @@
-# Include any files or directories that you don't want to be copied to your
-# container here (e.g., local build artifacts, temporary files, etc.).
-#
-# For more help, visit the .dockerignore file reference guide at
-# https://docs.docker.com/go/build-context-dockerignore/
-
+# ============================================
+# OS and IDE files (keep these)
+# ============================================
 **/.DS_Store
 **/.classpath
-**/.dockerignore
-**/.env
 **/.factorypath
 **/.git
-../gitHub/.gitignore
 **/.idea
 **/.project
 **/.sts4-cache
@@ -23,14 +17,13 @@
 **/*.dbmdl
 **/*.jfm
 **/charts
-**/docker-compose*
-**/compose.y*ml
-**/Dockerfile*
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/vendor
-LICENSE
-README.md
+
+# ============================================
+# Build artifacts (keep these)
+# ============================================
 **/*.class
 **/*.iml
 **/*.ipr
@@ -60,3 +53,22 @@ pom.xml.tag
 pom.xml.versionsBackup
 release.properties
 replay_pid*
+
+# ============================================
+# Documentation and misc (keep these)
+# ============================================
+LICENSE
+README.md
+
+# ============================================
+# Environment files (keep these - important!)
+# ============================================
+**/.env
+.env
+
+# ============================================
+# Files that should NOT be ignored:
+# ============================================
+# !**/Dockerfile*     ← DON'T ignore Dockerfiles
+# !**/docker-compose* ← DON'T ignore compose files
+# !.dockerignore      ← DON'T ignore .dockerignore itself

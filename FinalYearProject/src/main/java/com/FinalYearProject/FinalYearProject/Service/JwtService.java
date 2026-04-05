@@ -6,12 +6,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,17 +36,9 @@ import java.util.function.Function;
 public class JwtService  {
     private final UserRepository userRepository;
     private final String secretKey;
-    public JwtService(UserRepository userRepository){
-    try {
-        //TODO use fixed key
-        KeyGenerator keyGenerator= KeyGenerator.getInstance("HmacSHA256");
-        SecretKey sk=keyGenerator.generateKey();
-        secretKey= Base64.getEncoder().encodeToString(sk.getEncoded());
+    public JwtService(UserRepository userRepository,@Value("${app.jwt.key}") String key){
+        secretKey= Base64.getEncoder().encodeToString(key.getBytes());
         this.userRepository=userRepository;
-    }
-    catch (NoSuchAlgorithmException e){
-        throw new RuntimeException(e);
-    }
     }
     public SecretKey getKey(){
         byte [] KeyBytes = Decoders.BASE64.decode(secretKey);

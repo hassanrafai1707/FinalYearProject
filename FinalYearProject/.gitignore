@@ -37,3 +37,6 @@ target/
 
 # Ignore the IDEA settings in the parent directory
 ../.idea/
+.env
+Docker/.env
+**/.env
