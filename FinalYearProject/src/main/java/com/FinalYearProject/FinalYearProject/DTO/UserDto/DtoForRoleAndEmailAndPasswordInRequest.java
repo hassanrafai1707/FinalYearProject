@@ -1,5 +1,9 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * DTO for Role Updates by Email with Authorization
  * PURPOSE: Data Transfer Object for changing user roles identified by email, requiring password verification for authorization (either user or admin password depending on context).
@@ -13,40 +17,11 @@ package com.FinalYearProject.FinalYearProject.DTO.UserDto;
  * ERROR HANDLING: Should handle invalid roles, non-existent users, incorrect passwords, and insufficient privileges gracefully.
  * SERIALIZATION: Three-field POJO for JSON requests. Clear separation between target user (email), new privilege (role), and authorization (password).
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DtoForRoleAndEmailAndPasswordInRequest {
     String email;
     String role;
     String password;
-
-    public DtoForRoleAndEmailAndPasswordInRequest() {}
-
-    public DtoForRoleAndEmailAndPasswordInRequest(String email, String role, String password){
-        this.email=email;
-        this.role=role;
-        this.password=password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

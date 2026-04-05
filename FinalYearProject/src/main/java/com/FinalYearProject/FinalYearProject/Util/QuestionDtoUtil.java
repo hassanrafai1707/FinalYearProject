@@ -39,23 +39,17 @@ public class QuestionDtoUtil {
         )).collect(Collectors.toList());
     }
 
-    public static PageImpl<QuestionDTO> questionToQuestionDTO_Paged(Page<Question> questionPage, int pageNo, int size){
-        if (questionPage.isEmpty()||questionPage.getContent().isEmpty()){
-            throw new IllegalArgumentException("the question passed in this method can not be null");
-        }
-        return new PageImpl<>(
-                questionPage.getContent().stream().map(question -> new QuestionDTO(
-                        question.getId(),
-                        question.getSubjectName(),
-                        question.getQuestionMarks(),
-                        question.getMappedCO(),
-                        question.getSubjectCode(),
-                        question.getCognitiveLevel(),
-                        question.getQuestionBody()
-                )).collect(Collectors.toList()),
-                PageRequest.of(pageNo,size),
-                questionPage.getTotalElements()
-        );
+    public static Page<QuestionDTO> questionToQuestionDTO_Paged(Page<Question> questionPage){
+
+        return questionPage.map(question -> new QuestionDTO(
+                question.getId(),
+                question.getSubjectName(),
+                question.getQuestionMarks(),
+                question.getMappedCO(),
+                question.getSubjectCode(),
+                question.getCognitiveLevel(),
+                question.getQuestionBody()
+        ));
     }
 
     public static PageImpl<QuestionDTO> questionToQuestionDTO_Paged(

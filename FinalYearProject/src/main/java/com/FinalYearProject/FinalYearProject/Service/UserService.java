@@ -68,7 +68,7 @@ public class UserService {
         if (existsByEmail(user.getEmail())) {
             throw new DuplicateEmailException("Email already taken");
         }
-        user.setIs_enable(false);
+        user.set_enable(false);
         user.setRole("ROLE_STUDENT");
         user.setPassword(encoder.encode(user.getPassword()));
         user.setExpired(true);
@@ -121,7 +121,7 @@ public class UserService {
     public User updateUserEmail(String NewEmail) {
         User existingUser = findByEmail(UserUtil.getUserAuthentication().getUsername());
         existingUser.setEmail(NewEmail);
-        existingUser.setIs_enable(false);
+        existingUser.set_enable(false);
         existingUser.setPassword(encoder.encode(existingUser.getPassword()));
         existingUser.setExpired(true);
         existingUser.setLocked(true);
@@ -436,12 +436,12 @@ public class UserService {
     public User regenerateOtp(String email){
         User tempUser=findByEmail(email);
         if (
-                tempUser.isIs_enable()||!tempUser.isExpired()||!tempUser.isLocked()
+                tempUser.is_enable()||!tempUser.isExpired()||!tempUser.isLocked()
         ){
             return tempUser;
         }
         tempUser.setRole("ROLE_STUDENT");
-        tempUser.setIs_enable(false);
+        tempUser.set_enable(false);
         tempUser.setExpired(true);
         tempUser.setLocked(true);
         Conformation conformation = new Conformation(tempUser);

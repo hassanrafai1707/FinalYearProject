@@ -40,12 +40,12 @@ public class QuestionPaperDtoUtil {
         ).toList();
     }
 
-    public static PageImpl<QuestionPaperDto> questionPaperToQuestionPaperDtoPaged(Page<QuestionPaper> questionPapers,int pageNo, int size){
+    public static Page<QuestionPaperDto> questionPaperToQuestionPaperDtoPaged(Page<QuestionPaper> questionPapers){
         if (questionPapers.isEmpty()||questionPapers.getContent().isEmpty()){
             throw new IllegalArgumentException("the question passed in this method can not be null");
         }
-        return new PageImpl<>(
-                questionPapers.getContent().stream().map(questionPaper -> new QuestionPaperDto(
+        return questionPapers.map(
+                questionPaper ->new QuestionPaperDto(
                         questionPaper.getId(),
                         questionPaper.getExamTitle(),
                         questionPaper.getGeneratedBy(),
@@ -53,10 +53,7 @@ public class QuestionPaperDtoUtil {
                         questionPaper.getApprovedBy(),
                         questionPaper.getComment(),
                         questionPaper.getListOfQuestion()
-                )).toList(),
-                PageRequest.of(pageNo,size),
-                questionPapers.getTotalElements()
-        );
+                ));
     }
 
     public static PageImpl<QuestionPaperDto> questionPaperToQuestionPaperDtoPaged(

@@ -67,9 +67,7 @@ public class TeacherRestController {
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
-                        questionService.getAllQuestionsPaged(pageNo, size),
-                        pageNo,
-                        size
+                        questionService.getAllQuestionsPaged(pageNo, size)
                 ),
                 "All questions in the given page",
                 200
@@ -125,9 +123,7 @@ public class TeacherRestController {
                                 subjectCode,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions in the given page",
                 200
@@ -181,9 +177,7 @@ public class TeacherRestController {
                                 mappedCO,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions in the given page",
                 200
@@ -243,9 +237,7 @@ public class TeacherRestController {
                                 cognitiveLevel,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions with selected subject code, mapped co and cognitiveLevel ",
                 200
@@ -287,9 +279,7 @@ public class TeacherRestController {
                                 subjectName,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions with selected subject name :"+subjectName,
                 200
@@ -343,9 +333,7 @@ public class TeacherRestController {
                                 mappedCO,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "all questions with selected subject name and mapped co ",
                 200
@@ -406,9 +394,7 @@ public class TeacherRestController {
                                 cognitiveLevel,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions with selected subject name, mapped co and cognitiveLevel ",
                 200
@@ -492,9 +478,7 @@ public class TeacherRestController {
                         questionService.getAllQuestionsByCurrentUser(
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "My questions ",
                 200
@@ -525,9 +509,7 @@ public class TeacherRestController {
                         questionPaperService.myQuestionPapers(
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "ALL my question papers ",
                 200

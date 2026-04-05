@@ -1,5 +1,9 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,30 +20,10 @@ import java.util.List;
  * SECURITY AUDIT: Provides clear audit trail showing which admin performed batch operation, which users were affected, and when operation occurred.
  * SERIALIZATION: Contains List<String> for emails and single adminPassword. Enables clean JSON structure for batch operation requests.
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DtoForEmailsAndPasswordInRequest {
     List<String> emails;
     String adminPassword;
-
-    public DtoForEmailsAndPasswordInRequest() {}
-
-    public DtoForEmailsAndPasswordInRequest(String adminPassword,List<String> emails){
-        this.adminPassword=adminPassword;
-        this.emails=emails;
-    }
-
-    public List<String> getEmails() {
-        return emails;
-    }
-
-    public void setEmails(List<String> emails) {
-        this.emails = emails;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
-    }
 }

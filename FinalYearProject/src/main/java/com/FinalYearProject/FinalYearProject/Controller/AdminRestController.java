@@ -165,9 +165,7 @@ public class AdminRestController {
                                 role,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "all users with the selected role",
                 200
@@ -195,9 +193,7 @@ public class AdminRestController {
                         userService.findAllUsersPage(
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "all users ",
                 200

@@ -426,7 +426,7 @@ public class QuestionService {
         }
         question.setQuestionTitle(questionTitle);
         question.setCreatedBy(user);
-        question.setInUse(false);
+        question.setIsInUse(false);
         return questionRepository.save(question);
     }
 
@@ -479,7 +479,7 @@ public class QuestionService {
         }
         Collections.shuffle(allowed);
         for (Question question:allowed){
-            if (question.getInUse()) {
+            if (question.getIsInUse()) {
                 continue;
             }
             if(maxNumberOf2Marks==0 && maxNumberOf4Marks==0){
@@ -594,7 +594,7 @@ public class QuestionService {
         }
         Collections.shuffle(allowed);
         for (Question question:allowed){
-            if (question.getInUse()) {
+            if (question.getIsInUse()) {
                 continue;
             }
             if(maxNumberOf2Marks==0 && maxNumberOf4Marks==0){

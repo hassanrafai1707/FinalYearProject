@@ -1,5 +1,9 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * DTO for Email and Dual Password Operations
  * PURPOSE: Data Transfer Object for operations requiring user email and two different passwords - typically user password and admin password for authorization verification.
@@ -12,40 +16,11 @@ package com.FinalYearProject.FinalYearProject.DTO.UserDto;
  * SERIALIZATION: Three-field POJO for JSON requests. Clear field naming distinguishes between user and admin credentials.
  * SECURITY BEST PRACTICE: Admin password should never be logged. Should be validated quickly and discarded from memory. Password fields should use char[] in future for better security.
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DtoForEmailAnd2PasswordsInRequest {
     String email;
     String password;
     String adminPassword;
-
-    public DtoForEmailAnd2PasswordsInRequest(){}
-
-    public DtoForEmailAnd2PasswordsInRequest(String email, String password , String adminPassword){
-        this.email=email;
-        this.password=password;
-        this.adminPassword=adminPassword;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
-    }
 }

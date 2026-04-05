@@ -1,5 +1,9 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * DTO for User Password Updates by ID with Dual Authorization
  * PURPOSE: Data Transfer Object for changing user passwords identified by database ID, requiring both new password and admin password verification for secure password reset operations.
@@ -13,40 +17,11 @@ package com.FinalYearProject.FinalYearProject.DTO.UserDto;
  * ERROR HANDLING: Should handle invalid user ID, weak new password, incorrect admin password, and system errors gracefully.
  * SERIALIZATION: Three-field POJO for JSON requests. Clear separation between target user (id), new credential (password), and authorization (adminPassword).
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DtoForUserIdAndPasswordInRequest {
     Long id;
     String password;
     String adminPassword;
-
-    public DtoForUserIdAndPasswordInRequest(){}
-
-    public DtoForUserIdAndPasswordInRequest(Long id, String password,String adminPassword){
-        this.id =id;
-        this.password=password;
-        this.adminPassword=adminPassword;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
-    }
 }

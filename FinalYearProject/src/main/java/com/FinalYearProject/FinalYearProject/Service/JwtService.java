@@ -39,6 +39,7 @@ public class JwtService  {
     private final String secretKey;
     public JwtService(UserRepository userRepository){
     try {
+        //TODO use fixed key
         KeyGenerator keyGenerator= KeyGenerator.getInstance("HmacSHA256");
         SecretKey sk=keyGenerator.generateKey();
         secretKey= Base64.getEncoder().encodeToString(sk.getEncoded());

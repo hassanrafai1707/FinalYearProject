@@ -1,29 +1,13 @@
 package com.FinalYearProject.FinalYearProject.DTO.QuestionPaperDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ExamTitleAndComment {
     String examTitle;
     String comment;
-
-    public ExamTitleAndComment(){}
-
-    public ExamTitleAndComment(String examTitle,String comment) {
-        this.examTitle = examTitle;
-        this.comment=comment;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public String getExamTitle() {
-        return examTitle;
-    }
-
-    public void setExamTitle(String examTitle) {
-        this.examTitle = examTitle;
-    }
 }

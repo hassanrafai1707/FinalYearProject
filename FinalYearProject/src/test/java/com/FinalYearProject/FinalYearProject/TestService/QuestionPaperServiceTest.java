@@ -25,7 +25,7 @@ public class QuestionPaperServiceTest {
         q1.setQuestionMarks(4);
         q1.setQuestionTitle("Intro Question");
         q1.setQuestionBody("Explain JVM");
-        q1.setInUse(false);
+        q1.setIsInUse(false);
 
         Question q2 = new Question();
         q2.setId(1L);
@@ -36,7 +36,7 @@ public class QuestionPaperServiceTest {
         q2.setQuestionMarks(4);
         q2.setQuestionTitle("Intro Question");
         q2.setQuestionBody("Explain JVM");
-        q2.setInUse(false);
+        q2.setIsInUse(false);
 
         questionSet.add(q1);
         questionSet.add(q2);
@@ -50,7 +50,7 @@ public class QuestionPaperServiceTest {
                         q.getQuestionMarks() + "|" +
                         q.getQuestionTitle() + "|" +
                         q.getQuestionBody() + "|" +
-                        q.getInUse()+"|"
+                        q.getIsInUse()+"|"
                 )
                 .reduce("",String::concat);
         System.out.println(combined);

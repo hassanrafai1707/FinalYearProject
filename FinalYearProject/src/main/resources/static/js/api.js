@@ -1,5 +1,5 @@
 // ==========================================
-// COMPLETE API.JS - ALL ENDPOINTS INCLUDED
+// COMPLETE API.JS - ALL ENDPOINTS INCLUDED (FIXED)
 // ==========================================
 
 // ==========================================
@@ -7,13 +7,6 @@
 // ==========================================
 // For local development:
 const API_BASE_URL = 'http://localhost:8080/api/v1';
-
-// For Azure deployment (uncomment and comment above):
-// const API_BASE_URL = 'https://yourapp.azurewebsites.net/api/v1';
-
-// For custom domain:
-// const API_BASE_URL = 'https://api.yourdomain.com/api/v1';
-// ==========================================
 
 // Helper function for handling fetch responses
 const handleResponse = async (response) => {
@@ -28,12 +21,12 @@ const handleResponse = async (response) => {
         }
         throw new Error(errorMsg);
     }
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-        return null;
-    }
     const jsonResponse = await response.json();
-    return jsonResponse.data || jsonResponse;
+    // Handle different response structures
+    if (jsonResponse && jsonResponse.data !== undefined) {
+        return jsonResponse.data;
+    }
+    return jsonResponse;
 };
 
 // Helper function to build query string from object
@@ -79,6 +72,7 @@ const AuthAPI = {
     getToken: () => localStorage.getItem("jwt_token"),
     logout: () => {
         localStorage.removeItem("jwt_token");
+        sessionStorage.removeItem("jwt_token");
         window.location.href = "/login";
     },
     isAuthenticated: () => {
@@ -155,7 +149,7 @@ const AuthAPI = {
 };
 
 // ==========================================
-// ADMIN API
+// ADMIN API (keep as is - it's correct)
 // ==========================================
 const AdminAPI = {
     findUserById: async (id) => {
@@ -406,7 +400,7 @@ const AdminAPI = {
 };
 
 // ==========================================
-// STUDENT API
+// STUDENT API (FIXED - changed 'pagged' to 'paged')
 // ==========================================
 const StudentAPI = {
     getAllQuestions: async () => {
@@ -419,7 +413,7 @@ const StudentAPI = {
 
     getAllQuestionsPaged: async (pageNo = 0, size = 100) => {
         const qs = buildQueryString({ pageNo, size });
-        const response = await fetch(buildUrl(`student/questions/pagged${qs}`), {
+        const response = await fetch(buildUrl(`student/questions/paged${qs}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -446,7 +440,7 @@ const StudentAPI = {
 
     findBySubjectCodePaged: async (subjectCode, pageNo = 0, size = 100) => {
         const qs = buildQueryString({ subjectCode, pageNo, size });
-        const response = await fetch(buildUrl(`student/questions/subjectCode/pagged${qs}`), {
+        const response = await fetch(buildUrl(`student/questions/subjectCode/paged${qs}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -464,7 +458,7 @@ const StudentAPI = {
 
     findBySubjectCodeMappedCOPaged: async (subjectCode, mappedCO, pageNo = 0, size = 100) => {
         const qs = buildQueryString({ subjectCode, mappedCO, pageNo, size });
-        const response = await fetch(buildUrl(`student/questions/subjectCode/mappedCO/pagged${qs}`), {
+        const response = await fetch(buildUrl(`student/questions/subjectCode/mappedCO/paged${qs}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -482,7 +476,7 @@ const StudentAPI = {
 
     findBySubjectCodeMappedCOCognitiveLevelPaged: async (subjectCode, mappedCO, cognitiveLevel, pageNo = 0, size = 100) => {
         const qs = buildQueryString({ subjectCode, mappedCO, cognitiveLevel, pageNo, size });
-        const response = await fetch(buildUrl(`student/questions/subjectCode/mappedCO/cognitiveLevel/pagged${qs}`), {
+        const response = await fetch(buildUrl(`student/questions/subjectCode/mappedCO/cognitiveLevel/paged${qs}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -500,7 +494,7 @@ const StudentAPI = {
 
     findBySubjectNamePaged: async (subjectName, pageNo = 0, size = 100) => {
         const qs = buildQueryString({ subjectName, pageNo, size });
-        const response = await fetch(buildUrl(`student/questions/subjectName/pagged${qs}`), {
+        const response = await fetch(buildUrl(`student/questions/subjectName/paged${qs}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -518,7 +512,7 @@ const StudentAPI = {
 
     findBySubjectNameMappedCOPaged: async (subjectName, mappedCO, pageNo = 0, size = 100) => {
         const qs = buildQueryString({ subjectName, mappedCO, pageNo, size });
-        const response = await fetch(buildUrl(`student/questions/subjectName/mappedCO/pagged${qs}`), {
+        const response = await fetch(buildUrl(`student/questions/subjectName/mappedCO/paged${qs}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -536,7 +530,7 @@ const StudentAPI = {
 
     findBySubjectNameMappedCOCognitiveLevelPaged: async (subjectName, mappedCO, cognitiveLevel, pageNo = 0, size = 100) => {
         const qs = buildQueryString({ subjectName, mappedCO, cognitiveLevel, pageNo, size });
-        const response = await fetch(buildUrl(`student/questions/subjectName/mappedCO/cognitiveLevel/pagged${qs}`), {
+        const response = await fetch(buildUrl(`student/questions/subjectName/mappedCO/cognitiveLevel/paged${qs}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -579,7 +573,7 @@ const StudentAPI = {
 };
 
 // ==========================================
-// SUPERVISOR API
+// SUPERVISOR API (keep as is)
 // ==========================================
 const SupervisorAPI = {
     getAllQuestions: async () => {
@@ -657,8 +651,9 @@ const SupervisorAPI = {
     downloadQuestionPaper: async (id) => {
         const response = await fetch(buildUrl(`supervisor/download/questionsPapers/id${buildQueryString({id})}`), {
             method: "GET",
-            headers: authHeaders(true)
+            headers: authHeaders()
         });
+        if (!response.ok) throw new Error('Download failed');
         return await response.blob();
     },
     findByExamTitle: async (examTitle) => {
@@ -770,7 +765,7 @@ const SupervisorAPI = {
 };
 
 // ==========================================
-// TEACHER API
+// TEACHER API (FIXED - added missing methods)
 // ==========================================
 const TeacherAPI = {
     getAllQuestionsPaged: async (pageNo = 0, size = 100) => {
@@ -782,6 +777,13 @@ const TeacherAPI = {
     },
     getQuestionById: async (id) => {
         const r = await fetch(buildUrl(`teacher/question/id?id=${id}`), {
+            method: "GET",
+            headers: authHeaders()
+        });
+        return handleResponse(r);
+    },
+    getQuestionPaperById: async (id) => {
+        const r = await fetch(buildUrl(`teacher/questionsPapers/id?id=${id}`), {
             method: "GET",
             headers: authHeaders()
         });
@@ -932,18 +934,19 @@ const TeacherAPI = {
         });
         return handleResponse(r);
     },
-    myQuestionPaperPaged: async ()=>{
-        const r=await fetch(buildUrl('teacher/my/questionPapers'),{
-            method:"GET",
-            headers:authHeaders(true)
+    myQuestionPaperPaged: async () => {
+        const r = await fetch(buildUrl('teacher/my/questionPapers'), {
+            method: "GET",
+            headers: authHeaders()
         });
         return handleResponse(r);
     },
     downloadQuestionPaper: async (id) => {
         const response = await fetch(buildUrl(`teacher/download/questionsPapers/id${buildQueryString({id})}`), {
             method: "GET",
-            headers: authHeaders(true)
+            headers: authHeaders()
         });
+        if (!response.ok) throw new Error('Download failed');
         return await response.blob();
     },
     updateUserEmail: async (email) => {

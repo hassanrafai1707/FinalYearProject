@@ -1,5 +1,9 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * DTO for ID-Based Operations with Admin Authorization
  * PURPOSE: Data Transfer Object for user operations identified by database ID that require administrator password verification for extra security authorization.
@@ -13,30 +17,10 @@ package com.FinalYearProject.FinalYearProject.DTO.UserDto;
  * SERIALIZATION: Simple two-field POJO for JSON requests. Clear distinction between target user (id) and authorizing admin (adminPassword).
  * VALIDATION: Should validate that ID exists and belongs to valid user. Admin password must be verified against stored hash using secure comparison.
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DtoForIdAndAdminPasswordInRequest {
     Long id;
     String adminPassword;
-
-    public DtoForIdAndAdminPasswordInRequest() {}
-
-    public DtoForIdAndAdminPasswordInRequest(Long id,String adminPassword){
-        this.id=id;
-        this.adminPassword=adminPassword;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
-    }
 }

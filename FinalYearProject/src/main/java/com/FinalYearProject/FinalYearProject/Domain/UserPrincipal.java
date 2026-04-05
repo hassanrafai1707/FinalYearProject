@@ -32,7 +32,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isIs_enable();
+        return user.is_enable();
     }
 
     @Override

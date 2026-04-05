@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
@@ -71,9 +70,7 @@ public class SupervisorRestController {
         return ResponseUtility.responseTemplateForSingleData(
                 "successful",
                 QuestionDtoUtil.questionToQuestionDTO_Paged(
-                        questionService.getAllQuestionsPaged(pageNo, size),
-                        pageNo,
-                        size
+                        questionService.getAllQuestionsPaged(pageNo, size)
                 ),
                 "All questions in the given page",
                 200
@@ -129,9 +126,7 @@ public class SupervisorRestController {
                                 subjectCode,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions in the given page",
                 200
@@ -183,9 +178,7 @@ public class SupervisorRestController {
                                 mappedCO,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions in the given page",
                 200
@@ -245,9 +238,7 @@ public class SupervisorRestController {
                                 cognitiveLevel,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions with selected subject code, mapped co and cognitiveLevel ",
                 200
@@ -289,9 +280,7 @@ public class SupervisorRestController {
                                 subjectName,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions with selected subject name :"+subjectName,
                 200
@@ -343,9 +332,7 @@ public class SupervisorRestController {
                                 mappedCO,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "all questions with selected subject name and mapped co ",
                 200
@@ -373,7 +360,6 @@ public class SupervisorRestController {
                                 subjectName,
                                 mappedCO,
                                 cognitiveLevel
-
                         )
                 ),
                 "All questions with selected subject name, mapped co and cognitiveLevel ",
@@ -406,9 +392,7 @@ public class SupervisorRestController {
                                 cognitiveLevel,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "All questions with selected subject name, mapped co and cognitiveLevel ",
                 200
@@ -469,9 +453,7 @@ public class SupervisorRestController {
                 QuestionPaperDtoUtil.questionPaperToQuestionPaperDtoPaged(
                         questionPaperService.getAllQuestionPapers(
                                 pageNo, size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "all questions papers",
                 200
@@ -534,9 +516,7 @@ public class SupervisorRestController {
                                         email,
                                         pageNo,
                                         size
-                                ),
-                        pageNo,
-                        size
+                                )
                 ),
                 "all question papers my user with email:"+email,
                 200
@@ -570,9 +550,8 @@ public class SupervisorRestController {
                                 id,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
+
                 ),
                 "all question papers my user with id:"+id,
                 200
@@ -612,9 +591,8 @@ public class SupervisorRestController {
                                 email,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
+
                 ),
                 "all question papers approvedBy user with email:"+email,
                 200
@@ -648,9 +626,8 @@ public class SupervisorRestController {
                                 id,
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
+
                 ),
                 "all question papers approvedBy user with id:"+id,
                 200
@@ -680,9 +657,8 @@ public class SupervisorRestController {
                         questionPaperService.findApproved(
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
+
                 ),
                 "all approved question papers",
                 200
@@ -712,9 +688,7 @@ public class SupervisorRestController {
                         questionPaperService.findNotApproved(
                                 pageNo,
                                 size
-                        ),
-                        pageNo,
-                        size
+                        )
                 ),
                 "all not approved question papers",
                 200

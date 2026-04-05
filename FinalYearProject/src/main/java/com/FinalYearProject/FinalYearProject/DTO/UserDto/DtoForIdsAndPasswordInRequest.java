@@ -1,5 +1,9 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,28 +21,10 @@ import java.util.List;
  * AUDIT TRAIL: Provides clear record of which admin performed batch operation, which user IDs were affected, and operation timestamp.
  * SERIALIZATION: Contains List<Long> for IDs and single adminPassword. Enables efficient JSON structure for batch operation requests.
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DtoForIdsAndPasswordInRequest {
     List<Long> ids;
     String adminPassword;
-
-    public DtoForIdsAndPasswordInRequest(String adminPassword, List<Long> ids){
-        this.adminPassword=adminPassword;
-        this.ids=ids;
-    }
-
-    public List<Long> getIds() {
-        return ids;
-    }
-
-    public void setIds(List<Long> ids) {
-        this.ids = ids;
-    }
-
-    public String getAdminPassword() {
-        return adminPassword;
-    }
-
-    public void setAdminPassword(String adminPassword) {
-        this.adminPassword = adminPassword;
-    }
 }

@@ -1,5 +1,9 @@
 package com.FinalYearProject.FinalYearProject.DTO.UserDto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * DTO for Role Updates by ID with Authorization
  * PURPOSE: Data Transfer Object for changing user roles identified by database ID, requiring password verification for secure authorization of privilege changes.
@@ -13,40 +17,11 @@ package com.FinalYearProject.FinalYearProject.DTO.UserDto;
  * INTEGRATION: Works with UserService.updateUserRoleById() method. Service should handle authorization verification and audit logging.
  * SERIALIZATION: Three-field POJO for JSON requests. Clear distinction between target (id), change (role), and authorization (password).
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class DtoForRoleAndIdAndPassworedInRequest {
     Long id;
     String role;
     String password;
-
-    public DtoForRoleAndIdAndPassworedInRequest() {}
-
-    public DtoForRoleAndIdAndPassworedInRequest(Long id, String role,String password){
-        this.role=role;
-        this.id=id;
-        this.password=password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
